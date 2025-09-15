@@ -1,7 +1,6 @@
 package fatecipi.progweb.mymanga.repositories;
 
-import fatecipi.progweb.mymanga.models.Users;
-import lombok.NonNull;
+import fatecipi.progweb.mymanga.models.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

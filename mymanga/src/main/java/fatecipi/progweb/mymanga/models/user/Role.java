@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.user;
 
 import jakarta.persistence.*;
 import lombok.Getter;

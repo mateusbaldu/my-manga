@@ -3,10 +3,10 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.enums.MangaStatus;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Manga;
-import fatecipi.progweb.mymanga.models.MangaVolume;
-import fatecipi.progweb.mymanga.models.dtos.MangaDto;
-import fatecipi.progweb.mymanga.models.mappers.MangaMapper;
+import fatecipi.progweb.mymanga.models.manga.Manga;
+import fatecipi.progweb.mymanga.models.manga.MangaCreateDto;
+import fatecipi.progweb.mymanga.models.manga.Volume;
+import fatecipi.progweb.mymanga.models.manga.MangaMapper;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.MangaVolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,28 +60,27 @@ public class MangaService {
         mangaRepository.delete(findById(id));
     }
 
-    public Manga update(Long id, MangaDto mangaDto) {
+    public Manga update(Long id, MangaCreateDto mangaCreateDto) {
         Manga mangaSearched = findById(id);
-        mangaMapper.mapManga(mangaDto, mangaSearched);
+        mangaMapper.mapManga(mangaCreateDto, mangaSearched);
         return mangaRepository.save(mangaSearched);
     }
 
     public Manga save(Manga manga) {
-        Manga obj = mangaRepository
-                .findById(manga.getId())
-                .orElseThrow(() -> new ResourceAlreadyExistsException(manga.getTitle() + " already exists"));
-
-        return mangaRepository.save(obj);
+        if (mangaRepository.existsByTitle(manga.getTitle())) {
+            throw new ResourceAlreadyExistsException(manga.getTitle() + " já existe.");
+        }
+        return mangaRepository.save(manga);
     }
 
     @Transactional
-    public MangaVolume addVolumeToManga(Long mangaId, MangaVolume volume) {
+    public Volume addVolumeToManga(Long mangaId, Volume volume) {
         volume.setManga(findById(mangaId));
         return mangaVolumeRepository.save(volume);
     }
 
     @Transactional(readOnly = true)
-    public List<MangaVolume> getAllVolumesForManga(Long mangaId) {
+    public List<Volume> getAllVolumesForManga(Long mangaId) {
         if (!mangaRepository.existsById(mangaId)) {
             throw new ResourceNotFoundException("Manga with id " + mangaId + " not found");
         }

@@ -1,11 +1,9 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.manga;
 
 import fatecipi.progweb.mymanga.enums.Genres;
 import fatecipi.progweb.mymanga.enums.MangaStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
 
@@ -34,6 +32,6 @@ public class Manga {
     private Genres genres;
 
     @OneToMany(mappedBy = "manga", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<MangaVolume> mangaVolume;
+    private Set<Volume> volume;
 }
 

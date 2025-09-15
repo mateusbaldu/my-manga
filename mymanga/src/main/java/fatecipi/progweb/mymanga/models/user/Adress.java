@@ -1,8 +1,6 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.user;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 

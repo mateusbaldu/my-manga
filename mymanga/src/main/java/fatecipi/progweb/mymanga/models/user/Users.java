@@ -1,6 +1,7 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.user;
 
 import fatecipi.progweb.mymanga.configs.generator.GeneratedUuidV7;
+import fatecipi.progweb.mymanga.models.order.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;

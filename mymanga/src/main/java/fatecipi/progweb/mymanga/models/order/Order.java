@@ -1,7 +1,8 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.order;
 
 import fatecipi.progweb.mymanga.enums.OrderStatus;
 import fatecipi.progweb.mymanga.enums.PaymentMethod;
+import fatecipi.progweb.mymanga.models.user.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.WAITING_CONFIRMATION;
 
-    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> items = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

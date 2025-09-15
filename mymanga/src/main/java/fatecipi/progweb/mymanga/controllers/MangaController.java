@@ -1,8 +1,7 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.models.Manga;
-import fatecipi.progweb.mymanga.models.dtos.MangaDto;
-import fatecipi.progweb.mymanga.repositories.MangaRepository;
+import fatecipi.progweb.mymanga.models.manga.Manga;
+import fatecipi.progweb.mymanga.models.manga.MangaCreateDto;
 import fatecipi.progweb.mymanga.services.MangaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,18 +36,24 @@ public class MangaController {
         return mangaService.listAllReleasing();
     }
 
-    @GetMapping("/{keyword}")
+    @GetMapping("/search/{keyword}")
     public List<Manga> listByKeyword(@PathVariable String keyword) {
         return mangaService.findByKeyword(keyword);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Manga> update(@PathVariable Long id, @RequestBody MangaDto mangaDto) {
-        return ResponseEntity.ok(mangaService.update(id, mangaDto));
+    public ResponseEntity<Manga> update(@PathVariable Long id, @RequestBody MangaCreateDto mangaCreateDto) {
+        return ResponseEntity.ok(mangaService.update(id, mangaCreateDto));
     }
 
     @PostMapping("/new")
     public ResponseEntity<Manga> create(@RequestBody Manga manga) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mangaService.save(manga));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        mangaService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

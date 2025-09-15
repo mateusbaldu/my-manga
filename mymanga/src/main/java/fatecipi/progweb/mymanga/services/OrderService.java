@@ -1,10 +1,10 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Order;
-import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dtos.OrderDto;
-import fatecipi.progweb.mymanga.models.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.models.order.Order;
+import fatecipi.progweb.mymanga.models.order.OrderCreateDto;
+import fatecipi.progweb.mymanga.models.user.Users;
+import fatecipi.progweb.mymanga.models.order.OrderMapper;
 import fatecipi.progweb.mymanga.repositories.MangaVolumeRepository;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
@@ -44,46 +44,9 @@ public class OrderService {
         orderRepository.delete(findById(id));
     }
 
-    public Order update(Long id, OrderDto orderDto) {
+    public Order update(Long id, OrderCreateDto orderCreateDto) {
         Order order = findById(id);
-        orderMapper.mapOrder(orderDto, order);
+        orderMapper.mapOrder(orderCreateDto, order);
         return orderRepository.save(order);
-    }
-
-    @Transactional
-    public Order createOrder(OrderDto dto) {
-        Users user = userRepository
-                .findById(dto.users().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User " + dto.users().getName() + " not found"));
-
-        Order newOrder = new Order();
-        orderMapper.mapOrder(dto, newOrder);
-
-        // 3. Itera sobre os itens do DTO para criar as entidades "filhas"
-        for (OrderItemDTO itemDto : order.getItems()) {
-            // Encontra o produto que está sendo comprado
-            MangaVolume volume = volumeRepository.findById(itemDto.getVolumeId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Volume não encontrado"));
-
-            // Lógica de negócio: verificar estoque, etc.
-            if (volume.getStockQuantity() < itemDto.getQuantity()) {
-                throw new RegraDeNegocioException("Estoque insuficiente para o volume " + volume.getId());
-            }
-
-            // Cria a entidade "filha" (o ItemPedido)
-            OrderItem novoItem = new OrderItem();
-            novoItem.setMangaVolume(volume);
-            novoItem.setQuantity(itemDto.getQuantity());
-            novoItem.setPrice(volume.getPrice()); // Salva o preço no momento da compra
-
-            // A MÁGICA: Adiciona o filho ao pai (bidirecional)
-            newOrder.addItem(novoItem); // (Um método helper que faz novoItem.setOrder(this) e this.items.add(novoItem))
-        }
-
-        // 4. Lógica de negócio: calcular o valor final, etc.
-        newOrder.calculateFinalPrice();
-
-        // 5. Salva a entidade "mãe". Graças ao CascadeType.ALL, os "filhos" (OrderItems) serão salvos automaticamente.
-        return orderRepository.save(newOrder);
     }
 }

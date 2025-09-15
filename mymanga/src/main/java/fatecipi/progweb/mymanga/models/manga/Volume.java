@@ -1,7 +1,6 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.manga;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class MangaVolume {
+public class Volume {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

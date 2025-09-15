@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models;
+package fatecipi.progweb.mymanga.models.order;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,5 +23,5 @@ public class OrderItems {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private Order orders;
+    private Order order;
 }

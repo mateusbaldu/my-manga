@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.repositories;
 
-import fatecipi.progweb.mymanga.models.Manga;
+import fatecipi.progweb.mymanga.models.manga.Manga;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +13,6 @@ public interface MangaRepository extends JpaRepository<Manga, Long> {
     @Query(value = "SELECT * FROM manga WHERE name ILIKE ?1 OR description ILIKE ?1 OR keywords ILIKE ?1",
             nativeQuery = true)
     Optional<List<Manga>> findByKeyword(String keyword);
+
+    boolean existsByTitle(String title);
 }

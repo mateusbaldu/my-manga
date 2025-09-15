@@ -1,16 +1,14 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Manga;
-import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dtos.UserDto;
-import fatecipi.progweb.mymanga.models.mappers.UserMapper;
+import fatecipi.progweb.mymanga.models.user.UserCreateDto;
+import fatecipi.progweb.mymanga.models.user.Users;
+import fatecipi.progweb.mymanga.models.user.UserMapper;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -31,11 +29,11 @@ public class UserService {
         userRepository.delete(findByEmail(email));
     }
 
-    public Users update(UserDto userDto, String email) {
+    public Users update(UserCreateDto userCreateDto, String email) {
         Users user = findByEmail(email);
-        userMapper.mapUser(userDto, user);
+        userMapper.mapUser(userCreateDto, user);
         return user;
     }
 
-    
+
 }
