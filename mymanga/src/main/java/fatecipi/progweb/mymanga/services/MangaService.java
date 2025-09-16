@@ -3,12 +3,10 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.enums.MangaStatus;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.manga.Manga;
-import fatecipi.progweb.mymanga.models.manga.MangaCreateDto;
-import fatecipi.progweb.mymanga.models.manga.Volume;
-import fatecipi.progweb.mymanga.models.manga.MangaMapper;
+import fatecipi.progweb.mymanga.models.manga.*;
+import fatecipi.progweb.mymanga.models.volume.*;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
-import fatecipi.progweb.mymanga.repositories.MangaVolumeRepository;
+import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,9 @@ public class MangaService {
     @Autowired
     private MangaMapper mangaMapper;
     @Autowired
-    private MangaVolumeRepository mangaVolumeRepository;
+    private VolumeRepository volumeRepository;
+    @Autowired
+    private VolumeMapper volumeMapper;
 
     public List<Manga> listAll() {
         //pagination
@@ -60,30 +60,79 @@ public class MangaService {
         mangaRepository.delete(findById(id));
     }
 
-    public Manga update(Long id, MangaCreateDto mangaCreateDto) {
-        Manga mangaSearched = findById(id);
-        mangaMapper.mapManga(mangaCreateDto, mangaSearched);
-        return mangaRepository.save(mangaSearched);
+    public Manga update(Long id, MangaCreateAndUpdateDto mangaDto) {
+        Manga m = findById(id);
+        mangaMapper.mapManga(mangaDto, m);
+        return mangaRepository.save(m);
     }
 
-    public Manga save(Manga manga) {
-        if (mangaRepository.existsByTitle(manga.getTitle())) {
-            throw new ResourceAlreadyExistsException(manga.getTitle() + " já existe.");
+    public Manga save(MangaCreateAndUpdateDto mangaDto) {
+        if (mangaRepository.existsByTitle(mangaDto.title())) {
+            throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
         }
-        return mangaRepository.save(manga);
+        Manga m = new Manga();
+        mangaMapper.mapManga(mangaDto, m);
+        return mangaRepository.save(m);
     }
 
-    @Transactional
-    public Volume addVolumeToManga(Long mangaId, Volume volume) {
-        volume.setManga(findById(mangaId));
-        return mangaVolumeRepository.save(volume);
+    public Volume addVolumeToManga(Long mangaId, VolumeCreateDto volDto) {
+        Manga m = findById(mangaId);
+        Volume v = new Volume();
+        volumeMapper.mapCreateVolume(volDto, v);
+        v.setManga(m);
+        return volumeRepository.save(v);
     }
 
-    @Transactional(readOnly = true)
     public List<Volume> getAllVolumesForManga(Long mangaId) {
         if (!mangaRepository.existsById(mangaId)) {
             throw new ResourceNotFoundException("Manga with id " + mangaId + " not found");
         }
-        return mangaVolumeRepository.findByMangaId(mangaId);
+        return volumeRepository.findByMangaId(mangaId);
+    }
+
+    public VolumeResponseDto findVolumeById(Long mangaId, Long volumeId) {
+        Manga m = findById(mangaId);
+        Volume vol = volumeRepository
+                .findById(volumeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + volumeId + " not found"));
+        if (!m.getId().equals(mangaId)) {
+            throw new IllegalArgumentException("O volume " + volumeId + " não pertence ao mangá " + mangaId);
+        }
+        return VolumeResponseDto.builder().
+                id(vol.getId()).
+                volumeNumber(vol.getVolumeNumber()).
+                price(vol.getPrice()).
+                chapters(vol.getChapters()).
+                releaseDate(vol.getReleaseDate()).
+                mangaId(vol.getManga().getId()).
+                mangaTitle(vol.getManga().getTitle()).
+                build();
+    }
+
+    public Volume findByIdNoDto(Long id) {
+        return volumeRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + id + " not found"));
+    }
+
+    public Volume updateVolume(Long mangaId, Long volumeId, VolumeUpdateDto dto) {
+        Volume vol = volumeRepository.findById(volumeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Volume with ID " + volumeId + " not found."));
+        if (!vol.getManga().getId().equals(mangaId)) {
+            throw new IllegalArgumentException("O volume " + volumeId + " não pertence ao mangá " + mangaId);
+        }
+        volumeMapper.mapUpdateVolume(dto, vol);
+        return volumeRepository.save(vol);
+    }
+
+    public void deleteVolume(Long mangaId, Long volumeId) {
+        Manga m = findById(mangaId);
+        if (!volumeRepository.existsById(volumeId)) {
+            throw new ResourceNotFoundException("Volume com ID " + volumeId + " não encontrado.");
+        }
+        if (!m.getId().equals(mangaId)) {
+            throw new IllegalArgumentException("O volume " + volumeId + " não pertence ao mangá " + mangaId);
+        }
+        volumeRepository.delete(findByIdNoDto(volumeId));
     }
 }

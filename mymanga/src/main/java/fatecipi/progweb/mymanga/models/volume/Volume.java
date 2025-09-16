@@ -1,5 +1,6 @@
-package fatecipi.progweb.mymanga.models.manga;
+package fatecipi.progweb.mymanga.models.volume;
 
+import fatecipi.progweb.mymanga.models.manga.Manga;
 import jakarta.persistence.*;
 import lombok.*;
 

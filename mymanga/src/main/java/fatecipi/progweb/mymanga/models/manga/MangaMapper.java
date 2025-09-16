@@ -6,5 +6,5 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MangaMapper {
-    void mapManga(MangaCreateDto mangaCreateDto, @MappingTarget Manga manga);
+    void mapManga(MangaCreateAndUpdateDto mangaCreateAndUpdateDto, @MappingTarget Manga manga);
 }

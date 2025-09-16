@@ -3,14 +3,12 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.order.Order;
 import fatecipi.progweb.mymanga.models.order.OrderCreateDto;
-import fatecipi.progweb.mymanga.models.user.Users;
 import fatecipi.progweb.mymanga.models.order.OrderMapper;
-import fatecipi.progweb.mymanga.repositories.MangaVolumeRepository;
+import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class OrderService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
-    private MangaVolumeRepository mangaVolumeRepository;
+    private VolumeRepository volumeRepository;
 
     public List<Order> findAll() {
         return orderRepository.findAll();
