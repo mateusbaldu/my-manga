@@ -37,11 +37,10 @@ public class AdminUserConfig implements CommandLineRunner {
                 },
                 () -> {
                     Users users = new Users();
-                    users.setId(UuidUtils.randomV7());
                     users.setName("Admin");
                     users.setEmail("admin@mymanga.com");
                     Set<Role> set = Set.of(role);
-                    users.setRole(set);
+                    users.setRoles(set);
                     users.setPassword(passwordEncoder.encode("admin123"));
                     users.setCreatedAt(Instant.now());
                     userRepository.save(users);
