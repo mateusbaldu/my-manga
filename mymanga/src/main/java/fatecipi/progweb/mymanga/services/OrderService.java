@@ -2,7 +2,7 @@ package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.order.Order;
-import fatecipi.progweb.mymanga.models.order.OrderCreateDto;
+import fatecipi.progweb.mymanga.dto.order.OrderCreateDto;
 import fatecipi.progweb.mymanga.models.order.OrderMapper;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;

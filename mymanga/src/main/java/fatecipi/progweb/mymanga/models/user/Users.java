@@ -1,14 +1,17 @@
 package fatecipi.progweb.mymanga.models.user;
 
-import fatecipi.progweb.mymanga.configs.generator.GeneratedUuidV7;
+import fatecipi.progweb.mymanga.configs.generator.UuidV7Generator;
+import fatecipi.progweb.mymanga.dto.security.LoginRequestDto;
 import fatecipi.progweb.mymanga.models.order.Order;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,11 +22,12 @@ import java.util.UUID;
 @Builder
 public class Users {
     @Id
-    @GeneratedUuidV7
+    @GeneratedValue(generator = "uuidv7")
+    @GenericGenerator(name = "uuidv7", type = UuidV7Generator.class)
     @Column(name = "user_id")
     private UUID id;
 
-    @Email
+    @Column(unique = true)
     private String email;
     private String name;
     private String password;
@@ -32,10 +36,16 @@ public class Users {
     @Embedded
     private Adress adress;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "tb_users_roles",
+                joinColumns = @JoinColumn(name = "user_id"),
+                inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> role;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
+
+    public boolean isLoginCorrect(LoginRequestDto loginRequestDto, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(loginRequestDto.password(), this.password);
+    }
 }

@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.volume;
+package fatecipi.progweb.mymanga.dto.volume;
 
 import lombok.Builder;
 

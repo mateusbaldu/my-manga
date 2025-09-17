@@ -1,10 +1,10 @@
-package fatecipi.progweb.mymanga.models.manga;
+package fatecipi.progweb.mymanga.dto.manga;
 
 import fatecipi.progweb.mymanga.enums.Genres;
 import fatecipi.progweb.mymanga.enums.MangaStatus;
-import fatecipi.progweb.mymanga.models.volume.VolumeResponseDto;
+import fatecipi.progweb.mymanga.dto.volume.VolumeResponseDto;
 
-import java.util.List;
+import java.util.Set;
 
 public record MangaResponseDto(Long id,
                                String title,
@@ -12,7 +12,7 @@ public record MangaResponseDto(Long id,
                                String description,
                                Double rating,
                                String keywords,
-                               MangaStatus mangaStatus,
+                               MangaStatus status,
                                Genres genres,
-                               List<VolumeResponseDto> volumes) {
+                               Set<VolumeResponseDto> volumes) {
 }

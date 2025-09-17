@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.models.order;
 
+import fatecipi.progweb.mymanga.dto.order.OrderCreateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;

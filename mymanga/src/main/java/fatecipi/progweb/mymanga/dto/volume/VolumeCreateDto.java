@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.volume;
+package fatecipi.progweb.mymanga.dto.volume;
 
 import fatecipi.progweb.mymanga.models.manga.Manga;
 

@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.manga;
+package fatecipi.progweb.mymanga.dto.manga;
 
 import fatecipi.progweb.mymanga.enums.Genres;
 import fatecipi.progweb.mymanga.enums.MangaStatus;
