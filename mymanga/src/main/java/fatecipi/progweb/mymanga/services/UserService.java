@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public Users findByUsernameWithoutDto(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User with username"+ username +"not found"));
+        return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User with username "+ username +" not found"));
     }
 
     public UserResponse findByUsername(String username) {
@@ -48,7 +48,7 @@ public class UserService {
     }
 
     public Users findByIdWithoutDto(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id"+ id +"not found"));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id "+ id +" not found"));
     }
 
     public UserResponse findById(Long id) {
@@ -63,6 +63,7 @@ public class UserService {
     public UserResponse update(UserUpdate dto, String username) {
         Users user = findByUsernameWithoutDto(username);
         userMapper.mapUpdateUser(dto, user);
+        userRepository.save(user);
         return userMapper.toUserResponse(user);
     }
 

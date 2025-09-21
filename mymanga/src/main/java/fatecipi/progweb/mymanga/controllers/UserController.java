@@ -1,5 +1,7 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.exceptions.NotPermittedException;
+import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
@@ -52,13 +54,21 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@RequestBody Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, JwtAuthenticationToken token) {
+        Users user = userService.findByIdWithoutDto(id);
+        if (!user.getId().equals(Long.valueOf(token.getName()))) {
+            throw new NotPermittedException("User don't have permission to delete another account");
+        }
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<UserResponse> update(@RequestBody UserUpdate userUpdate, @PathVariable String username) {
+    public ResponseEntity<UserResponse> update(@RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
+        Users user = userService.findByUsernameWithoutDto(username);
+        if (!user.getId().equals(Long.valueOf(token.getName()))) {
+            throw new NotPermittedException("User don't have permission to delete another account");
+        }
         return ResponseEntity.ok(userService.update(userUpdate, username));
     }
 }

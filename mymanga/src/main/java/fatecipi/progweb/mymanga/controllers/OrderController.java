@@ -69,7 +69,7 @@ public class OrderController {
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
         if(!order.getUsers().getId().equals(user.getId()) || !isAdmin) {
-            throw new NotPermittedException("Esse pedido não está associado ao usuário " + user.getName());
+            throw new NotPermittedException("This order is not associated with user " + user.getName());
         }
     }
 }

@@ -1,5 +1,7 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
+import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
@@ -30,9 +32,9 @@ public class TokenService {
 
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with email "+ loginRequest.email() +" not found"));
         if (!user.isLoginCorrect(loginRequest, passwordEncoder)) {
-            throw new BadCredentialsException("Invalid password");
+            throw new InvalidLoginException("Invalid password");
         }
         Instant now = Instant.now();
         long expiresIn = 1800L;
