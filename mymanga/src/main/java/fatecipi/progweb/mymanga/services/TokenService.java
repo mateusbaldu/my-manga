@@ -1,11 +1,10 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.dto.security.LoginRequestDto;
-import fatecipi.progweb.mymanga.dto.security.LoginResponseDto;
-import fatecipi.progweb.mymanga.models.user.Users;
+import fatecipi.progweb.mymanga.models.Role;
+import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
+import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TokenService {
@@ -28,20 +28,27 @@ public class TokenService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        Optional<Users> user = userRepository.findByEmail(loginRequestDto.email());
-        if (user.isEmpty() || !user.get().isLoginCorrect(loginRequestDto, passwordEncoder)) {
-            throw new BadCredentialsException("Invalid email or password");
+    public LoginResponse login(LoginRequest loginRequest) {
+        Users user = userRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email"));
+        if (!user.isLoginCorrect(loginRequest, passwordEncoder)) {
+            throw new BadCredentialsException("Invalid password");
         }
         Instant now = Instant.now();
         long expiresIn = 1800L;
+
+        String scopes = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(" "));
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("my-mangá.api")
-                .subject(user.get().getId().toString())
+                .subject(user.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresIn))
+                .claim("scope", scopes)
                 .build();
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        return new LoginResponseDto(jwtValue, expiresIn);
+        return new LoginResponse(jwtValue, expiresIn);
     }
 }

@@ -1,0 +1,14 @@
+package fatecipi.progweb.mymanga.configs.mappers;
+
+import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.models.Order;
+import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface OrderMapper {
+    void mapOrder(OrderCreate orderCreate, @MappingTarget Order order);
+    OrderResponse toOrderResponse(Order order);
+}

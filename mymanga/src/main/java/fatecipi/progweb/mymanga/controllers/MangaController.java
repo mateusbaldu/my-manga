@@ -1,14 +1,18 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.dto.manga.MangaCreateAndUpdateDto;
-import fatecipi.progweb.mymanga.dto.manga.MangaResponseDto;
-import fatecipi.progweb.mymanga.dto.volume.VolumeCreateDto;
-import fatecipi.progweb.mymanga.dto.volume.VolumeResponseDto;
-import fatecipi.progweb.mymanga.dto.volume.VolumeUpdateDto;
+import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCreateAndUpdate;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
+import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
+import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
+import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
+import fatecipi.progweb.mymanga.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,72 +22,81 @@ import java.util.List;
 public class MangaController {
     @Autowired
     private MangaService mangaService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<MangaResponseDto> findById(@PathVariable Long id) {
+    public ResponseEntity<MangaResponse> findById(@PathVariable Long id, JwtAuthenticationToken token) {
+        Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
         return ResponseEntity.ok(mangaService.findById(id));
     }
 
     @GetMapping("/all")
-    public List<MangaResponseDto> listAll() {
+    public List<MangaResponse> listAll() {
         return mangaService.listAll();
     }
 
     @GetMapping("/best")
-    public List<MangaResponseDto> listByRating() {
+    public List<MangaResponse> listByRating() {
         return mangaService.listAllByRating();
     }
 
     @GetMapping("/releasing")
-    public List<MangaResponseDto> listReleasing() {
+    public List<MangaResponse> listReleasing() {
         return mangaService.listAllReleasing();
     }
 
     @GetMapping("/search/{keyword}")
-    public List<MangaResponseDto> listByKeyword(@PathVariable String keyword) {
+    public List<MangaResponse> listByKeyword(@PathVariable String keyword) {
         return mangaService.findByKeyword(keyword);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MangaResponseDto> update(@PathVariable Long id, @RequestBody MangaCreateAndUpdateDto mangaDto) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<MangaResponse> update(@PathVariable Long id, @RequestBody MangaCreateAndUpdate mangaDto) {
         return ResponseEntity.ok(mangaService.update(id, mangaDto));
     }
 
     @PostMapping("/new")
-    public ResponseEntity<MangaResponseDto> create(@RequestBody MangaCreateAndUpdateDto mangaDto) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<MangaResponse> create(@RequestBody MangaCreateAndUpdate mangaDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mangaService.save(mangaDto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         mangaService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/volumes/new")
-    public ResponseEntity<VolumeResponseDto> addVolumeToManga(@PathVariable Long id, @RequestBody VolumeCreateDto volDto) {
-        VolumeResponseDto vol = mangaService.addVolumeToManga(id, volDto);
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<VolumeResponse> addVolumeToManga(@PathVariable Long id, @RequestBody VolumeCreate volDto) {
+        VolumeResponse vol = mangaService.addVolumeToManga(id, volDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vol);
     }
 
     @GetMapping("/{id}/volumes/all")
-    public List<VolumeResponseDto> getAllVolumesForManga(@PathVariable Long id) {
+    public List<VolumeResponse> getAllVolumesForManga(@PathVariable Long id) {
         return mangaService.getAllVolumesForManga(id);
     }
 
     @PutMapping("/{id}/volumes/{volId}")
-    public ResponseEntity<VolumeResponseDto> updateVolume(@PathVariable Long id, @PathVariable Long volId, @RequestBody VolumeUpdateDto volDto) {
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<VolumeResponse> updateVolume(@PathVariable Long id, @PathVariable Long volId, @RequestBody VolumeUpdate volDto) {
         return ResponseEntity.ok(mangaService.updateVolume(id, volId, volDto));
     }
 
     @DeleteMapping("/{id}/volumes/{volId}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id, @PathVariable Long volId) {
         mangaService.deleteVolume(id, volId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/volumes/{volId}")
-    public ResponseEntity<VolumeResponseDto> findVolumeById(@PathVariable Long id, @PathVariable Long volId) {
+    public ResponseEntity<VolumeResponse> findVolumeById(@PathVariable Long id, @PathVariable Long volId) {
         return ResponseEntity.ok(mangaService.findVolumeById(id, volId));
     }
 }

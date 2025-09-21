@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.repositories;
 
-import fatecipi.progweb.mymanga.models.order.Order;
+import fatecipi.progweb.mymanga.models.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.repositories;
 
-import fatecipi.progweb.mymanga.models.manga.Manga;
+import fatecipi.progweb.mymanga.models.Manga;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

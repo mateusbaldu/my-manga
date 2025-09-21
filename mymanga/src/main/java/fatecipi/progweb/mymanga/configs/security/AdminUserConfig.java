@@ -1,8 +1,7 @@
 package fatecipi.progweb.mymanga.configs.security;
 
-import fatecipi.progweb.mymanga.configs.generator.UuidUtils;
-import fatecipi.progweb.mymanga.models.user.Role;
-import fatecipi.progweb.mymanga.models.user.Users;
+import fatecipi.progweb.mymanga.models.Role;
+import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.extern.log4j.Log4j2;
@@ -19,12 +18,15 @@ import java.util.Set;
 @Log4j2
 @Configuration
 public class AdminUserConfig implements CommandLineRunner {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+
+    public AdminUserConfig(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     @Transactional
@@ -41,6 +43,7 @@ public class AdminUserConfig implements CommandLineRunner {
                     users.setEmail("admin@mymanga.com");
                     Set<Role> set = Set.of(role);
                     users.setRoles(set);
+                    users.setUsername("admin");
                     users.setPassword(passwordEncoder.encode("admin123"));
                     users.setCreatedAt(Instant.now());
                     userRepository.save(users);

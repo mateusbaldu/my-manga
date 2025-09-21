@@ -1,16 +1,24 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.configs.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.order.Order;
-import fatecipi.progweb.mymanga.dto.order.OrderCreateDto;
-import fatecipi.progweb.mymanga.models.order.OrderMapper;
-import fatecipi.progweb.mymanga.repositories.VolumeRepository;
+import fatecipi.progweb.mymanga.models.*;
+import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -21,30 +29,86 @@ public class OrderService {
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
+    private MangaService mangaService;
+    @Autowired
     private VolumeRepository volumeRepository;
 
-    public List<Order> findAll() {
-        return orderRepository.findAll();
+    public List<OrderResponse> findAll() {
+        return orderRepository.findAll()
+                .stream()
+                .map(order -> orderMapper.toOrderResponse(order))
+                .toList();
     }
 
-    public Order findById(Long id) {
+    public OrderResponse findById(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
+        return orderMapper.toOrderResponse(order);
+    }
+
+    public Order findByIdWithoutDto(Long id) {
         return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
     }
 
-    public List<Order> findByUserEmail(String email) {
-        if (!userRepository.existsByEmail(email)) {
-            throw new ResourceNotFoundException("User with email " + email + " not found");
+    public List<OrderResponse> findByUserUsername(String username) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new ResourceNotFoundException("User with username " + username + " not found");
         }
-        return orderRepository.findByUsers_Email(email);
+        return orderRepository.findByUsers_Email(username)
+                .stream()
+                .map(order -> orderMapper.toOrderResponse(order))
+                .toList();
     }
 
     public void delete(Long id) {
-        orderRepository.delete(findById(id));
+        orderRepository.delete(findByIdWithoutDto(id));
     }
 
-    public Order update(Long id, OrderCreateDto orderCreateDto) {
-        Order order = findById(id);
-        orderMapper.mapOrder(orderCreateDto, order);
-        return orderRepository.save(order);
+    public OrderResponse update(Long id, OrderCreate orderDto) {
+        Order order = findByIdWithoutDto(id);
+        orderMapper.mapOrder(orderDto, order);
+        orderRepository.save(order);
+        return orderMapper.toOrderResponse(order);
     }
+
+    public OrderResponse create(OrderCreate orderDto, Users user) {
+        List<OrderItems> orderItemsList = orderDto.items().stream()
+                .map(itemDto -> {
+                    Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());
+                    if (volume.getQuantity() < itemDto.quantity()) {
+                        throw new NotAvailableException("Estoque insuficiente para o volume " + volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber());
+                    }
+                    volume.setQuantity(volume.getQuantity() - itemDto.quantity());
+                    volumeRepository.save(volume);
+                    return OrderItems.builder()
+                            .volumeId(volume.getId())
+                            .title(volume.getManga().getTitle()  + " Vol. " + volume.getVolumeNumber())
+                            .quantity(itemDto.quantity())
+                            .unitPrice(volume.getPrice())
+                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        BigDecimal totalPrice = orderItemsList.stream()
+                .map(OrderItems::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        boolean isSubscriber = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
+        if (isSubscriber) {
+            totalPrice = totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        Order newOrder = Order.builder()
+                .users(user)
+                .paymentMethod(orderDto.paymentMethod())
+                .createdAt(Instant.now())
+                .finalPrice(totalPrice)
+                .items(orderItemsList)
+                .build();
+        orderItemsList.forEach(item -> item.setOrder(newOrder));
+        orderRepository.save(newOrder);
+        return orderMapper.toOrderResponse(newOrder);
+    }
+
 }
