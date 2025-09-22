@@ -11,6 +11,8 @@ import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -37,11 +39,8 @@ public class OrderService {
     @Autowired
     private EmailService emailService;
 
-    public List<OrderResponse> findAll() {
-        return orderRepository.findAll()
-                .stream()
-                .map(order -> orderMapper.toOrderResponse(order))
-                .toList();
+    public Page<OrderResponse> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable).map(order -> orderMapper.toOrderResponse(order));
     }
 
     public OrderResponse findById(Long id) {
@@ -53,14 +52,12 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
     }
 
-    public List<OrderResponse> findByUserUsername(String username) {
+    public Page<OrderResponse> findByUserUsername(String username, Pageable pageable) {
         if (!userRepository.existsByUsername(username)) {
             throw new ResourceNotFoundException("User with username " + username + " not found");
         }
-        return orderRepository.findByUsers_Email(username)
-                .stream()
-                .map(order -> orderMapper.toOrderResponse(order))
-                .toList();
+        Page<Order> orderPage = orderRepository.findByUsers_Username(username, pageable);
+        return orderPage.map(order -> orderMapper.toOrderResponse(order));
     }
 
     public void delete(Long id) {

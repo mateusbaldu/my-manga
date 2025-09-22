@@ -15,6 +15,8 @@ import fatecipi.progweb.mymanga.models.Volume;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -32,10 +34,8 @@ public class MangaService {
     @Autowired
     private VolumeMapper volumeMapper;
 
-    public List<MangaResponse> listAll() {
-        return mangaRepository.findAll().stream()
-                .map(manga -> mangaMapper.toMangaResponseDto(manga))
-                .collect(Collectors.toList());
+    public Page<MangaResponse> listAll(Pageable pageable)  {
+        return mangaRepository.findAll(pageable).map(manga -> mangaMapper.toMangaResponseDto(manga));
     }
 
     public MangaResponse findById(Long id) {
@@ -47,28 +47,9 @@ public class MangaService {
         return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + "not found"));
     }
 
-    public List<MangaResponse> listAllByRating() {
-        //pagination
-        return mangaRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(Manga::getRating).reversed())
-                .map(manga -> mangaMapper.toMangaResponseDto(manga))
-                .collect(Collectors.toList());
-    }
-
-    public List<MangaResponse> listAllReleasing() {
-        return mangaRepository.findAll()
-                .stream()
-                .filter(manga -> manga.getStatus() == MangaStatus.RELEASING)
-                .map(manga -> mangaMapper.toMangaResponseDto(manga))
-                .collect(Collectors.toList());
-    }
-
-    public List<MangaResponse> findByKeyword(String keyword) {
-        List<Manga> mangas = mangaRepository.findByKeyword(keyword).orElseThrow(() -> new ResourceNotFoundException("No manga with " + keyword + " was found"));
-        return mangas.stream()
-                .map(manga -> mangaMapper.toMangaResponseDto(manga))
-                .collect(Collectors.toList());
+    public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {
+        Page<Manga> mangaPage = mangaRepository.findByKeyword(keyword, pageable);
+        return mangaPage.map(manga -> mangaMapper.toMangaResponseDto(manga));
     }
 
     public void deleteById(Long id) {
@@ -103,14 +84,12 @@ public class MangaService {
         return volumeMapper.toVolumeResponseDto(vol);
     }
 
-    public List<VolumeResponse> getAllVolumesForManga(Long mangaId) {
+    public Page<VolumeResponse> getAllVolumesForManga(Long mangaId, Pageable pageable) {
         if (!mangaRepository.existsById(mangaId)) {
             throw new ResourceNotFoundException("Manga with id " + mangaId + " not found");
         }
-        List<Volume> volumes = volumeRepository.findByMangaId(mangaId);
-        return volumes.stream()
-                .map(vol -> volumeMapper.toVolumeResponseDto(vol))
-                .collect(Collectors.toList());
+        Page<Volume> volumePage = volumeRepository.findByMangaId(mangaId, pageable);
+        return volumePage.map(vol -> volumeMapper.toVolumeResponseDto(vol));
     }
 
     public VolumeResponse findVolumeById(Long mangaId, Long volumeId) {

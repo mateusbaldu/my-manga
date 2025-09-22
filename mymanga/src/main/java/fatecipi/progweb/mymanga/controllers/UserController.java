@@ -12,6 +12,8 @@ import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,8 +53,8 @@ public class UserController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<List<UserResponse>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<Page<UserResponse>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @DeleteMapping("/{id}")

@@ -9,6 +9,8 @@ import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
 import fatecipi.progweb.mymanga.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,23 +34,13 @@ public class MangaController {
     }
 
     @GetMapping("/all")
-    public List<MangaResponse> listAll() {
-        return mangaService.listAll();
-    }
-
-    @GetMapping("/best")
-    public List<MangaResponse> listByRating() {
-        return mangaService.listAllByRating();
-    }
-
-    @GetMapping("/releasing")
-    public List<MangaResponse> listReleasing() {
-        return mangaService.listAllReleasing();
+    public ResponseEntity<Page<MangaResponse>> listAll(Pageable pageable) {
+        return ResponseEntity.ok(mangaService.listAll(pageable));
     }
 
     @GetMapping("/search/{keyword}")
-    public List<MangaResponse> listByKeyword(@PathVariable String keyword) {
-        return mangaService.findByKeyword(keyword);
+    public ResponseEntity<Page<MangaResponse>> listByKeyword(Pageable pageable, @PathVariable String keyword) {
+        return ResponseEntity.ok(mangaService.findByKeyword(keyword, pageable));
     }
 
     @PutMapping("/{id}")
@@ -78,8 +70,8 @@ public class MangaController {
     }
 
     @GetMapping("/{id}/volumes/all")
-    public List<VolumeResponse> getAllVolumesForManga(@PathVariable Long id) {
-        return mangaService.getAllVolumesForManga(id);
+    public ResponseEntity<Page<VolumeResponse>> getAllVolumesForManga(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(mangaService.getAllVolumesForManga(id, pageable));
     }
 
     @PutMapping("/{id}/volumes/{volId}")

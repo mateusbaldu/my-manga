@@ -31,6 +31,7 @@ public class LoginService {
         this.emailService = emailService;
     }
 
+
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User with email "+ loginRequest.email() +" not found"));

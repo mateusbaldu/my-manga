@@ -12,6 +12,8 @@ import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import org.mapstruct.control.MappingControl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,10 +37,8 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    public List<UserResponse> findAll() {
-        return userRepository.findAll().stream()
-                .map(user -> userMapper.toUserResponse(user))
-                .collect(Collectors.toList());
+    public Page<UserResponse> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(user -> userMapper.toUserResponse(user));
     }
 
     public Users findByUsernameWithoutDto(String username) {

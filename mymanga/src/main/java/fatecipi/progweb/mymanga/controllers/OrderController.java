@@ -11,6 +11,8 @@ import fatecipi.progweb.mymanga.services.OrderService;
 import fatecipi.progweb.mymanga.services.UserService;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,8 +38,8 @@ public class OrderController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<List<OrderResponse>> listAll() {
-        return ResponseEntity.ok(orderService.findAll());
+    public ResponseEntity<Page<OrderResponse>> listAll(Pageable pageable) {
+        return ResponseEntity.ok(orderService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -46,8 +48,8 @@ public class OrderController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<OrderResponse>> findByUserUsername(@PathVariable String username) {
-        return ResponseEntity.ok(orderService.findByUserUsername(username));
+    public ResponseEntity<Page<OrderResponse>> findByUserUsername(@PathVariable String username, Pageable pageable) {
+        return ResponseEntity.ok(orderService.findByUserUsername(username, pageable));
     }
 
     @DeleteMapping("/{id}")
