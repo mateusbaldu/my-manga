@@ -9,7 +9,7 @@ import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
-import fatecipi.progweb.mymanga.services.TokenService;
+import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
-    public TokenService tokenService;
+    public LoginService loginService;
 
     @PostMapping("/new")
     public ResponseEntity<UserResponse> create(@RequestBody UserCreate userCreate) {
@@ -35,7 +35,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(tokenService.login(loginRequest));
+        return ResponseEntity.ok(loginService.login(loginRequest));
     }
 
     @GetMapping("/{username}")
@@ -76,19 +76,19 @@ public class UserController {
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
-        userService.activateAccount(token);
+        loginService.activateAccount(token);
         return ResponseEntity.ok("Account activated successfully! You now can log in!");
     }
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        userService.requestPasswordReset(request.email());
+        loginService.requestPasswordReset(request.email());
         return ResponseEntity.ok("If the user exists, a reset link has been sent to the email.");
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
-        userService.resetPassword(request.token(), request.newPassword());
+        loginService.resetPassword(request.token(), request.newPassword());
         return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
 }

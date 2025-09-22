@@ -43,6 +43,7 @@ public class AdminUserConfig implements CommandLineRunner {
                     users.setEmail("admin@mymanga.com");
                     Set<Role> set = Set.of(role);
                     users.setRoles(set);
+                    users.setActive(true);
                     users.setUsername("admin");
                     users.setPassword(passwordEncoder.encode("admin123"));
                     users.setCreatedAt(Instant.now());

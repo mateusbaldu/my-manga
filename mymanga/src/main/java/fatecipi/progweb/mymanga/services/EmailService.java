@@ -25,5 +25,4 @@ public class EmailService {
             System.out.println("Error while sending the email: " + to + " | Error: " + e.getMessage());
         }
     }
-
 }
