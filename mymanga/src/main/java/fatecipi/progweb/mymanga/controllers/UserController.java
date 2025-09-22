@@ -2,8 +2,10 @@ package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.exceptions.NotPermittedException;
 import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
@@ -70,5 +72,23 @@ public class UserController {
             throw new NotPermittedException("User don't have permission to delete another account");
         }
         return ResponseEntity.ok(userService.update(userUpdate, username));
+    }
+
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
+        userService.activateAccount(token);
+        return ResponseEntity.ok("Account activated successfully! You now can log in!");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        userService.requestPasswordReset(request.email());
+        return ResponseEntity.ok("If the user exists, a reset link has been sent to the email.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request.token(), request.newPassword());
+        return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
 }

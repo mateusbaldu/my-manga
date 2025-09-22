@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +32,8 @@ public class UserService {
     private RoleRepository roleRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
 
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
@@ -74,10 +77,72 @@ public class UserService {
         }
         Users newUser = new Users();
         userMapper.mapCreateUser(dto, newUser);
+        String token = UUID.randomUUID().toString();
         newUser.setPassword(passwordEncoder.encode(dto.password()));
         newUser.setRoles(Set.of(role));
         newUser.setCreatedAt(Instant.now());
+        newUser.setActive(false);
+        newUser.setConfirmationToken(token);
         userRepository.save(newUser);
+
+        String activationUrl = "http://localhost:8080/my-manga/users/activate?token=" + token;
+        String subject = "Activate your account on My Mangá!";
+        String body = "Welcome, " + newUser.getName() + "! Click on the link below to activate your account:\n\n" + activationUrl;
+        emailService.sendEmail(newUser.getEmail(), subject, body);
+
         return userMapper.toUserResponse(newUser);
+    }
+
+    public void activateAccount(String token) {
+        Users user = userRepository.findByConfirmationToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Token de ativação inválido."));
+
+        user.setActive(true);
+        user.setConfirmationToken(null);
+        userRepository.save(user);
+    }
+
+    public void requestPasswordReset(String email) {
+        Users user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));
+
+        String token = UUID.randomUUID().toString();
+        user.setConfirmationToken(token);
+        userRepository.save(user);
+
+        String subject = "Instruções para Redefinição de Senha - My Mangá";
+        String body = String.format("""
+        Olá %s,
+        
+        Você solicitou a redefinição da sua senha. Como não temos um frontend, por favor, siga as instruções abaixo para criar uma nova senha usando uma ferramenta de API (como Postman, Insomnia, etc.):
+        
+        1. Método HTTP:
+           POST
+        2. URL do Endpoint:
+           http://localhost:8080/my-manga/users/reset-password
+           
+        3. No corpo (Body) da requisição, envie o seguinte JSON:
+           (Lembre-se de configurar o Header 'Content-Type' para 'application/json')
+           {
+               "token": "%s",
+               "newPassword": "SUA_NOVA_SENHA_AQUI"
+           }
+        INSTRUÇÕES IMPORTANTES:
+        - Copie o token exatamente como está.
+        - Substitua "SUA_NOVA_SENHA_AQUI" pela nova senha que você deseja.
+        
+        Se você não solicitou isso, pode ignorar este e-mail.
+        """, user.getName(), token);
+
+        emailService.sendEmail(user.getEmail(), subject, body);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        Users user = userRepository.findByConfirmationToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("TInvalid or expired token."));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setConfirmationToken(null);
+        userRepository.save(user);
     }
 }

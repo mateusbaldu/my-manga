@@ -24,10 +24,10 @@ public class Order {
 
     private Instant createdAt;
     private BigDecimal finalPrice;
+    private String confirmationToken;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.WAITING_CONFIRMATION;
 

@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.configs.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.enums.OrderStatus;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.*;
@@ -18,6 +19,7 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +34,8 @@ public class OrderService {
     private MangaService mangaService;
     @Autowired
     private VolumeRepository volumeRepository;
+    @Autowired
+    private EmailService emailService;
 
     public List<OrderResponse> findAll() {
         return orderRepository.findAll()
@@ -75,7 +79,7 @@ public class OrderService {
                 .map(itemDto -> {
                     Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
-                        throw new NotAvailableException("Estoque insuficiente para o volume " + volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber());
+                        throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }
                     volume.setQuantity(volume.getQuantity() - itemDto.quantity());
                     volumeRepository.save(volume);
@@ -99,16 +103,38 @@ public class OrderService {
             totalPrice = totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
         }
 
+        String token = UUID.randomUUID().toString();
         Order newOrder = Order.builder()
                 .users(user)
                 .paymentMethod(orderDto.paymentMethod())
                 .createdAt(Instant.now())
                 .finalPrice(totalPrice)
                 .items(orderItemsList)
+                .confirmationToken(token)
+                .status(OrderStatus.WAITING_CONFIRMATION)
                 .build();
         orderItemsList.forEach(item -> item.setOrder(newOrder));
         orderRepository.save(newOrder);
+
+        String confirmationUrl = "http://localhost:8080/my-manga/orders/confirm?token=" + token;
+        String subject = "Confirm your order #" + newOrder.getId();
+        String body = "Hi " + user.getName() + ",\n\nThank you for buying with us! Please, confirm your order by clicking on the link down below:\n\n" + confirmationUrl;
+        emailService.sendEmail(user.getEmail(), subject, body);
+
         return orderMapper.toOrderResponse(newOrder);
+    }
+
+    public void confirmOrder(String token) {
+        Order order = orderRepository.findByConfirmationToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired confirmation token"));
+
+        if (order.getStatus() == OrderStatus.WAITING_CONFIRMATION) {
+            order.setStatus(OrderStatus.CONFIRMED);
+            order.setConfirmationToken(null);
+            orderRepository.save(order);
+        } else {
+            throw new IllegalStateException("This order has already been confirmed.");
+        }
     }
 
 }

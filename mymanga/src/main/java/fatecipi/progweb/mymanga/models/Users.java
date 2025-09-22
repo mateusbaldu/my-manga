@@ -31,6 +31,8 @@ public class Users {
     private String name;
     private String password;
     private Instant createdAt;
+    private boolean isActive = false;
+    private String confirmationToken;
 
     @Embedded
     private Adress adress;

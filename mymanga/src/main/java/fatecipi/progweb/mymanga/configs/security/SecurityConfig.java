@@ -40,7 +40,11 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/my-manga/users/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/my-manga/users/new").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/my-manga/users/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/my-manga/users/activate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/my-manga/users/reset-password").permitAll()
                         .requestMatchers(HttpMethod.GET, "/my-manga/mangas/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/my-manga/orders/confirm").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

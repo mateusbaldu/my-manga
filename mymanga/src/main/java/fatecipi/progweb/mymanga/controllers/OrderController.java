@@ -63,9 +63,18 @@ public class OrderController {
         return ResponseEntity.ok(orderService.update(id, orderDto));
     }
 
+    @GetMapping("/confirm")
+    public ResponseEntity<String> confirmOrder(@RequestParam("token") String token) {
+        orderService.confirmOrder(token);
+        return ResponseEntity.ok("Order confirmed successfully!");
+    }
+
     private void isUserPermitted(@PathVariable Long id, JwtAuthenticationToken token) {
         Order order = orderService.findByIdWithoutDto(id);
         Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
+        if (!user.isActive()) {
+            throw new NotPermittedException("This account is inactive.");
+        }
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
         if(!order.getUsers().getId().equals(user.getId()) || !isAdmin) {
