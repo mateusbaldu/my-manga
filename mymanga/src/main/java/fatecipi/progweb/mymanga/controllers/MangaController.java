@@ -28,8 +28,7 @@ public class MangaController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<MangaResponse> findById(@PathVariable Long id, JwtAuthenticationToken token) {
-        Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
+    public ResponseEntity<MangaResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(mangaService.findById(id));
     }
 
@@ -64,8 +63,8 @@ public class MangaController {
 
     @PostMapping("/{id}/volumes/new")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<VolumeResponse> addVolumeToManga(@PathVariable Long id, @RequestBody VolumeCreate volDto) {
-        VolumeResponse vol = mangaService.addVolumeToManga(id, volDto);
+    public ResponseEntity<List<VolumeResponse>> addVolumesToManga(@PathVariable Long id, @RequestBody List<VolumeCreate> volDto) {
+        List<VolumeResponse> vol = mangaService.addVolumesToManga(id, volDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vol);
     }
 
@@ -82,7 +81,7 @@ public class MangaController {
 
     @DeleteMapping("/{id}/volumes/{volId}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @PathVariable Long volId) {
+    public ResponseEntity<Void> deleteVolume(@PathVariable Long id, @PathVariable Long volId) {
         mangaService.deleteVolume(id, volId);
         return ResponseEntity.noContent().build();
     }

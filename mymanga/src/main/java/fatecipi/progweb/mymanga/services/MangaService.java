@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class MangaService {
     }
 
     public Manga findByIdWithoutDto(Long id) {
-        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + "not found"));
+        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " not found"));
     }
 
     public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {
@@ -75,13 +76,18 @@ public class MangaService {
 
 
 
-    public VolumeResponse addVolumeToManga(Long mangaId, VolumeCreate volDto) {
+    public List<VolumeResponse> addVolumesToManga(Long mangaId, List<VolumeCreate> volDto) {
         Manga m = findByIdWithoutDto(mangaId);
-        Volume vol = new Volume();
-        volumeMapper.mapCreateVolume(volDto, vol);
-        vol.setManga(m);
-        volumeRepository.save(vol);
-        return volumeMapper.toVolumeResponseDto(vol);
+        return volDto.stream()
+                .map(vol -> {
+                    Volume volume = new Volume();
+                    volumeMapper.mapCreateVolume(vol, volume);
+                    volume.setManga(m);
+                    Volume savedVolume = volumeRepository.save(volume);
+
+                    return volumeMapper.toVolumeResponseDto(savedVolume);
+                })
+                .toList();
     }
 
     public Page<VolumeResponse> getAllVolumesForManga(Long mangaId, Pageable pageable) {
