@@ -60,7 +60,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponse> update(@PathVariable Long id, OrderCreate orderDto, JwtAuthenticationToken token) {
+    public ResponseEntity<OrderResponse> update(@PathVariable Long id, @RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
         isUserPermitted(id, token);
         return ResponseEntity.ok(orderService.update(id, orderDto));
     }
@@ -79,7 +79,7 @@ public class OrderController {
         }
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
-        if(!order.getUsers().getId().equals(user.getId()) || !isAdmin) {
+        if(!order.getUsers().getId().equals(user.getId()) && !isAdmin) {
             throw new NotPermittedException("This order is not associated with user " + user.getName());
         }
     }

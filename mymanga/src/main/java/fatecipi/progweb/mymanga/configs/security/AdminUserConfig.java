@@ -49,5 +49,20 @@ public class AdminUserConfig implements CommandLineRunner {
                     users.setCreatedAt(Instant.now());
                     userRepository.save(users);
                 });
+        Role basicRole = roleRepository.findByName(Role.Values.BASIC.name());
+        userRepository.findByEmail("usertest@mymanga.com").ifPresentOrElse(
+                userTest -> log.info("Usuário de teste já existe"),
+                () -> {
+                    Users testUser = new Users();
+                    testUser.setName("Teste");
+                    testUser.setEmail("usertest@mymanga.com");
+                    testUser.setRoles(Set.of(basicRole));
+                    testUser.setActive(true);
+                    testUser.setUsername("usertest");
+                    testUser.setPassword(passwordEncoder.encode("teste123"));
+                    testUser.setCreatedAt(Instant.now());
+                    userRepository.save(testUser);
+                }
+        );
     }
 }

@@ -66,12 +66,54 @@ public class OrderService {
 
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = findByIdWithoutDto(id);
-        orderMapper.mapOrder(orderDto, order);
+
+        order.getItems().clear();
+
+        List<OrderItems> newItems = orderDto.items().stream()
+                .map(itemDto -> {
+                    Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());
+                    if (volume.getQuantity() < itemDto.quantity()) {
+                        throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
+                    }
+
+                    volume.setQuantity(volume.getQuantity() - itemDto.quantity());
+                    volumeRepository.save(volume);
+
+                    return OrderItems.builder()
+                            .volumeId(volume.getId())
+                            .title(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber())
+                            .quantity(itemDto.quantity())
+                            .unitPrice(volume.getPrice())
+                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
+                            .order(order)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        order.getItems().addAll(newItems);
+
+        BigDecimal totalPrice = newItems.stream()
+                .map(OrderItems::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Users user = order.getUsers();
+        boolean isSubscriber = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
+        if (isSubscriber) {
+            totalPrice = totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        order.setFinalPrice(totalPrice);
+        order.setPaymentMethod(orderDto.paymentMethod());
+
         orderRepository.save(order);
         return orderMapper.toOrderResponse(order);
     }
 
     public OrderResponse create(OrderCreate orderDto, Users user) {
+        if (!user.isActive()) {
+            throw new BadCredentialsException("User account is not active");
+        }
         List<OrderItems> orderItemsList = orderDto.items().stream()
                 .map(itemDto -> {
                     Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());

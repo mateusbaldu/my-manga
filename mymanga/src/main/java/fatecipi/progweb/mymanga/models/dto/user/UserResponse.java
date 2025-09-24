@@ -10,7 +10,6 @@ import java.util.Set;
 @Builder
 public record UserResponse(String name,
                            String username,
-                           String email,
                            Instant createdAt,
                            Set<Role> roles,
                            Adress adress) {

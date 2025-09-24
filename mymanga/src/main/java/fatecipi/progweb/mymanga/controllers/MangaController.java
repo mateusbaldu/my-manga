@@ -42,7 +42,7 @@ public class MangaController {
         return ResponseEntity.ok(mangaService.findByKeyword(keyword, pageable));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<MangaResponse> update(@PathVariable Long id, @RequestBody MangaCreateAndUpdate mangaDto) {
         return ResponseEntity.ok(mangaService.update(id, mangaDto));
@@ -73,7 +73,7 @@ public class MangaController {
         return ResponseEntity.ok(mangaService.getAllVolumesForManga(id, pageable));
     }
 
-    @PutMapping("/{id}/volumes/{volId}")
+    @PatchMapping("/{id}/volumes/{volId}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<VolumeResponse> updateVolume(@PathVariable Long id, @PathVariable Long volId, @RequestBody VolumeUpdate volDto) {
         return ResponseEntity.ok(mangaService.updateVolume(id, volId, volDto));

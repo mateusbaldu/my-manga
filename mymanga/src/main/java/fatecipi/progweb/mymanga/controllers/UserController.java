@@ -67,7 +67,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{username}")
+    @PatchMapping("/{username}")
     public ResponseEntity<UserResponse> update(@RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
         Users user = userService.findByUsernameWithoutDto(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
