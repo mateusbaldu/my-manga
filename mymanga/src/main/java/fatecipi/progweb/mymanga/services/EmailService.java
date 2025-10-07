@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.exceptions.EmailSenderException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -22,7 +23,7 @@ public class EmailService {
             mailSender.send(message);
             System.out.println("Email successfully sent to: " + to);
         } catch (Exception e) {
-            System.out.println("Error while sending the email: " + to + " | Error: " + e.getMessage());
+            throw new EmailSenderException("Error while sending the email: " + to + " | Error: " + e.getMessage());
         }
     }
 }
