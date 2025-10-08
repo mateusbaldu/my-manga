@@ -1,6 +1,5 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreateAndUpdate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,10 +20,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/my-manga/mangas")
 public class MangaController {
-    @Autowired
-    private MangaService mangaService;
-    @Autowired
-    private UserService userService;
+    private final MangaService mangaService;
+
+    public MangaController(MangaService mangaService, UserService userService) {
+        this.mangaService = mangaService;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<MangaResponse> findById(@PathVariable Long id) {

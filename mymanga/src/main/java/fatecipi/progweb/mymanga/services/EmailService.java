@@ -1,16 +1,20 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.EmailSenderException;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendEmail(String to, String subject, String body) {
         try {
@@ -21,7 +25,7 @@ public class EmailService {
             message.setText(body);
 
             mailSender.send(message);
-            System.out.println("Email successfully sent to: " + to);
+            log.info("Email successfully sent to: " + to);
         } catch (Exception e) {
             throw new EmailSenderException("Error while sending the email: " + to + " | Error: " + e.getMessage());
         }

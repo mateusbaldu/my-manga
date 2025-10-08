@@ -168,7 +168,7 @@ class MangaServiceTest {
         }
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the Mangá is not found")
-        void findById_throwResourceNotFoundException_whenTheMangáIsNotFound() {
+        void findById_throwResourceNotFoundException_whenTheMangaIsNotFound() {
             //Arrange
             doReturn(Optional.empty()).when(mangaRepository).findById(anyLong());
 
@@ -352,7 +352,6 @@ class MangaServiceTest {
                     Genres.ACTION,
                     null
             );
-            Manga m = new Manga();
             MangaResponse mangaResponse = new MangaResponse(
                     1L,
                     "Test",

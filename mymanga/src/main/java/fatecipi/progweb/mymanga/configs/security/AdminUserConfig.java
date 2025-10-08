@@ -5,7 +5,6 @@ import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,9 +33,7 @@ public class AdminUserConfig implements CommandLineRunner {
         Role role = roleRepository.findByName(Role.Values.ADMIN.name());
         Optional<Users> user = userRepository.findByEmail("admin@mymanga.com");
         user.ifPresentOrElse(
-                users -> {
-                    log.info("admin já existe");
-                },
+                users -> log.info("admin já existe"),
                 () -> {
                     Users users = new Users();
                     users.setName("Admin");

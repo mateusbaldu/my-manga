@@ -2,16 +2,15 @@ package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.configs.mappers.MangaMapper;
 import fatecipi.progweb.mymanga.configs.mappers.VolumeMapper;
+import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
+import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.models.Manga;
+import fatecipi.progweb.mymanga.models.Volume;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreateAndUpdate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
-import fatecipi.progweb.mymanga.enums.MangaStatus;
-import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
-import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Manga;
-import fatecipi.progweb.mymanga.models.Volume;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +18,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MangaService {
-    @Autowired
-    private MangaRepository mangaRepository;
-    @Autowired
-    private MangaMapper mangaMapper;
-    @Autowired
-    private VolumeRepository volumeRepository;
-    @Autowired
-    private VolumeMapper volumeMapper;
+    private final MangaRepository mangaRepository;
+    private final MangaMapper mangaMapper;
+    private final VolumeRepository volumeRepository;
+    private final VolumeMapper volumeMapper;
+
+    public MangaService(MangaRepository mangaRepository, MangaMapper mangaMapper, VolumeRepository volumeRepository, VolumeMapper volumeMapper) {
+        this.mangaRepository = mangaRepository;
+        this.mangaMapper = mangaMapper;
+        this.volumeRepository = volumeRepository;
+        this.volumeMapper = volumeMapper;
+    }
 
     public Page<MangaResponse> listAll(Pageable pageable)  {
         return mangaRepository.findAll(pageable).map(manga -> mangaMapper.toMangaResponseDto(manga));
@@ -45,7 +44,7 @@ public class MangaService {
     }
 
     public Manga findByIdWithoutDto(Long id) {
-        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " not found"));
+        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
     }
 
     public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {

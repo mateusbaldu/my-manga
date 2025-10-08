@@ -19,25 +19,27 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OrderMapper orderMapper;
-    @Autowired
-    private MangaService mangaService;
-    @Autowired
-    private VolumeRepository volumeRepository;
-    @Autowired
-    private EmailService emailService;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final OrderMapper orderMapper;
+    private final MangaService mangaService;
+    private final VolumeRepository volumeRepository;
+    private final EmailService emailService;
+
+    public OrderService(OrderRepository orderRepository, UserRepository userRepository, OrderMapper orderMapper, MangaService mangaService, VolumeRepository volumeRepository, EmailService emailService) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.orderMapper = orderMapper;
+        this.mangaService = mangaService;
+        this.volumeRepository = volumeRepository;
+        this.emailService = emailService;
+    }
 
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).map(order -> orderMapper.toOrderResponse(order));
@@ -88,7 +90,7 @@ public class OrderService {
                             .order(order)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         order.getItems().addAll(newItems);
 

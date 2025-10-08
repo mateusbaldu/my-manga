@@ -1,6 +1,5 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.NotPermittedException;
 import fatecipi.progweb.mymanga.models.Order;
 import fatecipi.progweb.mymanga.models.Role;
@@ -9,7 +8,6 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
 import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.services.OrderService;
 import fatecipi.progweb.mymanga.services.UserService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,15 +17,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/my-manga/orders")
 public class OrderController {
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    private UserService userService;
+    private final OrderService orderService;
+    private final UserService userService;
+
+    public OrderController(UserService userService, OrderService orderService) {
+        this.userService = userService;
+        this.orderService = orderService;
+    }
 
     @PostMapping("/new")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {

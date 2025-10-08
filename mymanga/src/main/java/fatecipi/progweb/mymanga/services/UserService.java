@@ -1,44 +1,42 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
-import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
-import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
+import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
-import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
 import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
+import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
+import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
-import org.mapstruct.control.MappingControl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    @Autowired
-    private EmailService emailService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+
+    public UserService(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, EmailService emailService) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+    }
 
     public Page<UserResponse> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(user -> userMapper.toUserResponse(user));
+        return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
 
     public Users findByUsernameWithoutDto(String username) {
