@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
@@ -30,6 +31,7 @@ public class Users {
     private String username;
     private String name;
     private String password;
+    @CreationTimestamp
     private Instant createdAt;
     private boolean isActive = false;
     private String confirmationToken;

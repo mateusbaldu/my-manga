@@ -4,6 +4,7 @@ import fatecipi.progweb.mymanga.enums.OrderStatus;
 import fatecipi.progweb.mymanga.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -22,6 +23,7 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
+    @CreationTimestamp
     private Instant createdAt;
     private BigDecimal finalPrice;
     private String confirmationToken;

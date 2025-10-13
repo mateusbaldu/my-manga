@@ -10,7 +10,6 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -73,7 +72,7 @@ public class OrderService {
 
         List<OrderItems> newItems = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());
+                    Volume volume = mangaService.findVolumeByIdWithoutDto(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }
@@ -118,7 +117,7 @@ public class OrderService {
         }
         List<OrderItems> orderItemsList = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.findByIdNoDto(itemDto.volumeId());
+                    Volume volume = mangaService.findVolumeByIdWithoutDto(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }

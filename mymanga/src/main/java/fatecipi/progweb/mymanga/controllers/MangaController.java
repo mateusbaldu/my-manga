@@ -7,7 +7,6 @@ import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
 import fatecipi.progweb.mymanga.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -56,7 +55,7 @@ public class MangaController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        mangaService.deleteById(id);
+        mangaService.deleteMangaById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -81,7 +80,7 @@ public class MangaController {
     @DeleteMapping("/{id}/volumes/{volId}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> deleteVolume(@PathVariable Long id, @PathVariable Long volId) {
-        mangaService.deleteVolume(id, volId);
+        mangaService.deleteVolumeById(id, volId);
         return ResponseEntity.noContent().build();
     }
 

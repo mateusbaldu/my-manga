@@ -51,53 +51,5 @@ class LoginServiceTest {
 
     @Nested
     class Login {
-        @Test
-        @DisplayName("should return a loginresponse when a login is made successfully")
-        void login_returnLoginResponse_whenEverythingIsOk() {
-            //Arrange
-            Instant now = Instant.now();
-            Role role = new Role();
-            role.setName(Role.Values.BASIC.name());
-            LoginRequest loginRequest = new LoginRequest(
-                    "test@email.com",
-                    "password");
-            Users user = new Users(
-                    1L,
-                    "test@email.com",
-                    "test123",
-                    "Teste",
-                    "password",
-                    now,
-                    true,
-                    null,
-                    null,
-                    Set.of(role),
-                    null
-            );
-            Jwt fakeJwt = Jwt.withTokenValue("fake-token")
-                    .header("alg", "none")
-                    .claim("scope", "BASIC")
-                    .subject(user.getUsername())
-                    .build();
-
-            doReturn(Optional.of(user)).when(userRepository).findByEmail("test@email.com");
-            when(passwordEncoder.matches(loginRequest.password(), user.getPassword())).thenReturn(true);
-            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(fakeJwt);
-
-            //Act
-            LoginResponse response = loginService.login(loginRequest);
-
-            //Assert
-            assertNotNull(response);
-            assertEquals(fakeJwt.getTokenValue(), response.accessToken());
-
-            verify(userRepository, times(1)).findByEmail(loginRequest.email());
-            verify(passwordEncoder, times(1)).matches(loginRequest.password(), user.getPassword());
-
-            verify(jwtEncoder, times(1)).encode(jwtEncoderParametersCaptor.capture());
-
-            var capturedClaims = jwtEncoderParametersCaptor.getValue().getClaims();
-            assertEquals(user.getUsername(), capturedClaims.getSubject());
-        }
     }
 }

@@ -13,4 +13,5 @@ public record VolumeResponse(Long id,
                              LocalDate releaseDate,
                              Long mangaId,
                              String mangaTitle) {
+    //TODO - adicionar quntidade de volumes disponiveis na resposta
 }
