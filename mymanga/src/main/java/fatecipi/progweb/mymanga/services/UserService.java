@@ -68,10 +68,10 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
     public UserResponse create(UserCreate dto) {
-        Role role = roleRepository.findByName(Role.Values.BASIC.name());
         if(userRepository.findByEmail(dto.email()).isPresent()) {
             throw new ResourceAlreadyExistsException("User with email"+ dto.email() +" already exists");
         }
+        Role role = roleRepository.findByName(Role.Values.BASIC.name());
         Users newUser = new Users();
         userMapper.mapCreateUser(dto, newUser);
         String token = UUID.randomUUID().toString();

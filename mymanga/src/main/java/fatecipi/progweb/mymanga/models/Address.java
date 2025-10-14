@@ -1,15 +1,24 @@
 package fatecipi.progweb.mymanga.models;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Embeddable
+@Entity
+@Table(name = "address")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Adress {
+public class Address {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
     @Size(min = 8, max = 8)
     private String cep;
     private String street;

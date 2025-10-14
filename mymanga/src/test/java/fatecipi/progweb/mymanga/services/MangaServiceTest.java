@@ -448,6 +448,7 @@ class MangaServiceTest {
                     BigDecimal.valueOf(10.50),
                     "1 to 10",
                     LocalDate.now(),
+                    10,
                     mangaId,
                     mangaTitle
             );
@@ -518,6 +519,7 @@ class MangaServiceTest {
                     BigDecimal.valueOf(10.50),
                     "1 to 10",
                     LocalDate.now(),
+                    10,
                     mangaId,
                     null
             );
@@ -581,73 +583,29 @@ class MangaServiceTest {
                     BigDecimal.valueOf(10.50),
                     "1 to 10",
                     LocalDate.now(),
+                    10,
                     mangaId,
                     manga.getTitle()
             );
 
-            doReturn(Optional.of(manga)).when(mangaRepository).findById(mangaId);
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
             doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(volume);
 
             var output = mangaService.findVolumeById(mangaId, volumeId);
 
             assertNotNull(output);
-            verify(mangaRepository, times(1)).findById(mangaId);
             verify(volumeRepository, times(1)).findById(volumeId);
             verify(volumeMapper, times(1)).toVolumeResponseDto(volume);
             assertEquals(volumeResponse, output);
         }
 
         @Test
-        @DisplayName("should throw a ResourceNotFoundException when the Manga dont exists")
-        void findVolumeById_throwResourceNotFoundException_whenTheMangaDontExists() {
-            long mangaId = 1L;
-            long volumeId = 1L;
-            doThrow(new ResourceNotFoundException("error")).when(mangaRepository).findById(mangaId);
-
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findVolumeById(mangaId, volumeId));
-        }
-
-        @Test
-        @DisplayName("should throw a ResourceNotFoundException when the Volume dont exists")
-        void findVolumeById_throwResourceNotFoundException_whenTheVolumeDontExists() {
-            long mangaId = 1L;
+        @DisplayName("should throw a IllegalArgumentException when the Manga isn't associated with the Volume")
+        void findVolumeById_throwIllegalArgumentException_whenTheMangaDontExists() {
+            long mangaId = 2L;
             long volumeId = 1L;
             Manga manga = new Manga(
                     1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            doReturn(Optional.of(manga)).when(mangaRepository).findById(mangaId);
-            doThrow(new ResourceNotFoundException("error")).when(volumeRepository).findById(mangaId);
-
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findVolumeById(mangaId, volumeId));
-        }
-
-        @Test
-        @DisplayName("should throw a IllegalArgumentException when the MangaId of the Volume and the MangaId on param dont match")
-        void findVolumeById_throwIllegalArgumentException_whenTheVolumeMangaIdIsDifferentThanParamMangaId() {
-            long mangaId = 1L;
-            long volumeId = 1L;
-            Manga manga = new Manga(
-                    1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            Manga manga2 = new Manga(
-                    2L,
                     "Test",
                     "Author",
                     "Test description",
@@ -664,10 +622,9 @@ class MangaServiceTest {
                     "1 to 10",
                     LocalDate.now(),
                     10,
-                    manga2
+                    manga
             );
-            doReturn(Optional.of(manga)).when(mangaRepository).findById(mangaId);
-            doReturn(Optional.of(volume)).when(volumeRepository).findById(mangaId);
+            doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
 
             assertThrows(IllegalArgumentException.class, () -> mangaService.findVolumeById(mangaId, volumeId));
         }
@@ -739,6 +696,7 @@ class MangaServiceTest {
                     BigDecimal.valueOf(10.50),
                     "1 to 10",
                     LocalDate.now(),
+                    10,
                     manga.getId(),
                     manga.getTitle()
             );

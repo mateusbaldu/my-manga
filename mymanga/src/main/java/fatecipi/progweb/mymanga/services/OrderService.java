@@ -41,7 +41,7 @@ public class OrderService {
     }
 
     public Page<OrderResponse> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(order -> orderMapper.toOrderResponse(order));
+        return orderRepository.findAll(pageable).map(orderMapper::toOrderResponse);
     }
 
     public OrderResponse findById(Long id) {

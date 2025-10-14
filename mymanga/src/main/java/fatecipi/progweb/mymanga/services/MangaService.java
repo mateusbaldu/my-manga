@@ -102,13 +102,7 @@ public class MangaService {
     }
 
     public VolumeResponse findVolumeById(Long mangaId, Long volumeId) {
-        Manga m = findMangaByIdWithoutDto(mangaId);
-        Volume vol = volumeRepository
-                .findById(volumeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + volumeId + " not found"));
-        if (!vol.getManga().getId().equals(m.getId())) {
-            throw new IllegalArgumentException("O volume " + volumeId + " não pertence ao mangá " + mangaId);
-        }
+        Volume vol = getVolumeAssociatedWithManga(mangaId, volumeId);
         return volumeMapper.toVolumeResponseDto(vol);
     }
 
@@ -119,11 +113,7 @@ public class MangaService {
     }
 
     public VolumeResponse updateVolume(Long mangaId, Long volumeId, VolumeUpdate dto) {
-        Volume v = volumeRepository.findById(volumeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Volume with ID " + volumeId + " don't exists"));
-        if (!v.getManga().getId().equals(mangaId)) {
-            throw new IllegalArgumentException("The volume " + volumeId + " isn't associated with the manga with id " + mangaId);
-        }
+        Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeMapper.mapUpdateVolume(dto, v);
         volumeRepository.save(v);
 
@@ -131,10 +121,15 @@ public class MangaService {
     }
 
     public void deleteVolumeById(Long mangaId, Long volumeId) {
-        Volume v = findVolumeByIdWithoutDto(volumeId);
-        if (!v.getManga().getId().equals(mangaId)) {
-            throw new IllegalArgumentException("The volume " + volumeId + " isn't associated with the manga with id " + mangaId);
-        }
+        Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeRepository.deleteById(volumeId);
+    }
+
+    public Volume getVolumeAssociatedWithManga(Long mangaId, Long volumeId) {
+        Volume v = findVolumeByIdWithoutDto(volumeId);
+        if (!mangaId.equals(v.getManga().getId())) {
+            throw new IllegalArgumentException("Volume " + volumeId + " isn't associated with manga with id " + mangaId);
+        }
+        return v;
     }
 }

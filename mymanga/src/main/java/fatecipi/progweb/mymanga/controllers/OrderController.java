@@ -1,6 +1,5 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.exceptions.NotPermittedException;
 import fatecipi.progweb.mymanga.models.Order;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
@@ -8,12 +7,12 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
 import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.services.OrderService;
 import fatecipi.progweb.mymanga.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,12 +73,12 @@ public class OrderController {
         Order order = orderService.findByIdWithoutDto(id);
         Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
         if (!user.isActive()) {
-            throw new NotPermittedException("This account is inactive.");
+            throw new BadCredentialsException("This account is inactive.");
         }
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
         if(!order.getUsers().getId().equals(user.getId()) && !isAdmin) {
-            throw new NotPermittedException("This order is not associated with user " + user.getName());
+            throw new BadCredentialsException("This order is not associated with user " + user.getName());
         }
     }
 }

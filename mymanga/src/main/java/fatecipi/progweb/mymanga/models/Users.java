@@ -36,8 +36,8 @@ public class Users {
     private boolean isActive = false;
     private String confirmationToken;
 
-    @Embedded
-    private Adress adress;
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Address> address;
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "tb_users_roles",

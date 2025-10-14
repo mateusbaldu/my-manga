@@ -1,9 +1,12 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
+import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
+import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -252,20 +255,137 @@ class UserServiceTest {
         }
     }
 
-    //TODO: pesquisar como usar generics para mesclar as classes de pesquisa por Id e por username
-
     @Nested
     class deleteById {
-        //TODO: implementar
+        @Test
+        @DisplayName("should return void when User deleted succesfully")
+        void deleteById_returnVoid_whenEverythingIsOk() {
+            long id = 1L;
+            Users user = new Users(
+                    1L,
+                    "email@email.com",
+                    "test123",
+                    "Test",
+                    "password",
+                    Instant.now(),
+                    true,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
+            doNothing().when(userRepository).delete(any());
+
+            userService.deleteById(id);
+
+            verify(userRepository, times(1)).findById(id);
+            verify(userRepository, times(1)).delete(user);
+        }
+
+        @Test
+        @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
+        void deleteById_throwResourceNotFoundException_whenUserIsNotFound() {
+            doReturn(Optional.empty()).when(userRepository).findById(anyLong());
+
+            assertThrows(ResourceNotFoundException.class, () -> userService.deleteById(anyLong()));
+        }
     }
 
     @Nested
     class update {
-        //TODO: implementar
+        @Test
+        @DisplayName("should return a UserResponse successfully when the user is updated")
+        void update_returnUserResponse_whenUserIsUpdated() {
+            String username = "test123";
+            UserUpdate userUpdate = new UserUpdate(
+                    "Test",
+                    "email@email.com",
+                    "test123"
+            );
+            UserResponse userResponse = new UserResponse(
+                    "Test",
+                    "test123",
+                    Instant.now(),
+                    null,
+                    null
+            );
+            Users user = new Users(
+                    1L,
+                    "email@email.com",
+                    "test123",
+                    "Test",
+                    "password",
+                    Instant.now(),
+                    true,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
+            doNothing().when(userMapper).mapUpdateUser(any(UserUpdate.class), any(Users.class));
+            doReturn(user).when(userRepository).save(any());
+            doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
+
+            var output = userService.update(userUpdate, username);
+
+            assertNotNull(output);
+            assertEquals(user.getName(), output.name());
+            verify(userRepository, times(1)).findByUsername(anyString());
+            verify(userMapper, times(1)).mapUpdateUser(userUpdate, user);
+            verify(userRepository, times(1)).save(user);
+            verify(userMapper, times(1)).toUserResponse(user);
+        }
+
+        @Test
+        @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
+        void findByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
+            String username = "test123";
+            UserUpdate userUpdate = new UserUpdate(
+                    "Test",
+                    "email@email.com",
+                    "test123"
+            );
+            doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
+
+            assertThrows(ResourceNotFoundException.class, () -> userService.update(userUpdate, username));
+        }
     }
 
     @Nested
     class create {
-        //TODO: implementar
+        @Test
+        @DisplayName("should return a UserResponse when the User is created successfully")
+        void create_returnUserResponse_whenUserIsCreated() {
+
+        }
+
+        @Test
+        @DisplayName("should throw a ResourceAlreadyExists when the User already exists")
+        void create_throwResourceAlreadyExistsException_whenUserIsAlreadyExists() {
+            UserCreate userCreate = new UserCreate(
+                    "Test",
+                    "email@email.com",
+                    "test123",
+                    "password"
+            );
+            Users user = new Users(
+                    1L,
+                    "email@email.com",
+                    "test123",
+                    "Test",
+                    "password",
+                    Instant.now(),
+                    true,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
+
+            assertThrows(ResourceAlreadyExistsException.class, () -> userService.create(userCreate));
+        }
     }
 }

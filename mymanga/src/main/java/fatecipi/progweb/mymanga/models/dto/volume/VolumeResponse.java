@@ -11,7 +11,7 @@ public record VolumeResponse(Long id,
                              BigDecimal price,
                              String chapters,
                              LocalDate releaseDate,
+                             Integer quantity,
                              Long mangaId,
                              String mangaTitle) {
-    //TODO - adicionar quntidade de volumes disponiveis na resposta
 }
