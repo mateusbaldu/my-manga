@@ -103,7 +103,7 @@ public class LoginService {
 
     public void resetPassword(String token, String newPassword) {
         Users user = userRepository.findByConfirmationToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("TInvalid or expired token."));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token."));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setConfirmationToken(null);

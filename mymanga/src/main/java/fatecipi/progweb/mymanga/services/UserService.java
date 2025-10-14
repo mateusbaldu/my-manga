@@ -67,7 +67,6 @@ public class UserService {
         userRepository.save(user);
         return userMapper.toUserResponse(user);
     }
-
     public UserResponse create(UserCreate dto) {
         Role role = roleRepository.findByName(Role.Values.BASIC.name());
         if(userRepository.findByEmail(dto.email()).isPresent()) {
