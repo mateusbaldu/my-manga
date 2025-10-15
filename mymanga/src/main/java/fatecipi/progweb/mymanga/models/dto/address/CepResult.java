@@ -13,6 +13,7 @@ public record CepResult (
         String ibge,
         String gia,
         String ddd,
-        String siafi
+        String siafi,
+        boolean erro
 ){
 }

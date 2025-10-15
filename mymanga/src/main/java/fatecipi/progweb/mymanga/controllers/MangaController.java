@@ -27,7 +27,7 @@ public class MangaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MangaResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(mangaService.findById(id));
+        return ResponseEntity.ok(mangaService.getMangaResponseById(id));
     }
 
     @GetMapping("/all")
@@ -86,6 +86,6 @@ public class MangaController {
 
     @GetMapping("/{id}/volumes/{volId}")
     public ResponseEntity<VolumeResponse> findVolumeById(@PathVariable Long id, @PathVariable Long volId) {
-        return ResponseEntity.ok(mangaService.findVolumeById(id, volId));
+        return ResponseEntity.ok(mangaService.getVolumeResponseById(id, volId));
     }
 }

@@ -72,7 +72,7 @@ public class OrderService {
 
         List<OrderItems> newItems = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.findVolumeByIdWithoutDto(itemDto.volumeId());
+                    Volume volume = mangaService.getVolumeResponseById(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }
@@ -117,7 +117,7 @@ public class OrderService {
         }
         List<OrderItems> orderItemsList = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.findVolumeByIdWithoutDto(itemDto.volumeId());
+                    Volume volume = mangaService.getVolumeResponseById(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }

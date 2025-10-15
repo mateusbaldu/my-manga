@@ -29,7 +29,7 @@ public class OrderController {
 
     @PostMapping("/new")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
-        Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
+        Users user = userService.getUserById(Long.valueOf(token.getName()));
         OrderResponse order = orderService.create(orderDto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
@@ -71,7 +71,7 @@ public class OrderController {
 
     private void isUserPermitted(@PathVariable Long id, JwtAuthenticationToken token) {
         Order order = orderService.findByIdWithoutDto(id);
-        Users user = userService.findByIdWithoutDto(Long.valueOf(token.getName()));
+        Users user = userService.getUserById(Long.valueOf(token.getName()));
         if (!user.isActive()) {
             throw new BadCredentialsException("This account is inactive.");
         }

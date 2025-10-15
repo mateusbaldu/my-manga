@@ -1,7 +1,6 @@
 package fatecipi.progweb.mymanga.models.dto.address;
 
-public record AddressResponse(
-        Long id,
+public record AddressUpdate (
         String cep,
         String street,
         String number,

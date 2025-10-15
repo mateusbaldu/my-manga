@@ -37,12 +37,12 @@ public class MangaService {
         return mangaRepository.findAll(pageable).map(mangaMapper::toMangaResponseDto);
     }
 
-    public MangaResponse findById(Long id) {
-        Manga m = findMangaByIdWithoutDto(id);
+    public MangaResponse getMangaResponseById(Long id) {
+        Manga m = findMangaById(id);
         return mangaMapper.toMangaResponseDto(m);
     }
 
-    public Manga findMangaByIdWithoutDto(Long id) {
+    public Manga findMangaById(Long id) {
         return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
     }
 
@@ -59,7 +59,7 @@ public class MangaService {
     }
 
     public MangaResponse update(Long id, MangaCreateAndUpdate mangaDto) {
-        Manga m = findMangaByIdWithoutDto(id);
+        Manga m = findMangaById(id);
         mangaMapper.mapManga(mangaDto, m);
         mangaRepository.save(m);
         return mangaMapper.toMangaResponseDto(m);
@@ -79,7 +79,7 @@ public class MangaService {
 
     public List<VolumeResponse> addVolumesToManga(Long mangaId, List<VolumeCreate> volDto) {
         if (volDto.isEmpty()) throw new IllegalArgumentException("The list of volumes cannot be empty.");
-        Manga m = findMangaByIdWithoutDto(mangaId);
+        Manga m = findMangaById(mangaId);
 
         return volDto.stream()
                 .map(vol -> {
@@ -101,12 +101,13 @@ public class MangaService {
         return volumePage.map(volumeMapper::toVolumeResponseDto);
     }
 
-    public VolumeResponse findVolumeById(Long mangaId, Long volumeId) {
+    public VolumeResponse getVolumeResponseById(Long mangaId, Long volumeId) {
         Volume vol = getVolumeAssociatedWithManga(mangaId, volumeId);
         return volumeMapper.toVolumeResponseDto(vol);
     }
 
-    public Volume findVolumeByIdWithoutDto(Long id) {
+    public Volume getVolumeResponseById
+            (Long id) {
         return volumeRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + id + " not found"));
@@ -126,7 +127,7 @@ public class MangaService {
     }
 
     public Volume getVolumeAssociatedWithManga(Long mangaId, Long volumeId) {
-        Volume v = findVolumeByIdWithoutDto(volumeId);
+        Volume v = getVolumeResponseById(volumeId);
         if (!mangaId.equals(v.getManga().getId())) {
             throw new IllegalArgumentException("Volume " + volumeId + " isn't associated with manga with id " + mangaId);
         }

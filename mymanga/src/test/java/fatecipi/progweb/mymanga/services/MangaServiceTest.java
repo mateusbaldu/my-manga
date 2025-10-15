@@ -112,7 +112,7 @@ class MangaServiceTest {
             doReturn(Optional.of(manga)).when(mangaRepository).findById(anyLong());
 
             //Act
-            Manga output = mangaService.findMangaByIdWithoutDto(1L);
+            Manga output = mangaService.findMangaById(1L);
 
             //Assert
             assertNotNull(output);
@@ -126,7 +126,7 @@ class MangaServiceTest {
             when(mangaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findMangaByIdWithoutDto(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.findMangaById(anyLong()));
         }
     }
 
@@ -162,7 +162,7 @@ class MangaServiceTest {
             when(mangaRepository.findById(1L)).thenReturn(Optional.of(manga));
 
             //Act
-            MangaResponse output = mangaService.findById(1L);
+            MangaResponse output = mangaService.getMangaResponseById(1L);
 
             //Assert
             assertNotNull(output);
@@ -180,7 +180,7 @@ class MangaServiceTest {
             doReturn(Optional.empty()).when(mangaRepository).findById(anyLong());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findById(1L));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.getMangaResponseById(1L));
             verify(mangaRepository, atLeastOnce()).findById(1L);
         }
     }
@@ -591,7 +591,7 @@ class MangaServiceTest {
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
             doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(volume);
 
-            var output = mangaService.findVolumeById(mangaId, volumeId);
+            var output = mangaService.getVolumeResponseById(mangaId, volumeId);
 
             assertNotNull(output);
             verify(volumeRepository, times(1)).findById(volumeId);
@@ -626,7 +626,7 @@ class MangaServiceTest {
             );
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
 
-            assertThrows(IllegalArgumentException.class, () -> mangaService.findVolumeById(mangaId, volumeId));
+            assertThrows(IllegalArgumentException.class, () -> mangaService.getVolumeResponseById(mangaId, volumeId));
         }
     }
 
@@ -646,7 +646,7 @@ class MangaServiceTest {
             );
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volume.getId());
 
-            var output = mangaService.findVolumeByIdWithoutDto(1L);
+            var output = mangaService.getVolumeResponseById(1L);
 
             assertNotNull(output);
             verify(volumeRepository, times(1)).findById(anyLong());
@@ -659,7 +659,7 @@ class MangaServiceTest {
             doReturn(Optional.empty()).when(volumeRepository).findById(anyLong());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findVolumeByIdWithoutDto(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.getVolumeResponseById(anyLong()));
         }
     }
 

@@ -17,7 +17,7 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private Users users;
 
     @Size(min = 8, max = 8)
     private String cep;

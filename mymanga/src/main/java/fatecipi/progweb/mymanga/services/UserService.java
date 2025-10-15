@@ -39,30 +39,30 @@ public class UserService {
         return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
 
-    public Users findByUsernameWithoutDto(String username) {
+    public Users getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User with username "+ username +" not found"));
     }
 
-    public UserResponse findByUsername(String username) {
-        Users user = findByUsernameWithoutDto(username);
+    public UserResponse getUserResponseByUsername(String username) {
+        Users user = getUserByUsername(username);
         return userMapper.toUserResponse(user);
     }
 
-    public Users findByIdWithoutDto(Long id) {
+    public Users getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id "+ id +" not found"));
     }
 
-    public UserResponse findById(Long id) {
-        Users user = findByIdWithoutDto(id);
+    public UserResponse getUserResponseById(Long id) {
+        Users user = getUserById(id);
         return userMapper.toUserResponse(user);
     }
 
     public void deleteById(Long id) {
-        userRepository.delete(findByIdWithoutDto(id));
+        userRepository.delete(getUserById(id));
     }
 
     public UserResponse update(UserUpdate dto, String username) {
-        Users user = findByUsernameWithoutDto(username);
+        Users user = getUserByUsername(username);
         userMapper.mapUpdateUser(dto, user);
         userRepository.save(user);
         return userMapper.toUserResponse(user);

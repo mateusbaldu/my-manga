@@ -3,6 +3,7 @@ package fatecipi.progweb.mymanga.controllers;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
 import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
+import fatecipi.progweb.mymanga.models.dto.address.AddressUpdate;
 import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
@@ -47,13 +48,13 @@ public class UserController {
 
     @GetMapping("/{username}")
     public ResponseEntity<UserResponse> findByUsername(@PathVariable String username, JwtAuthenticationToken token) {
-        return ResponseEntity.ok(userService.findByUsername(username));
+        return ResponseEntity.ok(userService.getUserResponseByUsername(username));
     }
 
     @GetMapping("/id/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
+        return ResponseEntity.ok(userService.getUserResponseById(id));
     }
 
     @GetMapping("/all")
@@ -64,7 +65,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, JwtAuthenticationToken token) {
-        Users user = userService.findByIdWithoutDto(id);
+        Users user = userService.getUserById(id);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
             throw new BadCredentialsException("User don't have permission to delete another account");
         }
@@ -74,7 +75,7 @@ public class UserController {
 
     @PatchMapping("/{username}")
     public ResponseEntity<UserResponse> update(@RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
-        Users user = userService.findByUsernameWithoutDto(username);
+        Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
             throw new BadCredentialsException("User don't have permission to delete another account");
         }
@@ -100,18 +101,51 @@ public class UserController {
     }
 
 
-    @PostMapping("/{userid}/new")
-    public ResponseEntity<AddressResponse> addNewAddressToUser(
-            @PathVariable("userid") Long userid,
-            @RequestBody AddressCreate dto,
-            JwtAuthenticationToken token
+
+    @PostMapping("/{username}/address/new")
+    public ResponseEntity<AddressResponse> addNewAddressToUser(@PathVariable("username") String username, @RequestBody AddressCreate dto, JwtAuthenticationToken token
     ) {
-        Users user = userService.findByIdWithoutDto(userid);
+        Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
             throw new BadCredentialsException("User don't have permission to add new address to other account");
         }
-        return ResponseEntity.ok(addressService.addNewAddressToUser(userid, dto));
+        return ResponseEntity.ok(addressService.addNewAddressToUser(username, dto));
     }
 
+    @GetMapping("/{username}/address/{addressid}")
+    public ResponseEntity<AddressResponse> getAddressById(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, JwtAuthenticationToken token
+    ) {
+        verifyUserPermission(username, token);
+        return ResponseEntity.ok(addressService.getAddressResponseById(username, addressid));
+    }
 
+    @DeleteMapping("/{username}/address/{addressid}")
+    public ResponseEntity<Void> deleteAddressById(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, JwtAuthenticationToken token
+    ) {
+        verifyUserPermission(username, token);
+        addressService.deleteAddressById(username, addressid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{username}/address/all")
+    public ResponseEntity<Page<AddressResponse>> getAllAddresses(@PathVariable("username") String username, Pageable pageable, JwtAuthenticationToken token
+    ) {
+        verifyUserPermission(username, token);
+        return ResponseEntity.ok(addressService.getUserAddresses(username, pageable));
+    }
+
+    @PatchMapping("/{username}/address/{addressid}")
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, @RequestBody AddressUpdate update, JwtAuthenticationToken token) {
+        verifyUserPermission(username, token);
+        return ResponseEntity.ok(addressService.updateAddressById(username, addressid, update));
+    }
+
+    private void verifyUserPermission(String username, JwtAuthenticationToken token) {
+        Users user = userService.getUserByUsername(username);
+        if (!user.getId().equals(Long.valueOf(token.getName()))) {
+            throw new BadCredentialsException("User don't have permission to access the address by other account");
+        }
+    }
+
+    //TODO: EXTRAIR A LOGICA DE NAO PERMITIR ANALISAR ENDEREÇOS DE OUTRO USUÁRIO PARA UM MÉTODO
 }

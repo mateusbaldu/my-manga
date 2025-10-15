@@ -14,6 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,7 +28,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,6 +47,8 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+
 
     @Nested
     class findAll {
@@ -67,10 +70,9 @@ class UserServiceTest {
                     null
             );
             UserResponse userResponse = new UserResponse(
-                    "test123",
                     "Test",
+                    "test123",
                     Instant.now(),
-                    null,
                     null
             );
             Page<Users> userPage = new PageImpl<>(List.of(user));
@@ -88,10 +90,10 @@ class UserServiceTest {
     }
 
     @Nested
-    class findByUsernameWithoutDto {
+    class getUserByUsername {
         @Test
         @DisplayName("should return a User when everything is ok")
-        void findByUsernameWithoutDto_returnUser_whenEverythingIsOk() {
+        void getUserByUsername_returnUser_whenEverythingIsOk() {
             String username = "test123";
             Users user = new Users(
                     1L,
@@ -109,7 +111,7 @@ class UserServiceTest {
 
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
 
-            var output = userService.findByUsernameWithoutDto(username);
+            var output = userService.getUserByUsername(username);
 
             assertNotNull(output);
             assertEquals(user, output);
@@ -118,18 +120,18 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
-        void findByUsernameWithoutDto_throwResourceNotFoundException_whenUserIsNotFound() {
+        void getUserByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
             doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
 
-            assertThrows(ResourceNotFoundException.class, () -> userService.findByUsernameWithoutDto(anyString()));
+            assertThrows(ResourceNotFoundException.class, () -> userService.getUserByUsername(anyString()));
         }
     }
 
     @Nested
-    class findByUsername {
+    class getUserResponseByUsername {
         @Test
         @DisplayName("should return a UserResponse when everything is ok")
-        void findByUsername_returnUserResponse_whenEverythingIsOk() {
+        void getUserResponseByUsername_returnUserResponse_whenEverythingIsOk() {
             String username = "test123";
             Users user = new Users(
                     1L,
@@ -148,14 +150,13 @@ class UserServiceTest {
                     "Test",
                     "test123",
                     Instant.now(),
-                    null,
                     null
             );
 
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
             doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
 
-            var output = userService.findByUsername(username);
+            var output = userService.getUserResponseByUsername(username);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
@@ -165,18 +166,18 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
-        void findByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
+        void getUserResponseByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
             doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
 
-            assertThrows(ResourceNotFoundException.class, () -> userService.findByUsername(anyString()));
+            assertThrows(ResourceNotFoundException.class, () -> userService.getUserResponseByUsername(anyString()));
         }
     }
 
     @Nested
-    class findByIdWithoutDto {
+    class getUserById {
         @Test
         @DisplayName("should return a User when everything is ok")
-        void findByIdWithoutDto_returnUser_whenEverythingIsOk() {
+        void getUserById_returnUser_whenEverythingIsOk() {
             long id = 1L;
             Users user = new Users(
                     1L,
@@ -194,7 +195,7 @@ class UserServiceTest {
 
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
 
-            var output = userService.findByIdWithoutDto(id);
+            var output = userService.getUserById(id);
 
             assertNotNull(output);
             assertEquals(user, output);
@@ -203,18 +204,18 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
-        void findByIdWithoutDto_throwResourceNotFoundException_whenUserIsNotFound() {
+        void getUserById_throwResourceNotFoundException_whenUserIsNotFound() {
             doReturn(Optional.empty()).when(userRepository).findById(anyLong());
 
-            assertThrows(ResourceNotFoundException.class, () -> userService.findByIdWithoutDto(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(anyLong()));
         }
     }
 
     @Nested
-    class findById {
+    class getUserResponseById{
         @Test
         @DisplayName("should return a UserResponse when everything is ok")
-        void findById_returnUserResponse_whenEverythingIsOk() {
+        void getUserResponseById_returnUserResponse_whenEverythingIsOk() {
             long id = 1L;
             Users user = new Users(
                     1L,
@@ -233,14 +234,13 @@ class UserServiceTest {
                     "Test",
                     "test123",
                     Instant.now(),
-                    null,
                     null
             );
 
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
             doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
 
-            var output = userService.findById(id);
+            var output = userService.getUserResponseById(id);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
@@ -250,10 +250,10 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
-        void findById_throwResourceNotFoundException_whenUserIsNotFound() {
+        void getUserResponseById_throwResourceNotFoundException_whenUserIsNotFound() {
             doReturn(Optional.empty()).when(userRepository).findById(anyLong());
 
-            assertThrows(ResourceNotFoundException.class, () -> userService.findById(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> userService.getUserResponseById(anyLong()));
         }
     }
 
@@ -309,7 +309,6 @@ class UserServiceTest {
                     "Test",
                     "test123",
                     Instant.now(),
-                    null,
                     null
             );
             Users user = new Users(
@@ -360,8 +359,9 @@ class UserServiceTest {
         @Test
         @DisplayName("should return a UserResponse when the User is created successfully")
         void create_returnUserResponse_whenUserIsCreated() {
-            //TODO: implementar
+            //TODO
         }
+
 
         @Test
         @DisplayName("should throw a ResourceAlreadyExists when the User already exists")
