@@ -3,6 +3,7 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -358,7 +360,7 @@ class UserServiceTest {
         @Test
         @DisplayName("should return a UserResponse when the User is created successfully")
         void create_returnUserResponse_whenUserIsCreated() {
-
+            //TODO: implementar
         }
 
         @Test

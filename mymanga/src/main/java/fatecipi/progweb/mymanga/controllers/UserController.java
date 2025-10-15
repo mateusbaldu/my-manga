@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
+import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
 import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
@@ -8,6 +10,7 @@ import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
+import fatecipi.progweb.mymanga.services.AddressService;
 import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
 import org.springframework.data.domain.Page;
@@ -24,10 +27,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final LoginService loginService;
+    private final AddressService addressService;
 
-    public UserController(UserService userService, LoginService loginService) {
+    public UserController(UserService userService, LoginService loginService, AddressService addressService) {
         this.userService = userService;
         this.loginService = loginService;
+        this.addressService = addressService;
     }
 
     @PostMapping("/new")
@@ -93,4 +98,20 @@ public class UserController {
         loginService.resetPassword(request.token(), request.newPassword());
         return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
+
+
+    @PostMapping("/{userid}/new")
+    public ResponseEntity<AddressResponse> addNewAddressToUser(
+            @PathVariable("userid") Long userid,
+            @RequestBody AddressCreate dto,
+            JwtAuthenticationToken token
+    ) {
+        Users user = userService.findByIdWithoutDto(userid);
+        if (!user.getId().equals(Long.valueOf(token.getName()))) {
+            throw new BadCredentialsException("User don't have permission to add new address to other account");
+        }
+        return ResponseEntity.ok(addressService.addNewAddressToUser(userid, dto));
+    }
+
+
 }
