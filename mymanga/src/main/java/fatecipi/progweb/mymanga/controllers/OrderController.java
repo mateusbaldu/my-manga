@@ -42,12 +42,12 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.findById(id));
+        return ResponseEntity.ok(orderService.getOrderResponseById(id));
     }
 
     @GetMapping("/user/{username}")
     public ResponseEntity<Page<OrderResponse>> findByUserUsername(@PathVariable String username, Pageable pageable) {
-        return ResponseEntity.ok(orderService.findByUserUsername(username, pageable));
+        return ResponseEntity.ok(orderService.findAllByUserUsername(username, pageable));
     }
 
     @DeleteMapping("/{id}")
@@ -70,7 +70,7 @@ public class OrderController {
     }
 
     private void isUserPermitted(@PathVariable Long id, JwtAuthenticationToken token) {
-        Order order = orderService.findByIdWithoutDto(id);
+        Order order = orderService.getOrderById(id);
         Users user = userService.getUserById(Long.valueOf(token.getName()));
         if (!user.isActive()) {
             throw new BadCredentialsException("This account is inactive.");

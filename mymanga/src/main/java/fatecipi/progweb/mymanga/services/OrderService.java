@@ -20,7 +20,6 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -44,29 +43,29 @@ public class OrderService {
         return orderRepository.findAll(pageable).map(orderMapper::toOrderResponse);
     }
 
-    public OrderResponse findById(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
+    public OrderResponse getOrderResponseById(Long id) {
+       Order order = getOrderById(id);
         return orderMapper.toOrderResponse(order);
     }
 
-    public Order findByIdWithoutDto(Long id) {
+    public Order getOrderById(Long id) {
         return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
     }
 
-    public Page<OrderResponse> findByUserUsername(String username, Pageable pageable) {
+    public Page<OrderResponse> findAllByUserUsername(String username, Pageable pageable) {
         if (!userRepository.existsByUsername(username)) {
             throw new ResourceNotFoundException("User with username " + username + " not found");
         }
         Page<Order> orderPage = orderRepository.findByUsers_Username(username, pageable);
-        return orderPage.map(order -> orderMapper.toOrderResponse(order));
+        return orderPage.map(orderMapper::toOrderResponse);
     }
 
     public void delete(Long id) {
-        orderRepository.delete(findByIdWithoutDto(id));
+        orderRepository.delete(getOrderById(id));
     }
 
     public OrderResponse update(Long id, OrderCreate orderDto) {
-        Order order = findByIdWithoutDto(id);
+        Order order = getOrderById(id);
 
         order.getItems().clear();
 
@@ -74,7 +73,7 @@ public class OrderService {
                 .map(itemDto -> {
                     Volume volume = mangaService.getVolumeResponseById(itemDto.volumeId());
                     if (volume.getQuantity() < itemDto.quantity()) {
-                        throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
+                        throw new NotAvailableException("This quantity of " + volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " isn't available.");
                     }
 
                     volume.setQuantity(volume.getQuantity() - itemDto.quantity());
@@ -131,7 +130,7 @@ public class OrderService {
                             .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         BigDecimal totalPrice = orderItemsList.stream()
                 .map(OrderItems::getTotalPrice)

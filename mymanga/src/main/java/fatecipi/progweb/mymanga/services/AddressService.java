@@ -30,11 +30,11 @@ public class AddressService {
     }
 
     public AddressResponse addNewAddressToUser(String username, AddressCreate dto) {
-        Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         if (dto.cep().length() != 8) {
             throw new IllegalArgumentException("Cep length must be 8");
         }
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
 
         String viaCepUrl = "https://viacep.com.br/ws/" + dto.cep() + "/json/";
         CepResult cepResult = restTemplate.getForObject(viaCepUrl, CepResult.class);
@@ -70,8 +70,8 @@ public class AddressService {
     public void deleteAddressById(String username, Long addressid) {
         Address a = getAddressAssociatedWithUser(username, addressid);
         addressRepository.deleteById(a.getId());
+        //TODO: DELEÇÃO NAO TA FUNCIONANDO
     }
-    //TODO: DELEÇÃO NAO TA FUNCIONANDO
 
     public Page<AddressResponse> getUserAddresses(String username, Pageable pageable) {
         return addressRepository.findByUsers_Username(username, pageable).map(addressMapper::toAddressResponse);

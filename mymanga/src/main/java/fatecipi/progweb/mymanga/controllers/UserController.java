@@ -146,6 +146,4 @@ public class UserController {
             throw new BadCredentialsException("User don't have permission to access the address by other account");
         }
     }
-
-    //TODO: EXTRAIR A LOGICA DE NAO PERMITIR ANALISAR ENDEREÇOS DE OUTRO USUÁRIO PARA UM MÉTODO
 }
