@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.configs.security.TokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
@@ -7,6 +8,8 @@ import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,13 +26,16 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class LoginServiceTest {
     @Mock
@@ -42,6 +48,8 @@ class LoginServiceTest {
     RoleRepository roleRepository;
     @Mock
     JwtEncoder jwtEncoder;
+    @Mock
+    TokenConfig tokenConfig;
 
     @InjectMocks
     LoginService loginService;
@@ -51,49 +59,57 @@ class LoginServiceTest {
     @Captor
     ArgumentCaptor<JwtEncoderParameters> jwtEncoderParametersCaptor;
 
+    private Users user;
+    private Set<Role> roles = new HashSet<>();
+    private LoginRequest loginRequest;
+    private String token;
+
+    @BeforeEach
+    void setUp() {
+        Role role = new Role();
+        role.setId(Role.Values.BASIC.getRoleId());
+        role.setName(Role.Values.BASIC.name());
+        roles.add(role);
+        user = Users.builder()
+                .id(1L)
+                .email("email@email.com")
+                .username("test123")
+                .name("Test")
+                .password("password")
+                .createdAt(Instant.now())
+                .isActive(true)
+                .confirmationToken(null)
+                .address(null)
+                .roles(roles)
+                .orders(null)
+                .build();
+        loginRequest = new LoginRequest(
+                "email@email.com",
+                "password");
+        token = UUID.randomUUID().toString();
+    }
 
     @Nested
     class login {
         @Test
         @DisplayName("should return a LoginResponse when everything is ok")
         void login_returnLoginResponse_WhenEverythingIsOk() {
-            Instant now = Instant.now();
-
-            LoginRequest loginRequest = new LoginRequest(
-                    "email@email.com",
-                    "password");
-            Role role = new Role();
-            role.setId(Role.Values.BASIC.getRoleId());
-            role.setName(Role.Values.BASIC.name());
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    now,
-                    true,
-                    null,
-                    null,
-                    Set.of(role),
-                    null
-            );
-
-            String scopes = role.getName();
+            String scopes = roles.stream().map(Role::getName).collect(Collectors.joining(" "));
             long expiresIn = 200000L;
             JwtClaimsSet claims = JwtClaimsSet.builder()
                     .subject(user.getName())
-                    .expiresAt(now.plusSeconds(expiresIn))
+                    .expiresAt(Instant.now().plusSeconds(expiresIn))
                     .claim("scope", scopes)
                     .build();
             Jwt jwt = Jwt.withTokenValue("token-test")
                     .header("Test", "none")
                     .claim("scope", scopes)
                     .build();
+            String fakeTokenValue = jwt.getTokenValue();
 
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             when(user.isLoginCorrect(loginRequest, passwordEncoder)).thenReturn(true);
-            doReturn(jwt).when(jwtEncoder).encode(any(JwtEncoderParameters.class));
+            doReturn(fakeTokenValue).when(tokenConfig).generateToken(any(Users.class));
 
             var output = loginService.login(loginRequest);
 
@@ -107,9 +123,6 @@ class LoginServiceTest {
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found by email")
         void login_throwResourceNotFoundException_WhenUserNotFound() {
-            LoginRequest loginRequest = new LoginRequest(
-                    "email@email.com",
-                    "password");
             doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
 
             assertThrows(ResourceNotFoundException.class, () -> loginService.login(loginRequest));
@@ -119,22 +132,6 @@ class LoginServiceTest {
         @Test
         @DisplayName("should throw a InvalidLoginException when the password is invalid")
         void login_throwInvalidLoginException_WhenPasswordIsInvalid() {
-            LoginRequest loginRequest = new LoginRequest(
-                    "email@email.com",
-                    "password");
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             when(user.isLoginCorrect(loginRequest, passwordEncoder)).thenReturn(false);
 
@@ -145,22 +142,7 @@ class LoginServiceTest {
         @Test
         @DisplayName("should throw a InvalidLoginException when the User isn't active")
         void login_throwInvalidLoginException_WhenUserIsntActive() {
-            LoginRequest loginRequest = new LoginRequest(
-                    "email@email.com",
-                    "password");
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    false,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+            user.setActive(false);
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             when(user.isLoginCorrect(loginRequest, passwordEncoder)).thenReturn(true);
 
@@ -174,20 +156,6 @@ class LoginServiceTest {
         @Test
         @DisplayName("should return void when everything is ok")
         void activateAccount_returnVoid_WhenEverythingIsOk() {
-            String token = UUID.randomUUID().toString();
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    false,
-                    token,
-                    null,
-                    null,
-                    null
-            );
             doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(anyString());
 
             loginService.activateAccount(token);
@@ -200,7 +168,6 @@ class LoginServiceTest {
         @Test
         @DisplayName("Should throw a ResourceNotFoundException when the User isn't found by the token")
         void activateAccount_throwResourceNotFoundException_WhenUserIsNotFound() {
-            String token = UUID.randomUUID().toString();
             doReturn(Optional.empty()).when(userRepository).findByConfirmationToken(anyString());
 
             assertThrows(ResourceNotFoundException.class, () -> loginService.activateAccount(token));
@@ -213,20 +180,7 @@ class LoginServiceTest {
         @Test
         @DisplayName("should return void when everything is working successfully")
         void requestPasswordReset_returnVoid_WhenEverythingIsOk() {
-            String email = "email@email.com";
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+            String email = user.getEmail();
 
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             doReturn(user).when(userRepository).save(any(Users.class));
@@ -243,7 +197,7 @@ class LoginServiceTest {
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
         void requestPasswordReset_throwResourceNotFoundException_WhenUserIsNotFound() {
-            String email = "email@email.com";
+            String email = user.getEmail();
             doReturn(Optional.empty()).when(userRepository).findByEmail(email);
 
             assertThrows(ResourceNotFoundException.class, () -> loginService.requestPasswordReset(email));
@@ -255,22 +209,8 @@ class LoginServiceTest {
         @Test
         @DisplayName("should return void when everything is working successfully")
         void resetPassword_returnVoid_WhenEverythingIsOk() {
-            String password = "password";
+            String password = user.getPassword();
             String encodedPassword = "encodedPassword";
-            String token = UUID.randomUUID().toString();
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    token,
-                    null,
-                    null,
-                    null
-            );
 
             doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(token);
             doReturn(encodedPassword).when(passwordEncoder).encode(password);
@@ -286,8 +226,7 @@ class LoginServiceTest {
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
         void resetPassword_throwResourceNotFoundException_WhenUserIsNotFound() {
-            String password = "password";
-            String token = UUID.randomUUID().toString();
+            String password = user.getPassword();
 
             doReturn(Optional.empty()).when(userRepository).findByConfirmationToken(token);
 

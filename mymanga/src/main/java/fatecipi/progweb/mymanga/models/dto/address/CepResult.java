@@ -1,5 +1,8 @@
 package fatecipi.progweb.mymanga.models.dto.address;
 
+import lombok.Builder;
+
+@Builder
 public record CepResult (
         String cep,
         String logradouro,

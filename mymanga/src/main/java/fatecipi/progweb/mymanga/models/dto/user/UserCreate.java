@@ -4,7 +4,9 @@ import fatecipi.progweb.mymanga.validation.ValidUsername;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record UserCreate(
         @NotNull(message = "Field can't be null")
         String name,

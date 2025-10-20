@@ -9,6 +9,7 @@ import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,44 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    private Users user;
+    private UserResponse userResponse;
+    private UserUpdate userUpdate;
+    private UserCreate userCreate;
 
+    @BeforeEach
+    void setUp() {
+        user = new Users(
+                1L,
+                "email@email.com",
+                "test123",
+                "Test",
+                "password",
+                Instant.now(),
+                true,
+                null,
+                null,
+                null,
+                null
+        );
+        userUpdate = new UserUpdate(
+                "Test",
+                "email@email.com",
+                "test123"
+        );
+        userResponse = new UserResponse(
+                "Test",
+                "test123",
+                Instant.now(),
+                null
+        );
+        userCreate = new UserCreate(
+                "Test",
+                "email@email.com",
+                "test123",
+                "password"
+        );
+    }
 
     @Nested
     class findAll {
@@ -53,25 +91,6 @@ class UserServiceTest {
         @DisplayName("should return a Page of UserResponse when everything is ok")
         void findAll_returnPageResponse_whenEverythingIsOk() {
             Pageable pageable = PageRequest.of(0, 10);
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            UserResponse userResponse = new UserResponse(
-                    "Test",
-                    "test123",
-                    Instant.now(),
-                    null
-            );
             Page<Users> userPage = new PageImpl<>(List.of(user));
 
             doReturn(userPage).when(userRepository).findAll(any(Pageable.class));
@@ -92,19 +111,6 @@ class UserServiceTest {
         @DisplayName("should return a User when everything is ok")
         void getUserByUsername_returnUser_whenEverythingIsOk() {
             String username = "test123";
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
 
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
 
@@ -130,25 +136,6 @@ class UserServiceTest {
         @DisplayName("should return a UserResponse when everything is ok")
         void getUserResponseByUsername_returnUserResponse_whenEverythingIsOk() {
             String username = "test123";
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            UserResponse userResponse = new UserResponse(
-                    "Test",
-                    "test123",
-                    Instant.now(),
-                    null
-            );
 
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
             doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
@@ -175,20 +162,7 @@ class UserServiceTest {
         @Test
         @DisplayName("should return a User when everything is ok")
         void getUserById_returnUser_whenEverythingIsOk() {
-            long id = 1L;
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+            long id = user.getId();
 
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
 
@@ -214,25 +188,6 @@ class UserServiceTest {
         @DisplayName("should return a UserResponse when everything is ok")
         void getUserResponseById_returnUserResponse_whenEverythingIsOk() {
             long id = 1L;
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            UserResponse userResponse = new UserResponse(
-                    "Test",
-                    "test123",
-                    Instant.now(),
-                    null
-            );
 
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
             doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
@@ -260,19 +215,6 @@ class UserServiceTest {
         @DisplayName("should return void when User deleted succesfully")
         void deleteById_returnVoid_whenEverythingIsOk() {
             long id = 1L;
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
             doNothing().when(userRepository).delete(any());
 
@@ -297,30 +239,7 @@ class UserServiceTest {
         @DisplayName("should return a UserResponse successfully when the user is updated")
         void update_returnUserResponse_whenUserIsUpdated() {
             String username = "test123";
-            UserUpdate userUpdate = new UserUpdate(
-                    "Test",
-                    "email@email.com",
-                    "test123"
-            );
-            UserResponse userResponse = new UserResponse(
-                    "Test",
-                    "test123",
-                    Instant.now(),
-                    null
-            );
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
+
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
             doNothing().when(userMapper).updateMapping(any(UserUpdate.class), any(Users.class));
             doReturn(user).when(userRepository).save(any());
@@ -340,11 +259,7 @@ class UserServiceTest {
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
         void findByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
             String username = "test123";
-            UserUpdate userUpdate = new UserUpdate(
-                    "Test",
-                    "email@email.com",
-                    "test123"
-            );
+
             doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
 
             assertThrows(ResourceNotFoundException.class, () -> userService.update(userUpdate, username));
@@ -363,25 +278,6 @@ class UserServiceTest {
         @Test
         @DisplayName("should throw a ResourceAlreadyExists when the User already exists")
         void create_throwResourceAlreadyExistsException_whenUserIsAlreadyExists() {
-            UserCreate userCreate = new UserCreate(
-                    "Test",
-                    "email@email.com",
-                    "test123",
-                    "password"
-            );
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
 
             assertThrows(ResourceAlreadyExistsException.class, () -> userService.create(userCreate));

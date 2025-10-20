@@ -15,6 +15,7 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,31 +55,108 @@ class OrderServiceTest {
     private OrderService orderService;
 
 
+    private Order order;
+    private OrderResponse orderResponse;
+    private Users user;
+    private Manga manga;
+    private Volume volume;
+    private OrderItems orderItems;
+    private OrderCreate orderCreate;
+    private OrderItemsCreate orderItemsCreate;
+
+    @BeforeEach
+    void setUp() {
+        order = new Order(
+                1L,
+                Instant.now(),
+                BigDecimal.valueOf(20.00),
+                UUID.randomUUID().toString(),
+                PaymentMethod.CREDIT,
+                OrderStatus.WAITING_CONFIRMATION,
+                null,
+                null
+        );
+        orderResponse = new OrderResponse(
+                1L,
+                Instant.now(),
+                BigDecimal.valueOf(20.00),
+                PaymentMethod.CREDIT,
+                OrderStatus.WAITING_CONFIRMATION,
+                null,
+                null
+        );
+
+        Role role = new Role();
+        role.setId(1L);
+        role.setName("BASIC");
+        manga.setVolume(Set.of(volume));
+        user = new Users(
+                1L,
+                "email@email.com",
+                "test123",
+                "Test",
+                "password",
+                Instant.now(),
+                true,
+                null,
+                null,
+                Set.of(role),
+                null
+        );
+        manga = new Manga(
+                1L,
+                "Test",
+                "Author",
+                "Test description",
+                8.5,
+                "test",
+                MangaStatus.COMPLETED,
+                Genres.ACTION,
+                null
+        );
+        volume = new Volume(
+                1L,
+                1,
+                BigDecimal.valueOf(10.50),
+                "1 to 10",
+                LocalDate.now(),
+                50,
+                manga
+        );
+
+        orderItems = new OrderItems(
+                1L,
+                1L,
+                10,
+                manga.getTitle(),
+                volume.getPrice(),
+                BigDecimal.valueOf(105.00),
+                order
+        );
+        OrderItemsResponse orderItemsResponse = new OrderItemsResponse(
+                manga.getTitle(),
+                volume.getVolumeNumber(),
+                orderItemsCreate.quantity(),
+                volume.getPrice()
+        );
+        order.setItems(List.of(orderItems));
+        List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
+        orderItemsCreate = new OrderItemsCreate(
+                1L,
+                10
+        );
+        orderItemsCreateList.add(orderItemsCreate);
+        orderCreate = new OrderCreate(
+                PaymentMethod.CREDIT,
+                orderItemsCreateList
+        );
+    }
+
     @Nested
     class findAll {
         @Test
         @DisplayName("should return a Page of Orders when everything is ok")
         void findAll_returnPageOrder_whenEverythingIsOk() {
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-            OrderResponse orderResponse = new OrderResponse(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-
             Page<Order> pageOrder = new PageImpl<>(List.of(order));
             Pageable pageable = PageRequest.of(0, 10);
 
@@ -98,17 +176,6 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a Order when everything is ok")
         void getOrderById_returnOrder_whenEverythingIsOk() {
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-
             doReturn(Optional.of(order)).when(orderRepository).findById(1L);
 
             var output = orderService.getOrderById(1L);
@@ -131,27 +198,6 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a OrderResponse when everything is ok")
         void getOrderResponseById_returnOrder_whenEverythingIsOk() {
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-            OrderResponse orderResponse = new OrderResponse(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-
-
             doReturn(Optional.of(order)).when(orderRepository).findById(1L);
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
 
@@ -177,27 +223,6 @@ class OrderServiceTest {
         @DisplayName("should return a Page of OrderResponse when everything is ok")
         void findAllByUserUsername_returnPageOrderResponse_whenEverythingIsOk() {
             String username = "test";
-
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-            OrderResponse orderResponse = new OrderResponse(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-
             Page<Order> pageOrder = new PageImpl<>(List.of(order));
             Pageable pageable = PageRequest.of(0, 10);
 
@@ -228,17 +253,6 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return void when everything is ok")
         void delete_void_whenEverythingIsOk() {
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(20.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-
             doReturn(Optional.of(order)).when(orderRepository).findById(1L);
             doNothing().when(orderRepository).delete(order);
 
@@ -262,92 +276,6 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a OrderResponse when everything is ok")
         void create_returnOrderResponse_whenEverythingIsOk() {
-            Role role = new Role();
-            role.setId(1L);
-            role.setName("BASIC");
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    Set.of(role),
-                    null
-            );
-            Manga manga = new Manga(
-                    1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            Volume volume = new Volume(
-                    1L,
-                    1,
-                    BigDecimal.valueOf(10.50),
-                    "1 to 10",
-                    LocalDate.now(),
-                    50,
-                    manga
-            );
-            manga.setVolume(Set.of(volume));
-
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    user
-            );
-            OrderItems orderItems = new OrderItems(
-                    1L,
-                    1L,
-                    manga.getTitle(),
-                    volume.getPrice(),
-                    BigDecimal.valueOf(105.00),
-                    10,
-                    order
-            );
-            order.setItems(List.of(orderItems));
-
-            List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
-            OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
-                    1L,
-                    10
-            );
-            orderItemsCreateList.add(orderItemsCreate);
-            OrderCreate orderCreate = new OrderCreate(
-                    PaymentMethod.CREDIT,
-                    orderItemsCreateList
-            );
-
-            OrderItemsResponse orderItemsResponse = new OrderItemsResponse(
-                    manga.getTitle(),
-                    volume.getVolumeNumber(),
-                    orderItemsCreate.quantity(),
-                    volume.getPrice()
-                    );
-            OrderResponse orderResponse = new OrderResponse(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    List.of(orderItemsResponse),
-                    user
-            );
-
             doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
             doReturn(order).when(orderRepository).save(any(Order.class));
@@ -366,31 +294,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should throw NotAvailableException when the OrderCreateDto has more items than the available on the system")
         void create_throwNotAvailableException_whenItemsArentAvailable() {
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            Manga manga = new Manga(
-                    1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            Volume volume = new Volume(
+            volume = new Volume(
                     1L,
                     1,
                     BigDecimal.valueOf(10.50),
@@ -401,12 +305,12 @@ class OrderServiceTest {
             );
             manga.setVolume(Set.of(volume));
             List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
-            OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
+            orderItemsCreate = new OrderItemsCreate(
                     1L,
                     50
             );
             orderItemsCreateList.add(orderItemsCreate);
-            OrderCreate orderCreate = new OrderCreate(
+            orderCreate = new OrderCreate(
                     PaymentMethod.CREDIT,
                     orderItemsCreateList
             );
@@ -419,29 +323,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should throw BadCredentialsException when the User isn't active")
         void create_throwBadCredentialsException_whenUserIsNotActive() {
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    false,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
-            OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
-                    1L,
-                    10
-            );
-            orderItemsCreateList.add(orderItemsCreate);
-            OrderCreate orderCreate = new OrderCreate(
-                    PaymentMethod.CREDIT,
-                    orderItemsCreateList
-            );
+            user.setActive(false);
 
             assertThrows(BadCredentialsException.class, () -> orderService.create(orderCreate, user));
         }
@@ -453,16 +335,6 @@ class OrderServiceTest {
         @DisplayName("should return void when everything is ok")
         void confirmOrder_returnVoid_whenEverythingIsOk() {
             String token = UUID.randomUUID().toString();
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    token,
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
 
             doReturn(Optional.of(order)).when(orderRepository).findByConfirmationToken(anyString());
             doReturn(order).when(orderRepository).save(any(Order.class));
@@ -484,18 +356,9 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("should throw IllegalStateException when the OrderStatus isn't WAITING_CONFIRMATION")
-        void confirmOrder_throwIllegalStateException_whenOrderStatusIsntWAITING_CONFIRMATION() {
+        void confirmOrder_throwIllegalStateException_whenOrderStatusIsnotWAITING_CONFIRMATION() {
             String token = UUID.randomUUID().toString();
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    token,
-                    PaymentMethod.CREDIT,
-                    OrderStatus.CONFIRMED,
-                    null,
-                    null
-            );
+            order.setStatus(OrderStatus.CONFIRMED);
 
             doReturn(Optional.of(order)).when(orderRepository).findByConfirmationToken(anyString());
 
@@ -508,93 +371,9 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a OrderResponse when everything is ok")
         void update_returnOrderResponse_whenEverythingIsOk() {
-            Role role = new Role();
-            role.setId(1L);
-            role.setName("BASIC");
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    Set.of(role),
-                    null
-            );
-            Manga manga = new Manga(
-                    1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            Volume volume = new Volume(
-                    1L,
-                    1,
-                    BigDecimal.valueOf(10.50),
-                    "1 to 10",
-                    LocalDate.now(),
-                    50,
-                    manga
-            );
-            manga.setVolume(Set.of(volume));
-
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    user
-            );
-            OrderItems orderItems = new OrderItems(
-                    1L,
-                    1L,
-                    manga.getTitle(),
-                    volume.getPrice(),
-                    BigDecimal.valueOf(105.00),
-                    10,
-                    order
-            );
             List<OrderItems> items = new ArrayList<>();
             items.add(orderItems);
             order.setItems(items);
-
-            List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
-            OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
-                    1L,
-                    10
-            );
-            orderItemsCreateList.add(orderItemsCreate);
-            OrderCreate orderCreate = new OrderCreate(
-                    PaymentMethod.CREDIT,
-                    orderItemsCreateList
-            );
-
-            OrderItemsResponse orderItemsResponse = new OrderItemsResponse(
-                    manga.getTitle(),
-                    volume.getVolumeNumber(),
-                    orderItemsCreate.quantity(),
-                    volume.getPrice()
-            );
-            OrderResponse orderResponse = new OrderResponse(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    List.of(orderItemsResponse),
-                    user
-            );
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
             doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
@@ -616,18 +395,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should throw NotAvailableException when the OrderCreateDto has more items than the available on the system")
         void update_throwNotAvailableException_whenItemsArentAvailable() {
-            Manga manga = new Manga(
-                    1L,
-                    "Test",
-                    "Author",
-                    "Test description",
-                    8.5,
-                    "test",
-                    MangaStatus.COMPLETED,
-                    Genres.ACTION,
-                    null
-            );
-            Volume volume = new Volume(
+            volume = new Volume(
                     1L,
                     1,
                     BigDecimal.valueOf(10.50),
@@ -636,34 +404,13 @@ class OrderServiceTest {
                     10,
                     manga
             );
-            manga.setVolume(Set.of(volume));
-            List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
-            OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
-                    1L,
-                    50
-            );
-            orderItemsCreateList.add(orderItemsCreate);
-            OrderCreate orderCreate = new OrderCreate(
-                    PaymentMethod.CREDIT,
-                    orderItemsCreateList
-            );
-            Order order = new Order(
-                    1L,
-                    Instant.now(),
-                    BigDecimal.valueOf(105.00),
-                    UUID.randomUUID().toString(),
-                    PaymentMethod.CREDIT,
-                    OrderStatus.WAITING_CONFIRMATION,
-                    null,
-                    null
-            );
-            OrderItems orderItems = new OrderItems(
+            orderItems = new OrderItems(
                     1L,
                     1L,
+                    20,
                     manga.getTitle(),
                     volume.getPrice(),
                     BigDecimal.valueOf(105.00),
-                    10,
                     order
             );
             List<OrderItems> items = new ArrayList<>();
@@ -679,7 +426,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should throw ResourceNotFoundException when Order isn't found")
         void update_throwResourceNotFoundException_whenOrderIsntFound() {
-            OrderCreate orderCreate = new OrderCreate(
+            orderCreate = new OrderCreate(
                     PaymentMethod.CREDIT,
                     null
             );

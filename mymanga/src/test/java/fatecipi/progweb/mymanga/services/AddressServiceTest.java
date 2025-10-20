@@ -9,6 +9,7 @@ import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
 import fatecipi.progweb.mymanga.models.dto.address.CepResult;
 import fatecipi.progweb.mymanga.repositories.AddressRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,68 +39,79 @@ class AddressServiceTest {
     @InjectMocks
     private AddressService addressService;
 
+    private Users user;
+    private Address address;
+    private CepResult cepResult;
+    private AddressCreate addressCreate;
+    private String username;
+    private AddressResponse addressResponse;
+
+    @BeforeEach
+    void setUp() {
+        username = "test123";
+        user = Users.builder()
+                .id(1L)
+                .email("email@email.com")
+                .username("test123")
+                .name("Test")
+                .password("password")
+                .createdAt(Instant.now())
+                .isActive(true)
+                .confirmationToken(null)
+                .address(null)
+                .roles(null)
+                .orders(null)
+                .build();
+
+        cepResult = CepResult.builder()
+                .cep("01001-000")
+                .logradouro("Praça da Sé")
+                .complemento("lado ímpar")
+                .unidade("")
+                .bairro("Sé")
+                .localidade("São Paulo")
+                .uf("SP")
+                .estado("São Paulo")
+                .regiao("Sudeste")
+                .ibge("3550308")
+                .gia("1004")
+                .ddd("11")
+                .siafi("7107")
+                .erro(false)
+                .build();
+        addressCreate = AddressCreate.builder()
+                .cep("01001000")
+                .number("")
+                .complement("lado ímpar")
+                .build();
+        address = Address.builder()
+                .users(user)
+                .cep(cepResult.cep())
+                .street(cepResult.logradouro())
+                .number(addressCreate.number())
+                .complement(addressCreate.complement())
+                .locality(cepResult.bairro())
+                .city(cepResult.localidade())
+                .state(cepResult.estado())
+                .build();
+
+        addressResponse = new AddressResponse(
+                1L,
+                cepResult.cep(),
+                cepResult.logradouro(),
+                addressCreate.number(),
+                addressCreate.complement(),
+                cepResult.bairro(),
+                cepResult.localidade(),
+                cepResult.estado()
+        );
+    }
+
     @Nested
     class addNewAddressToUser {
         @Test
         @DisplayName("should return a AddressResponse when everything is ok")
         void addNewAddressToUser_returnAddressResponse_whenEverythingIsOk() {
-            String username = "test123";
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            AddressCreate addressCreate = new AddressCreate(
-                    "01001000",
-                    "",
-                    "lado ímpar"
-            );
-            CepResult cepResult = new CepResult(
-                    "01001-000",
-                    "Praça da Sé",
-                    "lado ímpar",
-                    "",
-                    "Sé",
-                    "São Paulo",
-                    "SP",
-                    "São Paulo",
-                     "Sudeste",
-                     "3550308",
-                    "1004",
-                    "11",
-                    "7107",
-                    false
-            );
-            Address address = Address.builder()
-                    .users(user)
-                    .cep(cepResult.cep())
-                    .street(cepResult.logradouro())
-                    .number(addressCreate.number())
-                    .complement(addressCreate.complement())
-                    .locality(cepResult.bairro())
-                    .city(cepResult.localidade())
-                    .state(cepResult.estado())
-                    .build();
-
-            AddressResponse addressResponse = new AddressResponse(
-                    1L,
-                    cepResult.cep(),
-                    cepResult.logradouro(),
-                    addressCreate.number(),
-                    addressCreate.complement(),
-                    cepResult.bairro(),
-                    cepResult.localidade(),
-                    cepResult.estado()
-            );
-
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
             doReturn(cepResult).when(restTemplate).getForObject(anyString(), eq(CepResult.class));
             doReturn(address).when(addressRepository).save(any(Address.class));
@@ -118,42 +130,12 @@ class AddressServiceTest {
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the Address isn't found")
         void addNewAddressToUser_throwResourceNotFoundException_whenAddressIsntFound() {
-            Users user = new Users(
-                    1L,
-                    "email@email.com",
-                    "test123",
-                    "Test",
-                    "password",
-                    Instant.now(),
-                    true,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            AddressCreate addressCreate = new AddressCreate(
-                    "01001000",
-                    "",
-                    "lado ímpar"
-            );
-            CepResult cepResult = new CepResult(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    true
-            );
+            CepResult errorCepResult = CepResult.builder()
+                    .erro(true)
+                    .build();
+
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
-            doReturn(cepResult).when(restTemplate).getForObject(anyString(), eq(CepResult.class));
+            doReturn(errorCepResult).when(restTemplate).getForObject(anyString(), eq(CepResult.class));
 
             assertThrows(ResourceNotFoundException.class, () -> addressService.addNewAddressToUser("test123", addressCreate));
         }
@@ -161,24 +143,19 @@ class AddressServiceTest {
         @Test
         @DisplayName("should throw a IllegalArgumentException when the Cep length is different than 8")
         void addNewAddressToUser_throwIllegalArgumentException_whenCepLengthIsDifferentThan8() {
-            String username = "test123";
-            AddressCreate addressCreate = new AddressCreate(
-                    "01001000",
+            AddressCreate errorCep = new AddressCreate(
+                    "0100100000",
                     "",
                     "lado ímpar"
             );
-            assertThrows(IllegalArgumentException.class, () -> addressService.addNewAddressToUser(username, addressCreate));
+            assertThrows(IllegalArgumentException.class, () -> addressService.addNewAddressToUser(username, errorCep));
         }
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when User isn't found")
         void addNewAddressToUser_throwResourceNotFoundException_whenUserIsntFound() {
             doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
-            AddressCreate addressCreate = new AddressCreate(
-                    "01001000",
-                    "",
-                    "lado ímpar"
-            );
+
             assertThrows(ResourceNotFoundException.class, () -> addressService.addNewAddressToUser("test123", addressCreate));
         }
     }

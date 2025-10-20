@@ -29,6 +29,7 @@ public class MangaService {
     private final VolumeRepository volumeRepository;
     private final VolumeMapper volumeMapper;
 
+
     public Page<MangaResponse> listAll(Pageable pageable)  {
         return mangaRepository.findAll(pageable).map(mangaMapper::responseMapping);
     }
@@ -102,8 +103,7 @@ public class MangaService {
         return volumeMapper.responseMapping(vol);
     }
 
-    public Volume getVolumeResponseById
-            (Long id) {
+    public Volume getVolumeResponseById(Long id) {
         return volumeRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + id + " not found"));
@@ -119,7 +119,7 @@ public class MangaService {
 
     public void deleteVolumeById(Long mangaId, Long volumeId) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
-        volumeRepository.deleteById(volumeId);
+        volumeRepository.deleteById(v.getId());
     }
 
     public Volume getVolumeAssociatedWithManga(Long mangaId, Long volumeId) {
