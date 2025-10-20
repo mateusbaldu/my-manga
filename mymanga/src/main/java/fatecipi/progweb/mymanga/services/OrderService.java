@@ -1,7 +1,7 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.OrderMapper;
-import fatecipi.progweb.mymanga.enums.OrderStatus;
+import fatecipi.progweb.mymanga.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.*;
@@ -10,6 +10,7 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
@@ -29,16 +31,6 @@ public class OrderService {
     private final MangaService mangaService;
     private final VolumeRepository volumeRepository;
     private final EmailService emailService;
-
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, OrderMapper orderMapper, MangaService mangaService, VolumeRepository volumeRepository, EmailService emailService) {
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.orderMapper = orderMapper;
-        this.mangaService = mangaService;
-        this.volumeRepository = volumeRepository;
-        this.emailService = emailService;
-    }
-
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).map(orderMapper::toOrderResponse);
     }

@@ -1,7 +1,7 @@
 package fatecipi.progweb.mymanga.models;
 
-import fatecipi.progweb.mymanga.enums.Genres;
-import fatecipi.progweb.mymanga.enums.MangaStatus;
+import fatecipi.progweb.mymanga.models.enums.Genres;
+import fatecipi.progweb.mymanga.models.enums.MangaStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

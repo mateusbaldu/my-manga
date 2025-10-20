@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/my-manga/orders/confirm").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configure(http))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

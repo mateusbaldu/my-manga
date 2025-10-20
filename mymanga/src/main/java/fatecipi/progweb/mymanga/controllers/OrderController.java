@@ -7,6 +7,8 @@ import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
 import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.services.OrderService;
 import fatecipi.progweb.mymanga.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,17 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/my-manga/orders")
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
 
-    public OrderController(UserService userService, OrderService orderService) {
-        this.userService = userService;
-        this.orderService = orderService;
-    }
-
     @PostMapping("/new")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
         Users user = userService.getUserById(Long.valueOf(token.getName()));
         OrderResponse order = orderService.create(orderDto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
@@ -58,7 +56,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponse> update(@PathVariable Long id, @RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
+    public ResponseEntity<OrderResponse> update(@PathVariable Long id, @Valid @RequestBody OrderCreate orderDto, JwtAuthenticationToken token) {
         isUserPermitted(id, token);
         return ResponseEntity.ok(orderService.update(id, orderDto));
     }

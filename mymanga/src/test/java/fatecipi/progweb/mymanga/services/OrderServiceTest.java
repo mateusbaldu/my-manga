@@ -1,10 +1,10 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.OrderMapper;
-import fatecipi.progweb.mymanga.enums.Genres;
-import fatecipi.progweb.mymanga.enums.MangaStatus;
-import fatecipi.progweb.mymanga.enums.OrderStatus;
-import fatecipi.progweb.mymanga.enums.PaymentMethod;
+import fatecipi.progweb.mymanga.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.models.enums.Genres;
+import fatecipi.progweb.mymanga.models.enums.MangaStatus;
+import fatecipi.progweb.mymanga.models.enums.OrderStatus;
+import fatecipi.progweb.mymanga.models.enums.PaymentMethod;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.*;

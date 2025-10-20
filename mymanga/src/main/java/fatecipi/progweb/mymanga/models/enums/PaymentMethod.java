@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.enums;
+package fatecipi.progweb.mymanga.models.enums;
 
 public enum PaymentMethod {
     PIX, CREDIT, DEBIT, BOLETO;

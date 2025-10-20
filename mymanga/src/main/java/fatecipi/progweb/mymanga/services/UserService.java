@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
+import fatecipi.progweb.mymanga.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
@@ -10,6 +10,7 @@ import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,20 +21,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
-
-    public UserService(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, EmailService emailService) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
 
     public Page<UserResponse> findAll(Pageable pageable) {
         return userRepository.findAll(pageable).map(userMapper::toUserResponse);

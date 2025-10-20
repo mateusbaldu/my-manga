@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -19,7 +20,6 @@ public class Address {
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
 
-    @Size(min = 8, max = 8)
     private String cep;
     private String street;
     private String number;

@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,10 +18,10 @@ public class OrderItems {
     private Long id;
 
     private Long volumeId;
+    private int quantity;
     private String title;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
-    private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

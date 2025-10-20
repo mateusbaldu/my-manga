@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.configs.mappers;
+package fatecipi.progweb.mymanga.mappers;
 
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;

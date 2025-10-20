@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.UserMapper;
+import fatecipi.progweb.mymanga.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Users;

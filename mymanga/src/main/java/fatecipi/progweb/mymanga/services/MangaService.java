@@ -1,18 +1,20 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.MangaMapper;
-import fatecipi.progweb.mymanga.configs.mappers.VolumeMapper;
+import fatecipi.progweb.mymanga.mappers.MangaMapper;
+import fatecipi.progweb.mymanga.mappers.VolumeMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Manga;
 import fatecipi.progweb.mymanga.models.Volume;
-import fatecipi.progweb.mymanga.models.dto.manga.MangaCreateAndUpdate;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,18 +22,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MangaService {
     private final MangaRepository mangaRepository;
     private final MangaMapper mangaMapper;
     private final VolumeRepository volumeRepository;
     private final VolumeMapper volumeMapper;
-
-    public MangaService(MangaRepository mangaRepository, MangaMapper mangaMapper, VolumeRepository volumeRepository, VolumeMapper volumeMapper) {
-        this.mangaRepository = mangaRepository;
-        this.mangaMapper = mangaMapper;
-        this.volumeRepository = volumeRepository;
-        this.volumeMapper = volumeMapper;
-    }
 
     public Page<MangaResponse> listAll(Pageable pageable)  {
         return mangaRepository.findAll(pageable).map(mangaMapper::toMangaResponseDto);
@@ -58,19 +54,19 @@ public class MangaService {
         mangaRepository.deleteById(id);
     }
 
-    public MangaResponse update(Long id, MangaCreateAndUpdate mangaDto) {
+    public MangaResponse update(Long id, MangaUpdate mangaDto) {
         Manga m = findMangaById(id);
-        mangaMapper.mapManga(mangaDto, m);
+        mangaMapper.mapUpdateManga(mangaDto, m);
         mangaRepository.save(m);
         return mangaMapper.toMangaResponseDto(m);
     }
 
-    public MangaResponse save(MangaCreateAndUpdate mangaDto) {
+    public MangaResponse save(MangaCreate mangaDto) {
         if (mangaRepository.existsByTitle(mangaDto.title())) {
             throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
         }
         Manga m = new Manga();
-        mangaMapper.mapManga(mangaDto, m);
+        mangaMapper.mapCreateManga(mangaDto, m);
         mangaRepository.save(m);
         return mangaMapper.toMangaResponseDto(m);
     }

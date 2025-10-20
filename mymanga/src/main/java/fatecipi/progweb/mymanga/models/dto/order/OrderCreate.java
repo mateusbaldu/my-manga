@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.models.dto.order;
 
-import fatecipi.progweb.mymanga.enums.PaymentMethod;
+import fatecipi.progweb.mymanga.models.enums.PaymentMethod;
 
 import java.util.List;
 

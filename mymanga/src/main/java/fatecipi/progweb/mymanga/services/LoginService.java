@@ -7,6 +7,7 @@ import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -18,18 +19,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
-
-    public LoginService(JwtEncoder jwtEncoder, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, EmailService emailService) {
-        this.jwtEncoder = jwtEncoder;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
 
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())

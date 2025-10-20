@@ -14,6 +14,8 @@ import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.services.AddressService;
 import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,24 +27,19 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/my-manga/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final LoginService loginService;
     private final AddressService addressService;
 
-    public UserController(UserService userService, LoginService loginService, AddressService addressService) {
-        this.userService = userService;
-        this.loginService = loginService;
-        this.addressService = addressService;
-    }
-
     @PostMapping("/new")
-    public ResponseEntity<UserResponse> create(@RequestBody UserCreate userCreate) {
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreate userCreate) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userCreate));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(loginService.login(loginRequest));
     }
 
@@ -74,7 +71,7 @@ public class UserController {
     }
 
     @PatchMapping("/{username}")
-    public ResponseEntity<UserResponse> update(@RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
+    public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
             throw new BadCredentialsException("User don't have permission to delete another account");
@@ -89,13 +86,13 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         loginService.requestPasswordReset(request.email());
         return ResponseEntity.ok("If the user exists, a reset link has been sent to the email.");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         loginService.resetPassword(request.token(), request.newPassword());
         return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
@@ -103,7 +100,7 @@ public class UserController {
 
 
     @PostMapping("/{username}/address/new")
-    public ResponseEntity<AddressResponse> addNewAddressToUser(@PathVariable("username") String username, @RequestBody AddressCreate dto, JwtAuthenticationToken token
+    public ResponseEntity<AddressResponse> addNewAddressToUser(@PathVariable("username") String username, @Valid @RequestBody AddressCreate dto, JwtAuthenticationToken token
     ) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
@@ -135,7 +132,7 @@ public class UserController {
     }
 
     @PatchMapping("/{username}/address/{addressid}")
-    public ResponseEntity<AddressResponse> updateAddress(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, @RequestBody AddressUpdate update, JwtAuthenticationToken token) {
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, @Valid @RequestBody AddressUpdate update, JwtAuthenticationToken token) {
         verifyUserPermission(username, token);
         return ResponseEntity.ok(addressService.updateAddressById(username, addressid, update));
     }

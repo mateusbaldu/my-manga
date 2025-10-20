@@ -1,14 +1,15 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.MangaMapper;
-import fatecipi.progweb.mymanga.configs.mappers.VolumeMapper;
-import fatecipi.progweb.mymanga.enums.Genres;
-import fatecipi.progweb.mymanga.enums.MangaStatus;
+import fatecipi.progweb.mymanga.mappers.MangaMapper;
+import fatecipi.progweb.mymanga.mappers.VolumeMapper;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
+import fatecipi.progweb.mymanga.models.enums.Genres;
+import fatecipi.progweb.mymanga.models.enums.MangaStatus;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Manga;
 import fatecipi.progweb.mymanga.models.Volume;
-import fatecipi.progweb.mymanga.models.dto.manga.MangaCreateAndUpdate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
@@ -280,7 +281,7 @@ class MangaServiceTest {
                     Genres.ACTION,
                     null
             );
-            MangaCreateAndUpdate mangaUpdate = new MangaCreateAndUpdate(
+            MangaUpdate mangaUpdate = new MangaUpdate(
                     "Test updated",
                     "Test Author update",
                     "Test Mangá test test updated",
@@ -301,7 +302,7 @@ class MangaServiceTest {
                     null
             );
             when(mangaRepository.findById(1L)).thenReturn(Optional.of(mangaFound));
-            doNothing().when(mangaMapper).mapManga(mangaUpdate, mangaFound);
+            doNothing().when(mangaMapper).mapUpdateManga(mangaUpdate, mangaFound);
             doReturn(mangaFound).when(mangaRepository).save(mangaFound);
             doReturn(mangaResponse).when(mangaMapper).toMangaResponseDto(mangaFound);
 
@@ -309,7 +310,7 @@ class MangaServiceTest {
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).findById(1L);
-            verify(mangaMapper, times(1)).mapManga(any(), any());
+            verify(mangaMapper, times(1)).mapCreateManga(any(), any());
             verify(mangaRepository, times(1)).save(any());
         }
 
@@ -317,7 +318,7 @@ class MangaServiceTest {
         @DisplayName("should throw a ResourceNotFoundException when the Mangá is not found")
         void update_throwResourceNotFoundException_whenTheMangaIsNotFound() {
             //Arrange
-            MangaCreateAndUpdate mangaUpdate = new MangaCreateAndUpdate(
+            MangaUpdate mangaUpdate = new MangaUpdate(
                     "Test updated",
                     "Test Author update",
                     "Test Mangá test test updated",
@@ -339,7 +340,7 @@ class MangaServiceTest {
         @Test
         @DisplayName("should save a Mangá successfully when everything is ok")
         void save_returnMangaResponse_whenEverythingIsOK() {
-            MangaCreateAndUpdate newManga = new MangaCreateAndUpdate(
+            MangaCreate newManga = new MangaCreate(
                     "Test",
                     "Test Author",
                     "Test Mangá test test",
@@ -371,7 +372,7 @@ class MangaServiceTest {
                     null
             );
             doReturn(false).when(mangaRepository).existsByTitle(anyString());
-            doNothing().when(mangaMapper).mapManga(any(), any());
+            doNothing().when(mangaMapper).mapCreateManga(any(), any());
             doReturn(mappedManga).when(mangaRepository).save(any());
             doReturn(mangaResponse).when(mangaMapper).toMangaResponseDto(any());
 
@@ -380,14 +381,14 @@ class MangaServiceTest {
             assertNotNull(output);
             verify(mangaRepository, times(1)).existsByTitle(anyString());
             verify(mangaRepository, times(1)).save(any());
-            verify(mangaMapper, times(1)).mapManga(any(), any());
+            verify(mangaMapper, times(1)).mapCreateManga(any(), any());
             assertEquals(newManga.title(), output.title());
         }
 
         @Test
         @DisplayName("should throw a exception when the Mangá already exists")
         void save_throwException_whenTheMangaAlreadyExists() {
-            MangaCreateAndUpdate newManga = new MangaCreateAndUpdate(
+            MangaCreate newManga = new MangaCreate(
                     "Test",
                     "Test Author",
                     "Test Mangá test test",

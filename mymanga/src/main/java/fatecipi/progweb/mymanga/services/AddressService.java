@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.AddressMapper;
+import fatecipi.progweb.mymanga.mappers.AddressMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Address;
 import fatecipi.progweb.mymanga.models.Users;
@@ -10,24 +10,19 @@ import fatecipi.progweb.mymanga.models.dto.address.AddressUpdate;
 import fatecipi.progweb.mymanga.models.dto.address.CepResult;
 import fatecipi.progweb.mymanga.repositories.AddressRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class AddressService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final AddressMapper addressMapper;
-
-    public AddressService(AddressRepository addressRepository, UserRepository userRepository, RestTemplate restTemplate, AddressMapper addressMapper) {
-        this.addressRepository = addressRepository;
-        this.userRepository = userRepository;
-        this.restTemplate = restTemplate;
-        this.addressMapper = addressMapper;
-    }
 
     public AddressResponse addNewAddressToUser(String username, AddressCreate dto) {
         if (dto.cep().length() != 8) {

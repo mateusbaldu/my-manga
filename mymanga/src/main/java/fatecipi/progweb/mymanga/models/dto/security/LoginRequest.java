@@ -1,4 +1,12 @@
 package fatecipi.progweb.mymanga.models.dto.security;
 
-public record LoginRequest(String email, String password) {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
+public record LoginRequest(
+        @NotNull(message = "Field can't be null")
+        @Email(message = "Invalid email")
+        String email,
+        @NotNull(message = "Field can't be null")
+        String password) {
 }

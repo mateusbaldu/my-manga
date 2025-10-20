@@ -1,0 +1,7 @@
+POST http://localhost:8080/my-manga/users/new
+Content-Type: application/json
+
+{
+  "name": "Mateus 2",
+  "email": "email"
+}

@@ -1,8 +1,8 @@
 package fatecipi.progweb.mymanga.models.dto.manga;
 
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
-import fatecipi.progweb.mymanga.enums.Genres;
-import fatecipi.progweb.mymanga.enums.MangaStatus;
+import fatecipi.progweb.mymanga.models.enums.Genres;
+import fatecipi.progweb.mymanga.models.enums.MangaStatus;
 
 import java.util.Set;
 

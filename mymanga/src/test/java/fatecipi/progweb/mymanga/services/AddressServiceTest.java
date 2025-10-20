@@ -1,7 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.mappers.AddressMapper;
-import fatecipi.progweb.mymanga.configs.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.mappers.AddressMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Address;
 import fatecipi.progweb.mymanga.models.Users;
@@ -9,10 +8,7 @@ import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
 import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
 import fatecipi.progweb.mymanga.models.dto.address.CepResult;
 import fatecipi.progweb.mymanga.repositories.AddressRepository;
-import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
-import fatecipi.progweb.mymanga.repositories.VolumeRepository;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

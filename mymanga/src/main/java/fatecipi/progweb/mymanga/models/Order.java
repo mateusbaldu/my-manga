@@ -1,7 +1,7 @@
 package fatecipi.progweb.mymanga.models;
 
-import fatecipi.progweb.mymanga.enums.OrderStatus;
-import fatecipi.progweb.mymanga.enums.PaymentMethod;
+import fatecipi.progweb.mymanga.models.enums.OrderStatus;
+import fatecipi.progweb.mymanga.models.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
