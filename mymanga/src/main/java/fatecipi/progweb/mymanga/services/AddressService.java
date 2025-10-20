@@ -74,7 +74,7 @@ public class AddressService {
 
     public AddressResponse updateAddressById(String username, Long addressid, AddressUpdate dto) {
         Address address = getAddressAssociatedWithUser(username, addressid);
-        addressMapper.mapAddress(dto, address);
+        addressMapper.updateMapping(dto, address);
         addressRepository.save(address);
 
         return addressMapper.toAddressResponse(address);

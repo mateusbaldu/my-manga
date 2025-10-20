@@ -1,8 +1,9 @@
 package fatecipi.progweb.mymanga.models.dto.address;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
-public record AddressCreate(@NotNull(message = "Field can't be null")
+
+public record AddressCreate(@NotEmpty(message = "Cep can't be empty")
                             String cep,
                             String number,
                             String complement) {

@@ -5,8 +5,8 @@ target/
 !**/src/test/**/target/
 .env
 secrets.properties
-.key
-.pub
+*.key
+*.pub
 
 # Compiled class file
 *.class

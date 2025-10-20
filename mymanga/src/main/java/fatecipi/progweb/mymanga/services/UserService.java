@@ -30,7 +30,7 @@ public class UserService {
     private final EmailService emailService;
 
     public Page<UserResponse> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(userMapper::toUserResponse);
+        return userRepository.findAll(pageable).map(userMapper::responseMapping);
     }
 
     public Users getUserByUsername(String username) {
@@ -39,7 +39,7 @@ public class UserService {
 
     public UserResponse getUserResponseByUsername(String username) {
         Users user = getUserByUsername(username);
-        return userMapper.toUserResponse(user);
+        return userMapper.responseMapping(user);
     }
 
     public Users getUserById(Long id) {
@@ -48,7 +48,7 @@ public class UserService {
 
     public UserResponse getUserResponseById(Long id) {
         Users user = getUserById(id);
-        return userMapper.toUserResponse(user);
+        return userMapper.responseMapping(user);
     }
 
     public void deleteById(Long id) {
@@ -57,9 +57,9 @@ public class UserService {
 
     public UserResponse update(UserUpdate dto, String username) {
         Users user = getUserByUsername(username);
-        userMapper.mapUpdateUser(dto, user);
+        userMapper.updateMapping(dto, user);
         userRepository.save(user);
-        return userMapper.toUserResponse(user);
+        return userMapper.responseMapping(user);
     }
     public UserResponse create(UserCreate dto) {
         if(userRepository.findByEmail(dto.email()).isPresent()) {
@@ -67,7 +67,7 @@ public class UserService {
         }
         Role role = roleRepository.findByName(Role.Values.BASIC.name());
         Users newUser = new Users();
-        userMapper.mapCreateUser(dto, newUser);
+        userMapper.createMapping(dto, newUser);
         String token = UUID.randomUUID().toString();
         newUser.setPassword(passwordEncoder.encode(dto.password()));
         newUser.setRoles(Set.of(role));
@@ -81,6 +81,6 @@ public class UserService {
         String body = "Welcome, " + newUser.getName() + "! Click on the link below to activate your account:\n\n" + activationUrl;
         emailService.sendEmail(newUser.getEmail(), subject, body);
 
-        return userMapper.toUserResponse(newUser);
+        return userMapper.responseMapping(newUser);
     }
 }

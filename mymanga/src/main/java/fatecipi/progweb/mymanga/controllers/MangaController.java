@@ -59,16 +59,25 @@ public class MangaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/volumes/new")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<List<VolumeResponse>> addVolumesToManga(@PathVariable Long id, @Valid @RequestBody List<VolumeCreate> volDto) {
-        List<VolumeResponse> vol = mangaService.addVolumesToManga(id, volDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(vol);
+
+
+
+
+    @GetMapping("/{id}/volumes/{volId}")
+    public ResponseEntity<VolumeResponse> findVolumeById(@PathVariable Long id, @PathVariable Long volId) {
+        return ResponseEntity.ok(mangaService.getVolumeResponseById(id, volId));
     }
 
     @GetMapping("/{id}/volumes/all")
     public ResponseEntity<Page<VolumeResponse>> getAllVolumesForManga(@PathVariable Long id, Pageable pageable) {
         return ResponseEntity.ok(mangaService.getAllVolumesForManga(id, pageable));
+    }
+
+    @PostMapping("/{id}/volumes/new")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<List<VolumeResponse>> addVolumesToManga(@PathVariable Long id, @Valid @RequestBody List<VolumeCreate> volDto) {
+        List<VolumeResponse> vol = mangaService.addVolumesToManga(id, volDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(vol);
     }
 
     @PatchMapping("/{id}/volumes/{volId}")
@@ -82,10 +91,5 @@ public class MangaController {
     public ResponseEntity<Void> deleteVolume(@PathVariable Long id, @PathVariable Long volId) {
         mangaService.deleteVolumeById(id, volId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{id}/volumes/{volId}")
-    public ResponseEntity<VolumeResponse> findVolumeById(@PathVariable Long id, @PathVariable Long volId) {
-        return ResponseEntity.ok(mangaService.getVolumeResponseById(id, volId));
     }
 }

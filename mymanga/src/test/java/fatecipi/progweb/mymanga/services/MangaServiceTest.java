@@ -159,7 +159,7 @@ class MangaServiceTest {
                     Genres.ACTION,
                     null
             );
-            when(mangaMapper.toMangaResponseDto(any(Manga.class))).thenReturn(mangaResponse);
+            when(mangaMapper.responseMapping(any(Manga.class))).thenReturn(mangaResponse);
             when(mangaRepository.findById(1L)).thenReturn(Optional.of(manga));
 
             //Act
@@ -167,7 +167,7 @@ class MangaServiceTest {
 
             //Assert
             assertNotNull(output);
-            verify(mangaMapper, times(1)).toMangaResponseDto(mangaCaptor.capture());
+            verify(mangaMapper, times(1)).responseMapping(mangaCaptor.capture());
             verify(mangaRepository, atLeastOnce()).findById(1L);
 
             Manga capturedManga = mangaCaptor.getValue();
@@ -215,14 +215,14 @@ class MangaServiceTest {
             );
             Pageable pageable = PageRequest.of(0, 10);
             Page<Manga> pageResponse = new PageImpl<>(List.of(manga), pageable, 1);
-            when(mangaMapper.toMangaResponseDto(manga)).thenReturn(mangaResponse);
+            when(mangaMapper.responseMapping(manga)).thenReturn(mangaResponse);
             when(mangaRepository.findByKeyword("test", pageable)).thenReturn(pageResponse);
 
             Page<MangaResponse> output = mangaService.findByKeyword("test", pageable);
 
             assertNotNull(output);
             assertEquals(1, output.getTotalElements());
-            verify(mangaMapper, times(1)).toMangaResponseDto(any(Manga.class));
+            verify(mangaMapper, times(1)).responseMapping(any(Manga.class));
             verify(mangaRepository, atLeastOnce()).findByKeyword("test", pageable);
         }
     }
@@ -302,15 +302,15 @@ class MangaServiceTest {
                     null
             );
             when(mangaRepository.findById(1L)).thenReturn(Optional.of(mangaFound));
-            doNothing().when(mangaMapper).mapUpdateManga(mangaUpdate, mangaFound);
+            doNothing().when(mangaMapper).updateMapping(mangaUpdate, mangaFound);
             doReturn(mangaFound).when(mangaRepository).save(mangaFound);
-            doReturn(mangaResponse).when(mangaMapper).toMangaResponseDto(mangaFound);
+            doReturn(mangaResponse).when(mangaMapper).responseMapping(mangaFound);
 
             MangaResponse output = mangaService.update(1L, mangaUpdate);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).findById(1L);
-            verify(mangaMapper, times(1)).mapCreateManga(any(), any());
+            verify(mangaMapper, times(1)).createMapping(any(), any());
             verify(mangaRepository, times(1)).save(any());
         }
 
@@ -372,16 +372,16 @@ class MangaServiceTest {
                     null
             );
             doReturn(false).when(mangaRepository).existsByTitle(anyString());
-            doNothing().when(mangaMapper).mapCreateManga(any(), any());
+            doNothing().when(mangaMapper).createMapping(any(), any());
             doReturn(mappedManga).when(mangaRepository).save(any());
-            doReturn(mangaResponse).when(mangaMapper).toMangaResponseDto(any());
+            doReturn(mangaResponse).when(mangaMapper).responseMapping(any());
 
             MangaResponse output = mangaService.save(newManga);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).existsByTitle(anyString());
             verify(mangaRepository, times(1)).save(any());
-            verify(mangaMapper, times(1)).mapCreateManga(any(), any());
+            verify(mangaMapper, times(1)).createMapping(any(), any());
             assertEquals(newManga.title(), output.title());
         }
 
@@ -455,17 +455,17 @@ class MangaServiceTest {
             );
 
             doReturn(Optional.of(manga)).when(mangaRepository).findById(mangaId);
-            doNothing().when(volumeMapper).mapCreateVolume(any(VolumeCreate.class), any(Volume.class));
+            doNothing().when(volumeMapper).createMapping(any(VolumeCreate.class), any(Volume.class));
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
-            doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(any(Volume.class));
+            doReturn(volumeResponse).when(volumeMapper).responseMapping(any(Volume.class));
 
             List<VolumeResponse> output = mangaService.addVolumesToManga(mangaId, input);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).findById(anyLong());
             verify(volumeRepository, times(1)).save(any());
-            verify(volumeMapper, times(1)).mapCreateVolume(any(), any());
-            verify(volumeMapper, times(1)).toVolumeResponseDto(any());
+            verify(volumeMapper, times(1)).createMapping(any(), any());
+            verify(volumeMapper, times(1)).responseMapping(any());
             assertEquals(mangaId, output.getFirst().mangaId());
             assertEquals(mangaTitle, output.getFirst().mangaTitle());
         }
@@ -529,14 +529,14 @@ class MangaServiceTest {
 
             doReturn(true).when(mangaRepository).existsById(mangaId);
             doReturn(volumePage).when(volumeRepository).findByMangaId(mangaId, pageable);
-            doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(any(Volume.class));
+            doReturn(volumeResponse).when(volumeMapper).responseMapping(any(Volume.class));
 
             var output = mangaService.getAllVolumesForManga(mangaId, pageable);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).existsById(mangaId);
             verify(volumeRepository, times(1)).findByMangaId(mangaId, pageable);
-            verify(volumeMapper, times(1)).toVolumeResponseDto(any(Volume.class));
+            verify(volumeMapper, times(1)).responseMapping(any(Volume.class));
             assertEquals(1, output.getTotalElements());
         }
 
@@ -590,13 +590,13 @@ class MangaServiceTest {
             );
 
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
-            doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(volume);
+            doReturn(volumeResponse).when(volumeMapper).responseMapping(volume);
 
             var output = mangaService.getVolumeResponseById(mangaId, volumeId);
 
             assertNotNull(output);
             verify(volumeRepository, times(1)).findById(volumeId);
-            verify(volumeMapper, times(1)).toVolumeResponseDto(volume);
+            verify(volumeMapper, times(1)).responseMapping(volume);
             assertEquals(volumeResponse, output);
         }
 
@@ -710,18 +710,18 @@ class MangaServiceTest {
             );
 
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volumeId);
-            doNothing().when(volumeMapper).mapUpdateVolume(any(VolumeUpdate.class), any(Volume.class));
+            doNothing().when(volumeMapper).updateMapping(any(VolumeUpdate.class), any(Volume.class));
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
-            doReturn(volumeResponse).when(volumeMapper).toVolumeResponseDto(volume);
+            doReturn(volumeResponse).when(volumeMapper).responseMapping(volume);
 
             VolumeResponse output = mangaService.updateVolume(mangaId, volumeId, volumeUpdate);
 
             assertNotNull(output);
             verify(volumeRepository, times(1)).findById(volumeId);
-            verify(volumeMapper, times(1)).mapUpdateVolume(volumeUpdateCaptor.capture(), volumeCaptor.capture());
+            verify(volumeMapper, times(1)).updateMapping(volumeUpdateCaptor.capture(), volumeCaptor.capture());
             var captured = volumeCaptor.getValue();
             assertEquals(captured.getId(), output.id());
-            verify(volumeMapper, times(1)).toVolumeResponseDto(any());
+            verify(volumeMapper, times(1)).responseMapping(any());
             verify(volumeRepository, times(1)).save(any(Volume.class));
 
         }

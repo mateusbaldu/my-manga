@@ -32,12 +32,6 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Page<OrderResponse>> listAll(Pageable pageable) {
-        return ResponseEntity.ok(orderService.findAll(pageable));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderResponseById(id));
@@ -67,7 +61,13 @@ public class OrderController {
         return ResponseEntity.ok("Order confirmed successfully!");
     }
 
-    private void isUserPermitted(@PathVariable Long id, JwtAuthenticationToken token) {
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Page<OrderResponse>> listAll(Pageable pageable) {
+        return ResponseEntity.ok(orderService.findAll(pageable));
+    }
+
+    private void isUserPermitted(Long id, JwtAuthenticationToken token) {
         Order order = orderService.getOrderById(id);
         Users user = userService.getUserById(Long.valueOf(token.getName()));
         if (!user.isActive()) {

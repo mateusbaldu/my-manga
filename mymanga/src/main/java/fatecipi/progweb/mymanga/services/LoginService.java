@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.configs.security.TokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
@@ -25,6 +26,7 @@ public class LoginService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final TokenConfig tokenConfig;
 
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
@@ -35,21 +37,9 @@ public class LoginService {
         if (!user.isActive()) {
             throw new InvalidLoginException("User account is not active");
         }
-        Instant now = Instant.now();
         long expiresIn = 1800L;
 
-        String scopes = user.getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.joining(" "));
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("my-mangá.api")
-                .subject(user.getId().toString())
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresIn))
-                .claim("scope", scopes)
-                .build();
-        String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        String jwtValue = tokenConfig.generateToken(user);
         return new LoginResponse(jwtValue, expiresIn);
     }
 

@@ -48,18 +48,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserResponseByUsername(username));
     }
 
-    @GetMapping("/id/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserResponseById(id));
-    }
-
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Page<UserResponse>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(userService.findAll(pageable));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, JwtAuthenticationToken token) {
         Users user = userService.getUserById(id);
@@ -95,6 +83,18 @@ public class UserController {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         loginService.resetPassword(request.token(), request.newPassword());
         return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
+    }
+
+    @GetMapping("/id/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserResponseById(id));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Page<UserResponse>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
 

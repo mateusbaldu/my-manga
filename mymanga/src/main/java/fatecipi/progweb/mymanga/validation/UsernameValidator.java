@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.configs.validation;
+package fatecipi.progweb.mymanga.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

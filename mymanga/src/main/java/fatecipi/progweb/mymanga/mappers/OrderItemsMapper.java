@@ -10,7 +10,7 @@ import org.mapstruct.ReportingPolicy;
 public interface OrderItemsMapper {
     @Mapping(source = "title", target = "mangaTitle")
     @Mapping(target = "volumeNumber", expression = "java(extractVolumeNumber(orderItems.getTitle()))")
-    OrderItemsResponse toOrderItemsResponse(OrderItems orderItems);
+    OrderItemsResponse responseMapping(OrderItems orderItems);
 
     default Integer extractVolumeNumber(String title) {
         if (title != null && title.contains("Vol. ")) {

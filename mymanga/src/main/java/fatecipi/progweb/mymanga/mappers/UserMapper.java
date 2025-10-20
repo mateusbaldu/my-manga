@@ -8,11 +8,11 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-    void mapCreateUser(UserCreate userCreate, @MappingTarget Users user);
+    void createMapping(UserCreate userCreate, @MappingTarget Users user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void mapUpdateUser(UserUpdate userUpdate, @MappingTarget Users user);
+    void updateMapping(UserUpdate userUpdate, @MappingTarget Users user);
 
     @Mapping(source = "roles", target = "roles")
-    UserResponse toUserResponse(Users user);
+    UserResponse responseMapping(Users user);
 }

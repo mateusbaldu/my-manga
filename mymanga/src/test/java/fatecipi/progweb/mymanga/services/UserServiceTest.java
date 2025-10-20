@@ -75,13 +75,13 @@ class UserServiceTest {
             Page<Users> userPage = new PageImpl<>(List.of(user));
 
             doReturn(userPage).when(userRepository).findAll(any(Pageable.class));
-            doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
+            doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
 
             var output = userService.findAll(pageable);
 
             assertNotNull(output);
             assertEquals(userPage.getTotalElements(), output.getTotalElements());
-            verify(userMapper, times(1)).toUserResponse(user);
+            verify(userMapper, times(1)).responseMapping(user);
             verify(userRepository, times(1)).findAll(pageable);
         }
     }
@@ -151,14 +151,14 @@ class UserServiceTest {
             );
 
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
-            doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
+            doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
 
             var output = userService.getUserResponseByUsername(username);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
             verify(userRepository, times(1)).findByUsername(username);
-            verify(userMapper, times(1)).toUserResponse(user);
+            verify(userMapper, times(1)).responseMapping(user);
         }
 
         @Test
@@ -235,14 +235,14 @@ class UserServiceTest {
             );
 
             doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
-            doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
+            doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
 
             var output = userService.getUserResponseById(id);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
             verify(userRepository, times(1)).findById(id);
-            verify(userMapper, times(1)).toUserResponse(user);
+            verify(userMapper, times(1)).responseMapping(user);
         }
 
         @Test
@@ -322,18 +322,18 @@ class UserServiceTest {
                     null
             );
             doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
-            doNothing().when(userMapper).mapUpdateUser(any(UserUpdate.class), any(Users.class));
+            doNothing().when(userMapper).updateMapping(any(UserUpdate.class), any(Users.class));
             doReturn(user).when(userRepository).save(any());
-            doReturn(userResponse).when(userMapper).toUserResponse(any(Users.class));
+            doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
 
             var output = userService.update(userUpdate, username);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
             verify(userRepository, times(1)).findByUsername(anyString());
-            verify(userMapper, times(1)).mapUpdateUser(userUpdate, user);
+            verify(userMapper, times(1)).updateMapping(userUpdate, user);
             verify(userRepository, times(1)).save(user);
-            verify(userMapper, times(1)).toUserResponse(user);
+            verify(userMapper, times(1)).responseMapping(user);
         }
 
         @Test

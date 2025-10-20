@@ -30,12 +30,12 @@ public class MangaService {
     private final VolumeMapper volumeMapper;
 
     public Page<MangaResponse> listAll(Pageable pageable)  {
-        return mangaRepository.findAll(pageable).map(mangaMapper::toMangaResponseDto);
+        return mangaRepository.findAll(pageable).map(mangaMapper::responseMapping);
     }
 
     public MangaResponse getMangaResponseById(Long id) {
         Manga m = findMangaById(id);
-        return mangaMapper.toMangaResponseDto(m);
+        return mangaMapper.responseMapping(m);
     }
 
     public Manga findMangaById(Long id) {
@@ -44,7 +44,7 @@ public class MangaService {
 
     public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {
         Page<Manga> mangaPage = mangaRepository.findByKeyword(keyword, pageable);
-        return mangaPage.map(mangaMapper::toMangaResponseDto);
+        return mangaPage.map(mangaMapper::responseMapping);
     }
 
     public void deleteMangaById(Long id) {
@@ -56,9 +56,9 @@ public class MangaService {
 
     public MangaResponse update(Long id, MangaUpdate mangaDto) {
         Manga m = findMangaById(id);
-        mangaMapper.mapUpdateManga(mangaDto, m);
+        mangaMapper.updateMapping(mangaDto, m);
         mangaRepository.save(m);
-        return mangaMapper.toMangaResponseDto(m);
+        return mangaMapper.responseMapping(m);
     }
 
     public MangaResponse save(MangaCreate mangaDto) {
@@ -66,9 +66,9 @@ public class MangaService {
             throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
         }
         Manga m = new Manga();
-        mangaMapper.mapCreateManga(mangaDto, m);
+        mangaMapper.createMapping(mangaDto, m);
         mangaRepository.save(m);
-        return mangaMapper.toMangaResponseDto(m);
+        return mangaMapper.responseMapping(m);
     }
 
 
@@ -80,11 +80,11 @@ public class MangaService {
         return volDto.stream()
                 .map(vol -> {
                     Volume volume = new Volume();
-                    volumeMapper.mapCreateVolume(vol, volume);
+                    volumeMapper.createMapping(vol, volume);
                     volume.setManga(m);
                     Volume savedVolume = volumeRepository.save(volume);
 
-                    return volumeMapper.toVolumeResponseDto(savedVolume);
+                    return volumeMapper.responseMapping(savedVolume);
                 })
                 .toList();
     }
@@ -94,12 +94,12 @@ public class MangaService {
             throw new ResourceNotFoundException("Manga with id " + mangaId + " not found");
         }
         Page<Volume> volumePage = volumeRepository.findByMangaId(mangaId, pageable);
-        return volumePage.map(volumeMapper::toVolumeResponseDto);
+        return volumePage.map(volumeMapper::responseMapping);
     }
 
     public VolumeResponse getVolumeResponseById(Long mangaId, Long volumeId) {
         Volume vol = getVolumeAssociatedWithManga(mangaId, volumeId);
-        return volumeMapper.toVolumeResponseDto(vol);
+        return volumeMapper.responseMapping(vol);
     }
 
     public Volume getVolumeResponseById
@@ -111,10 +111,10 @@ public class MangaService {
 
     public VolumeResponse updateVolume(Long mangaId, Long volumeId, VolumeUpdate dto) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
-        volumeMapper.mapUpdateVolume(dto, v);
+        volumeMapper.updateMapping(dto, v);
         volumeRepository.save(v);
 
-        return volumeMapper.toVolumeResponseDto(v);
+        return volumeMapper.responseMapping(v);
     }
 
     public void deleteVolumeById(Long mangaId, Long volumeId) {

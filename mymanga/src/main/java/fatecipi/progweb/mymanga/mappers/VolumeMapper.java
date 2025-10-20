@@ -8,12 +8,12 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface VolumeMapper {
-    void mapCreateVolume(VolumeCreate volumeCreate, @MappingTarget Volume volume);
+    void createMapping(VolumeCreate volumeCreate, @MappingTarget Volume volume);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void mapUpdateVolume(VolumeUpdate volumeUpdate, @MappingTarget Volume volume);
+    void updateMapping(VolumeUpdate volumeUpdate, @MappingTarget Volume volume);
 
     @Mapping(source = "manga.id", target = "mangaId")
     @Mapping(source = "manga.title", target = "mangaTitle")
-    VolumeResponse toVolumeResponseDto(Volume volume);
+    VolumeResponse responseMapping(Volume volume);
 }

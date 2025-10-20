@@ -1,10 +1,7 @@
 package fatecipi.progweb.mymanga.models;
 
-import fatecipi.progweb.mymanga.configs.validation.ValidUsername;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
