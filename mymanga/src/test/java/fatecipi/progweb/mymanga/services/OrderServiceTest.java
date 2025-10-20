@@ -1,17 +1,16 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
+import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
+import fatecipi.progweb.mymanga.models.*;
+import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.models.dto.order.OrderItemsCreate;
+import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.models.enums.Genres;
 import fatecipi.progweb.mymanga.models.enums.MangaStatus;
 import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.models.enums.PaymentMethod;
-import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
-import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.*;
-import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
-import fatecipi.progweb.mymanga.models.dto.order.OrderItemsCreate;
-import fatecipi.progweb.mymanga.models.dto.order.OrderItemsResponse;
-import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
@@ -46,9 +45,9 @@ class OrderServiceTest {
     @Mock
     private OrderMapper orderMapper;
     @Mock
-    private MangaService mangaService;
-    @Mock
     private EmailService emailService;
+    @Mock
+    private MangaService mangaService;
     @Mock
     private VolumeRepository volumeRepository;
     @InjectMocks
@@ -66,30 +65,20 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        order = new Order(
+        manga = new Manga(
                 1L,
-                Instant.now(),
-                BigDecimal.valueOf(20.00),
-                UUID.randomUUID().toString(),
-                PaymentMethod.CREDIT,
-                OrderStatus.WAITING_CONFIRMATION,
-                null,
+                "Test",
+                "Author",
+                "Test description",
+                8.5,
+                "test",
+                MangaStatus.COMPLETED,
+                Genres.ACTION,
                 null
         );
-        orderResponse = new OrderResponse(
-                1L,
-                Instant.now(),
-                BigDecimal.valueOf(20.00),
-                PaymentMethod.CREDIT,
-                OrderStatus.WAITING_CONFIRMATION,
-                null,
-                null
-        );
-
         Role role = new Role();
         role.setId(1L);
         role.setName("BASIC");
-        manga.setVolume(Set.of(volume));
         user = new Users(
                 1L,
                 "email@email.com",
@@ -103,17 +92,6 @@ class OrderServiceTest {
                 Set.of(role),
                 null
         );
-        manga = new Manga(
-                1L,
-                "Test",
-                "Author",
-                "Test description",
-                8.5,
-                "test",
-                MangaStatus.COMPLETED,
-                Genres.ACTION,
-                null
-        );
         volume = new Volume(
                 1L,
                 1,
@@ -123,7 +101,18 @@ class OrderServiceTest {
                 50,
                 manga
         );
+        manga.setVolume(Set.of(volume));
 
+        order = new Order(
+                1L,
+                Instant.now(),
+                BigDecimal.valueOf(20.00),
+                UUID.randomUUID().toString(),
+                PaymentMethod.CREDIT,
+                OrderStatus.WAITING_CONFIRMATION,
+                null,
+                null
+        );
         orderItems = new OrderItems(
                 1L,
                 1L,
@@ -133,23 +122,30 @@ class OrderServiceTest {
                 BigDecimal.valueOf(105.00),
                 order
         );
-        OrderItemsResponse orderItemsResponse = new OrderItemsResponse(
-                manga.getTitle(),
-                volume.getVolumeNumber(),
-                orderItemsCreate.quantity(),
-                volume.getPrice()
-        );
-        order.setItems(List.of(orderItems));
-        List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
+        List<OrderItems> items = new ArrayList<>();
+        items.add(orderItems);
+        order.setItems(items);
         orderItemsCreate = new OrderItemsCreate(
                 1L,
                 10
         );
+        List<OrderItemsCreate> orderItemsCreateList = new ArrayList<>();
         orderItemsCreateList.add(orderItemsCreate);
+
         orderCreate = new OrderCreate(
                 PaymentMethod.CREDIT,
                 orderItemsCreateList
         );
+        orderResponse = new OrderResponse(
+                1L,
+                Instant.now(),
+                BigDecimal.valueOf(20.00),
+                PaymentMethod.CREDIT,
+                OrderStatus.WAITING_CONFIRMATION,
+                null,
+                null
+        );
+        order.setUsers(user);
     }
 
     @Nested
@@ -395,32 +391,16 @@ class OrderServiceTest {
         @Test
         @DisplayName("should throw NotAvailableException when the OrderCreateDto has more items than the available on the system")
         void update_throwNotAvailableException_whenItemsArentAvailable() {
-            volume = new Volume(
-                    1L,
-                    1,
-                    BigDecimal.valueOf(10.50),
-                    "1 to 10",
-                    LocalDate.now(),
-                    10,
-                    manga
+            OrderItemsCreate wrongItemsCreate = new OrderItemsCreate(1L, 100);
+            OrderCreate wrongItemsOrder = new OrderCreate(
+                    PaymentMethod.CREDIT,
+                    List.of(wrongItemsCreate)
             );
-            orderItems = new OrderItems(
-                    1L,
-                    1L,
-                    20,
-                    manga.getTitle(),
-                    volume.getPrice(),
-                    BigDecimal.valueOf(105.00),
-                    order
-            );
-            List<OrderItems> items = new ArrayList<>();
-            items.add(orderItems);
-            order.setItems(items);
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
             doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
 
-            assertThrows(NotAvailableException.class, () -> orderService.update(1L, orderCreate));
+            assertThrows(NotAvailableException.class, () -> orderService.update(1L, wrongItemsOrder));
         }
 
         @Test
