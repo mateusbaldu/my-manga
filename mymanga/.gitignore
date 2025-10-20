@@ -5,8 +5,8 @@ target/
 !**/src/test/**/target/
 .env
 secrets.properties
-mymanga/src/main/resources/app.key
-mymanga/src/main/resources/app.pub
+.key
+.pub
 
 # Compiled class file
 *.class
