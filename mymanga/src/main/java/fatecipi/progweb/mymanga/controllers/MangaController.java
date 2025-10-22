@@ -7,7 +7,6 @@ import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
-import fatecipi.progweb.mymanga.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
