@@ -18,6 +18,7 @@ public interface MangaRepository extends JpaRepository<Manga, Long> {
             "LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(m.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(m.keywords) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @EntityGraph(attributePaths = {"volume"})
     Page<Manga> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Override

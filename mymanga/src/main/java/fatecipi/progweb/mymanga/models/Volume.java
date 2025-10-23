@@ -10,7 +10,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "manga_volume")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor

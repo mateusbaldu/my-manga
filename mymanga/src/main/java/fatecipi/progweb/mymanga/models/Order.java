@@ -11,11 +11,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Table(name = "orders")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Order {
     @Id

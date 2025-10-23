@@ -11,8 +11,9 @@ import java.util.Set;
 @Table(name = "manga")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+@Getter
+@Setter
 public class Manga {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +32,7 @@ public class Manga {
     @Enumerated(EnumType.STRING)
     private Genres genres;
 
-    @OneToMany(mappedBy = "manga", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "manga", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Volume> volume;
 }
 
