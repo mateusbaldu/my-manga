@@ -44,12 +44,12 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserResponse> findByUsername(@PathVariable String username, JwtAuthenticationToken token) {
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username, JwtAuthenticationToken token) {
         return ResponseEntity.ok(userService.getUserResponseByUsername(username));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, JwtAuthenticationToken token) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
         Users user = userService.getUserById(id);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
             throw new BadCredentialsException("User don't have permission to delete another account");
@@ -87,13 +87,13 @@ public class UserController {
 
     @GetMapping("/id/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserResponseById(id));
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Page<UserResponse>> findAll(Pageable pageable) {
+    public ResponseEntity<Page<UserResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(userService.findAll(pageable));
     }
 

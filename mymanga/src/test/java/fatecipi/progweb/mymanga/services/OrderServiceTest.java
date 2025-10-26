@@ -47,8 +47,6 @@ class OrderServiceTest {
     @Mock
     private EmailService emailService;
     @Mock
-    private MangaService mangaService;
-    @Mock
     private VolumeRepository volumeRepository;
     @InjectMocks
     private OrderService orderService;
@@ -272,7 +270,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a OrderResponse when everything is ok")
         void create_returnOrderResponse_whenEverythingIsOk() {
-            doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
+            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
             doReturn(order).when(orderRepository).save(any(Order.class));
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
@@ -284,7 +282,7 @@ class OrderServiceTest {
             verify(orderRepository, times(1)).save(any(Order.class));
             verify(volumeRepository, times(1)).save(any(Volume.class));
             verify(orderMapper, times(1)).toOrderResponse(any(Order.class));
-            verify(mangaService, times(1)).getVolumeResponseById(1L);
+            verify(volumeRepository, times(1)).findById(1L);
         }
 
         @Test
@@ -311,7 +309,7 @@ class OrderServiceTest {
                     orderItemsCreateList
             );
 
-            doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
+            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
 
             assertThrows(NotAvailableException.class, () -> orderService.create(orderCreate, user));
         }
@@ -372,7 +370,7 @@ class OrderServiceTest {
             order.setItems(items);
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
-            doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
+            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
             doReturn(order).when(orderRepository).save(any(Order.class));
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
@@ -385,7 +383,7 @@ class OrderServiceTest {
             verify(orderRepository, times(1)).save(any(Order.class));
             verify(volumeRepository, times(1)).save(any(Volume.class));
             verify(orderMapper, times(1)).toOrderResponse(any(Order.class));
-            verify(mangaService, times(1)).getVolumeResponseById(1L);
+            verify(volumeRepository, times(1)).findById(1L);
         }
 
         @Test
@@ -398,7 +396,7 @@ class OrderServiceTest {
             );
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
-            doReturn(volume).when(mangaService).getVolumeResponseById(anyLong());
+            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
 
             assertThrows(NotAvailableException.class, () -> orderService.update(1L, wrongItemsOrder));
         }

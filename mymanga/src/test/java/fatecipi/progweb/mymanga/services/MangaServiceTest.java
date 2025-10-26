@@ -313,7 +313,7 @@ class MangaServiceTest {
             doReturn(manga).when(mangaRepository).save(any());
             doReturn(mangaResponse).when(mangaMapper).responseMapping(any());
 
-            MangaResponse output = mangaService.save(mangaCreate);
+            MangaResponse output = mangaService.create(mangaCreate);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).existsByTitle(anyString());
@@ -327,7 +327,7 @@ class MangaServiceTest {
         void save_throwException_whenTheMangaAlreadyExists() {
             doReturn(true).when(mangaRepository).existsByTitle(anyString());
 
-            assertThrows(ResourceAlreadyExistsException.class, () -> mangaService.save(mangaCreate));
+            assertThrows(ResourceAlreadyExistsException.class, () -> mangaService.create(mangaCreate));
         }
     }
 
@@ -450,7 +450,7 @@ class MangaServiceTest {
         void findVolumeByWithoutDto_returnVolume_WhenEvevrythingIsOk() {
             doReturn(Optional.of(volume)).when(volumeRepository).findById(volume.getId());
 
-            var output = mangaService.getVolumeResponseById(1L);
+            var output = mangaService.getVolumeById(1L);
 
             assertNotNull(output);
             verify(volumeRepository, times(1)).findById(anyLong());
@@ -463,7 +463,7 @@ class MangaServiceTest {
             doReturn(Optional.empty()).when(volumeRepository).findById(anyLong());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.getVolumeResponseById(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.getVolumeById(anyLong()));
         }
     }
 

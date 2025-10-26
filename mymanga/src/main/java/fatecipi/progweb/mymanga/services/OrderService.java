@@ -1,12 +1,12 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.mappers.OrderMapper;
-import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.mappers.OrderMapper;
 import fatecipi.progweb.mymanga.models.*;
 import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
 import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
+import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
@@ -28,7 +28,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
-    private final MangaService mangaService;
     private final VolumeRepository volumeRepository;
     private final EmailService emailService;
     public Page<OrderResponse> findAll(Pageable pageable) {
@@ -63,7 +62,8 @@ public class OrderService {
 
         List<OrderItems> newItems = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.getVolumeResponseById(itemDto.volumeId());
+                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
+                            () -> new ResourceNotFoundException("Volume with id " + itemDto.volumeId() + " not found"));
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException("This quantity of " + volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " isn't available.");
                     }
@@ -108,7 +108,8 @@ public class OrderService {
         }
         List<OrderItems> orderItemsList = orderDto.items().stream()
                 .map(itemDto -> {
-                    Volume volume = mangaService.getVolumeResponseById(itemDto.volumeId());
+                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
+                            () -> new ResourceNotFoundException("Volume with id " + itemDto.volumeId() + " not found"));
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }

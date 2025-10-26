@@ -1,13 +1,13 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.models.Manga;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
+import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
+import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.models.enums.Genres;
 import fatecipi.progweb.mymanga.models.enums.MangaStatus;
 import fatecipi.progweb.mymanga.services.MangaService;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -45,6 +48,9 @@ class MangaControllerTest {
     private MangaResponse mangaResponse;
     private MangaUpdate mangaUpdate;
     private MangaCreate mangaCreate;
+
+    private VolumeResponse volumeResponse;
+    private VolumeCreate volumeCreate;
 
     @BeforeEach
     void setUp() {
@@ -82,6 +88,16 @@ class MangaControllerTest {
                 "Test"
         );
 
+        volumeResponse = new VolumeResponse(
+                1L,
+                1,
+                BigDecimal.valueOf(10),
+                "1 to 10",
+                LocalDate.now(),
+                10,
+                mangaResponse.id(),
+                mangaResponse.title()
+        );
     }
 
     @Nested
@@ -182,7 +198,7 @@ class MangaControllerTest {
         @Test
         @DisplayName("POST /my-manga/mangas/new - should return Manga response when everything is ok")
         void create_returnMangaResponse_WhenEverythingIsOk() {
-            doReturn(mangaResponse).when(mangaService).save(any(MangaCreate.class));
+            doReturn(mangaResponse).when(mangaService).create(any(MangaCreate.class));
 
             RestAssuredMockMvc
                     .given()
@@ -192,7 +208,7 @@ class MangaControllerTest {
                     .then()
                     .statusCode(HttpStatus.CREATED.value())
                     .body("title", equalTo("Test"));
-            verify(mangaService, times(1)).save(mangaCreate);
+            verify(mangaService, times(1)).create(mangaCreate);
         }
     }
 
@@ -209,6 +225,106 @@ class MangaControllerTest {
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
             verify(mangaService, times(1)).deleteMangaById(anyLong());
+        }
+    }
+
+
+
+    @Nested
+    class findVolumeById {
+        @Test
+        @DisplayName("GET /my-manga/mangas/{id}/volumes/{volId} - should return Volume Response" +
+                "when everything is ok")
+        void findVolumeById_returnVolumeResponse_WhenEverythingIsOk() {
+            doReturn(volumeResponse).when(mangaService).getVolumeResponseById(anyLong(), anyLong());
+
+            RestAssuredMockMvc
+                    .given()
+                    .get("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("id", equalTo(1));
+            verify(mangaService, times(1)).getVolumeResponseById(anyLong(), anyLong());
+        }
+    }
+
+    @Nested
+    class getAllVolumesForManga {
+        @Test
+        @DisplayName("GET /my-manga/mangas/{id}/volumes/all - should return Page of Volume Response" +
+                "when everything is ok")
+        void getAllVolumesForManga_returnpAGEVolumeResponse_WhenEverythingIsOk() {
+            Page<MangaResponse> pageResponse = new PageImpl<>(List.of(mangaResponse), PageRequest.of(0, 10), 1);
+            doReturn(pageResponse).when(mangaService).getAllVolumesForManga(anyLong(), any());
+
+            RestAssuredMockMvc
+                    .given()
+                    .get("/my-manga/mangas/{id}/volumes/all", 1L)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("totalElements", equalTo(1))
+                    .body("totalPages", equalTo(1))
+                    .body("content[0].title", equalTo("Test"));
+            verify(mangaService, times(1)).getAllVolumesForManga(anyLong(), any());
+        }
+    }
+
+    @Nested
+    class addVolumesToManga {
+        @Test
+        @DisplayName("POST /my-manga/mangas/{id}/volumes/new - should return a List of Volume" +
+                "Response when everything is ok")
+        void addVolumesToManga_returnListVolumeResponse_WhenEverythingIsOk() {
+            doReturn(List.of(volumeResponse)).when(mangaService).addVolumesToManga(anyLong(), anyList());
+            List<VolumeCreate> createList = new ArrayList<>();
+            createList.add(volumeCreate);
+
+            RestAssuredMockMvc
+                    .given()
+                    .contentType(ContentType.JSON)
+                    .body(createList)
+                    .post("/my-manga/mangas/{id}/volumes/new", 1L)
+                    .then()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .body("[0].mangaTitle", equalTo("Test"));
+            verify(mangaService, times(1)).addVolumesToManga(anyLong(), anyList());
+        }
+    }
+
+    @Nested
+    class updateVolume {
+        @Test
+        @DisplayName("PATCH /my-manga/mangas/{id}/volumes/{volId} - should return Volume Response" +
+                "when everything is ok")
+        void updateVolume_returnVolumeResponse_WhenEverythingIsOk() {
+            doReturn(volumeResponse).when(mangaService).updateVolume(anyLong(), anyLong(), any());
+
+            RestAssuredMockMvc
+                    .given()
+                    .contentType(ContentType.JSON)
+                    .body(mangaUpdate)
+                    .patch("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("mangaTitle", equalTo("Test"));
+            verify(mangaService, times(1)).updateVolume(anyLong(), anyLong(), any());
+        }
+    }
+
+    @Nested
+    class deleteVolume {
+        @Test
+        @DisplayName("DELETE /my-manga/mangas/{id}/volumes/{volId} - should return No Content Response" +
+                "Entity when everything is ok")
+        void delete_returnNoContent_WhenEverythingIsOk() {
+            doNothing().when(mangaService).deleteVolumeById(anyLong(), anyLong());
+
+            RestAssuredMockMvc
+                    .given()
+                    .delete("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .then()
+                    .statusCode(HttpStatus.NO_CONTENT.value());
+            verify(mangaService, times(1)).deleteVolumeById(anyLong(), anyLong());
         }
     }
 }

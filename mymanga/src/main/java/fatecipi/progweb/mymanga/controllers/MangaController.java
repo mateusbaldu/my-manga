@@ -25,7 +25,7 @@ public class MangaController {
     private final MangaService mangaService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<MangaResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<MangaResponse> getMangaById(@PathVariable Long id) {
         return ResponseEntity.ok(mangaService.getMangaResponseById(id));
     }
 
@@ -35,7 +35,7 @@ public class MangaController {
     }
 
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<Page<MangaResponse>> listByKeyword(Pageable pageable, @PathVariable String keyword) {
+    public ResponseEntity<Page<MangaResponse>> findByKeyword(Pageable pageable, @PathVariable String keyword) {
         return ResponseEntity.ok(mangaService.findByKeyword(keyword, pageable));
     }
 
@@ -48,12 +48,12 @@ public class MangaController {
     @PostMapping("/new")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<MangaResponse> create(@Valid @RequestBody MangaCreate mangaDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(mangaService.save(mangaDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mangaService.create(mangaDto));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         mangaService.deleteMangaById(id);
         return ResponseEntity.noContent().build();
     }

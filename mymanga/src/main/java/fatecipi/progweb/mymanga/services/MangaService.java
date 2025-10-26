@@ -62,7 +62,7 @@ public class MangaService {
         return mangaMapper.responseMapping(m);
     }
 
-    public MangaResponse save(MangaCreate mangaDto) {
+    public MangaResponse create(MangaCreate mangaDto) {
         if (mangaRepository.existsByTitle(mangaDto.title())) {
             throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
         }
@@ -103,7 +103,7 @@ public class MangaService {
         return volumeMapper.responseMapping(vol);
     }
 
-    public Volume getVolumeResponseById(Long id) {
+    public Volume getVolumeById(Long id) {
         return volumeRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + id + " not found"));
@@ -123,7 +123,7 @@ public class MangaService {
     }
 
     public Volume getVolumeAssociatedWithManga(Long mangaId, Long volumeId) {
-        Volume v = getVolumeResponseById(volumeId);
+        Volume v = getVolumeById(volumeId);
         if (!mangaId.equals(v.getManga().getId())) {
             throw new IllegalArgumentException("Volume " + volumeId + " isn't associated with manga with id " + mangaId);
         }

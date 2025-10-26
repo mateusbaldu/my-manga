@@ -33,7 +33,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderResponseById(id));
     }
 
@@ -73,6 +73,7 @@ public class OrderController {
         if (!user.isActive()) {
             throw new BadCredentialsException("This account is inactive.");
         }
+        //TODO: essa Exception retorna 500, procurar uma diferente ou formas de alterar o codigo de retorno
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
         if(!order.getUsers().getId().equals(user.getId()) && !isAdmin) {
