@@ -14,6 +14,6 @@ public record OrderResponse(Long id,
                             PaymentMethod paymentMethod,
                             OrderStatus status,
                             List<OrderItemsResponse> items,
-                            Long userId
+                            String username
 ){
 }

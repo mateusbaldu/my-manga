@@ -14,6 +14,6 @@ import org.mapstruct.ReportingPolicy;
 public interface OrderMapper {
     void createMapping(OrderCreate orderCreate, @MappingTarget Order order);
 
-    @Mapping(source = "users.id", target = "userId")
+    @Mapping(source = "users.username", target = "username")
     OrderResponse toOrderResponse(Order order);
 }

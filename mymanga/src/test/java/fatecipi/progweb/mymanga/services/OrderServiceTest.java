@@ -141,7 +141,7 @@ class OrderServiceTest {
                 PaymentMethod.CREDIT,
                 OrderStatus.WAITING_CONFIRMATION,
                 null,
-                null
+                user.getUsername()
         );
         order.setUsers(user);
     }
