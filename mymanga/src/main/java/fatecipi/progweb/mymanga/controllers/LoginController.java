@@ -32,8 +32,7 @@ public class LoginController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        loginService.resetPassword(request.token(), request.newPassword());
+        loginService.resetPassword(request);
         return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
-
 }

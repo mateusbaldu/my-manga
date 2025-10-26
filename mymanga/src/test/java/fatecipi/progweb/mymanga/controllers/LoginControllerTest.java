@@ -1,8 +1,10 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.services.LoginService;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -17,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +38,8 @@ class LoginControllerTest {
     private Users user;
     private LoginRequest loginRequest;
     private LoginResponse loginResponse;
+    private ForgotPasswordRequest forgotPasswordRequest;
+    private ResetPasswordRequest resetPasswordRequest;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +67,14 @@ class LoginControllerTest {
                 tokenValue,
                 1800L
         );
+        forgotPasswordRequest = new ForgotPasswordRequest(
+                "email@email.com"
+        );
+        String token = UUID.randomUUID().toString();
+        resetPasswordRequest = new ResetPasswordRequest(
+                token,
+                "newPassword"
+        );
     }
 
     @Nested
@@ -85,6 +98,52 @@ class LoginControllerTest {
                     .statusCode(HttpStatus.OK.value())
                     .body("expiresIn", equalTo(1800));
             verify(loginService, times(1)).login(loginRequest);
+        }
+    }
+
+    @Nested
+    class forgotPassword {
+        @Test
+        @DisplayName("POST /my-manga/login/forgot-password - should return a message when everything is ok")
+        void forgotPassword_returnMessage_whenEverythingIsOk() {
+            doNothing().when(loginService).requestPasswordReset(anyString());
+
+            RestAssuredMockMvc
+                    .given()
+                    .contentType(ContentType.JSON)
+                    .body(forgotPasswordRequest)
+                    .postProcessors(
+                            jwt().jwt(j -> j.subject(user.getId().toString())),
+                            csrf()
+                    )
+                    .when()
+                    .post("/my-manga/login/forgot-password")
+                    .then()
+                    .statusCode(HttpStatus.OK.value());
+            verify(loginService, times(1)).requestPasswordReset(forgotPasswordRequest.email());
+        }
+    }
+
+    @Nested
+    class resetPassword {
+        @Test
+        @DisplayName("POST /my-manga/login/reset-password - should return a message when everything is ok")
+        void resetPassword_returnMessage_whenEverythingIsOk() {
+            doNothing().when(loginService).resetPassword(any(ResetPasswordRequest.class));
+
+            RestAssuredMockMvc
+                    .given()
+                    .contentType(ContentType.JSON)
+                    .body(resetPasswordRequest)
+                    .postProcessors(
+                            jwt().jwt(j -> j.subject(user.getId().toString())),
+                            csrf()
+                    )
+                    .when()
+                    .post("/my-manga/login/reset-password")
+                    .then()
+                    .statusCode(HttpStatus.OK.value());
+            verify(loginService, times(1)).resetPassword(resetPasswordRequest);
         }
     }
 }

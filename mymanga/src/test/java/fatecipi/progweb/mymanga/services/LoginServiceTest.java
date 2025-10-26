@@ -6,6 +6,7 @@ import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
+import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,7 @@ class LoginServiceTest {
     private Set<Role> roles = new HashSet<>();
     private LoginRequest loginRequest;
     private String token;
+    private ResetPasswordRequest resetPasswordRequest;
 
     @BeforeEach
     void setUp() {
@@ -87,6 +89,10 @@ class LoginServiceTest {
                 "email@email.com",
                 "password");
         token = UUID.randomUUID().toString();
+        resetPasswordRequest = new ResetPasswordRequest(
+                token,
+                "newPassword"
+        );
     }
 
     @Nested
@@ -185,28 +191,23 @@ class LoginServiceTest {
         @Test
         @DisplayName("should return void when everything is working successfully")
         void resetPassword_returnVoid_WhenEverythingIsOk() {
-            String password = user.getPassword();
-            String encodedPassword = "encodedPassword";
+            doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(anyString());
+            doReturn(resetPasswordRequest.newPassword()).when(passwordEncoder).encode(anyString());
+            doReturn(user).when(userRepository).save(any(Users.class));
 
-            doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(token);
-            doReturn(encodedPassword).when(passwordEncoder).encode(password);
+            loginService.resetPassword(resetPasswordRequest);
 
-            loginService.resetPassword(token, password);
-
-            assertNull(user.getConfirmationToken());
-            assertEquals(encodedPassword, user.getPassword());
-            verify(userRepository, times(1)).findByConfirmationToken(token);
-            verify(passwordEncoder, times(1)).encode(password);
+            verify(userRepository, times(1)).findByConfirmationToken(resetPasswordRequest.token());
+            verify(userRepository, times(1)).save(user);
+            verify(passwordEncoder, times(1)).encode(resetPasswordRequest.newPassword());
         }
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
         void resetPassword_throwResourceNotFoundException_WhenUserIsNotFound() {
-            String password = user.getPassword();
-
             doReturn(Optional.empty()).when(userRepository).findByConfirmationToken(token);
 
-            assertThrows(ResourceNotFoundException.class, () -> loginService.resetPassword(token, password));
+            assertThrows(ResourceNotFoundException.class, () -> loginService.resetPassword(resetPasswordRequest));
             verify(userRepository, times(1)).findByConfirmationToken(token);
         }
     }
