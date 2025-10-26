@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
 import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +25,7 @@ public class AddressController {
     @PostMapping("/{username}/address/new")
     public ResponseEntity<AddressResponse> addNewAddressToUser(@PathVariable("username") String username, @Valid @RequestBody AddressCreate dto, JwtAuthenticationToken token
     ) {
-        Users user = userService.getUserByUsername(username);
-        if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new BadCredentialsException("User don't have permission to add new address to other account");
-        }
+        verifyUserPermission(username, token);
         return ResponseEntity.ok(addressService.addNewAddressToUser(username, dto));
     }
 
@@ -48,7 +45,7 @@ public class AddressController {
     }
 
     @GetMapping("/{username}/address/all")
-    public ResponseEntity<Page<AddressResponse>> getAllAddresses(@PathVariable("username") String username, Pageable pageable, JwtAuthenticationToken token
+    public ResponseEntity<Page<AddressResponse>> getAllAddressesFromUser(@PathVariable("username") String username, Pageable pageable, JwtAuthenticationToken token
     ) {
         verifyUserPermission(username, token);
         return ResponseEntity.ok(addressService.getUserAddresses(username, pageable));
@@ -64,7 +61,7 @@ public class AddressController {
     private void verifyUserPermission(String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new BadCredentialsException("User don't have permission to access the address by other account");
+            throw new NotAvailableException("User don't have permission to access the address by other account");
         }
     }
 }

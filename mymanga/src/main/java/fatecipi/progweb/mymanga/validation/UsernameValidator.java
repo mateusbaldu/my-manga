@@ -11,7 +11,5 @@ public class UsernameValidator implements ConstraintValidator<ValidUsername, Str
             return false;
         }
         return s.matches("^[a-zA-Z0-9_.-]{5,20}$");
-
-        //TODO: melhorar verificação, garantir que a cada parametro errado (tamanho, caractere invalido) ele retorne algo diferente
     }
 }

@@ -104,7 +104,7 @@ class OrderControllerTest {
                 PaymentMethod.CREDIT,
                 OrderStatus.WAITING_CONFIRMATION,
                 responseList,
-                user
+                user.getId()
         );
 
         order = new Order(

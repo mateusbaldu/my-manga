@@ -14,7 +14,6 @@ public record OrderResponse(Long id,
                             PaymentMethod paymentMethod,
                             OrderStatus status,
                             List<OrderItemsResponse> items,
-                            Users user){
-
-    //TODO: remover usuário da resposta e retornar so ID ou nome
+                            Long userId
+){
 }
