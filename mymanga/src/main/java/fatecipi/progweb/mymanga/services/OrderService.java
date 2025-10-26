@@ -5,6 +5,7 @@ import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
 import fatecipi.progweb.mymanga.models.*;
 import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.models.dto.order.OrderItemsCreate;
 import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
@@ -58,44 +59,18 @@ public class OrderService {
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = getOrderById(id);
 
+        order.getItems().forEach(item -> volumeRepository.findById(item.getVolumeId()).ifPresent(volume -> {
+            volume.setQuantity(volume.getQuantity() + item.getQuantity());
+            volumeRepository.save(volume);
+        }));
         order.getItems().clear();
+        orderRepository.flush();
 
-        List<OrderItems> newItems = orderDto.items().stream()
-                .map(itemDto -> {
-                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
-                            () -> new ResourceNotFoundException("Volume with id " + itemDto.volumeId() + " not found"));
-                    if (volume.getQuantity() < itemDto.quantity()) {
-                        throw new NotAvailableException("This quantity of " + volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " isn't available.");
-                    }
-
-                    volume.setQuantity(volume.getQuantity() - itemDto.quantity());
-                    volumeRepository.save(volume);
-
-                    return OrderItems.builder()
-                            .volumeId(volume.getId())
-                            .title(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber())
-                            .quantity(itemDto.quantity())
-                            .unitPrice(volume.getPrice())
-                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
-                            .order(order)
-                            .build();
-                })
-                .toList();
+        List<OrderItems> newItems = processOrderItems(orderDto.items(), order);
+        BigDecimal finalPrice = calculateFinalPrice(newItems, order.getUsers());
 
         order.getItems().addAll(newItems);
-
-        BigDecimal totalPrice = newItems.stream()
-                .map(OrderItems::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Users user = order.getUsers();
-        boolean isSubscriber = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
-        if (isSubscriber) {
-            totalPrice = totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
-        }
-
-        order.setFinalPrice(totalPrice);
+        order.setFinalPrice(finalPrice);
         order.setPaymentMethod(orderDto.paymentMethod());
 
         orderRepository.save(order);
@@ -104,50 +79,25 @@ public class OrderService {
 
     public OrderResponse create(OrderCreate orderDto, Users user) {
         if (!user.isActive()) {
-            throw new BadCredentialsException("User account is not active");
-        }
-        List<OrderItems> orderItemsList = orderDto.items().stream()
-                .map(itemDto -> {
-                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
-                            () -> new ResourceNotFoundException("Volume with id " + itemDto.volumeId() + " not found"));
-                    if (volume.getQuantity() < itemDto.quantity()) {
-                        throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
-                    }
-
-                    volume.setQuantity(volume.getQuantity() - itemDto.quantity());
-                    volumeRepository.save(volume);
-
-                    return OrderItems.builder()
-                            .volumeId(volume.getId())
-                            .title(volume.getManga().getTitle()  + " Vol. " + volume.getVolumeNumber())
-                            .quantity(itemDto.quantity())
-                            .unitPrice(volume.getPrice())
-                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
-                            .build();
-                })
-                .toList();
-
-        BigDecimal totalPrice = orderItemsList.stream()
-                .map(OrderItems::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        boolean isSubscriber = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
-        if (isSubscriber) {
-            totalPrice = totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
+            throw new BadCredentialsException("A conta do usuário não está ativa");
         }
 
         String token = UUID.randomUUID().toString();
+
         Order newOrder = Order.builder()
                 .users(user)
                 .paymentMethod(orderDto.paymentMethod())
                 .createdAt(Instant.now())
-                .finalPrice(totalPrice)
-                .items(orderItemsList)
                 .confirmationToken(token)
                 .status(OrderStatus.WAITING_CONFIRMATION)
                 .build();
-        orderItemsList.forEach(item -> item.setOrder(newOrder));
+
+        List<OrderItems> processedItems = processOrderItems(orderDto.items(), newOrder);
+        BigDecimal finalPrice = calculateFinalPrice(processedItems, user);
+
+        newOrder.setItems(processedItems);
+        newOrder.setFinalPrice(finalPrice);
+
         orderRepository.save(newOrder);
 
         String confirmationUrl = "http://localhost:8080/my-manga/orders/confirm?token=" + token;
@@ -172,4 +122,44 @@ public class OrderService {
     }
 
 
+
+    private List<OrderItems> processOrderItems(List<OrderItemsCreate> itemDtos, Order order) {
+        return itemDtos.stream()
+                .map(itemDto -> {
+                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
+                            () -> new ResourceNotFoundException("Volume com id " + itemDto.volumeId() + " não encontrado"));
+
+                    if (volume.getQuantity() < itemDto.quantity()) {
+                        throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " não está disponível na quantidade solicitada.");
+                    }
+
+                    volume.setQuantity(volume.getQuantity() - itemDto.quantity());
+                    volumeRepository.save(volume);
+
+                    return OrderItems.builder()
+                            .volumeId(volume.getId())
+                            .title(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber())
+                            .quantity(itemDto.quantity())
+                            .unitPrice(volume.getPrice())
+                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
+                            .order(order)
+                            .build();
+                })
+                .toList();
+    }
+
+    private BigDecimal calculateFinalPrice(List<OrderItems> items, Users user) {
+        BigDecimal totalPrice = items.stream()
+                .map(OrderItems::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        boolean isSubscriber = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
+
+        if (isSubscriber) {
+            return totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        return totalPrice;
+    }
 }
