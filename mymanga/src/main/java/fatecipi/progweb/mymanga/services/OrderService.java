@@ -113,8 +113,10 @@ public class OrderService {
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " is not available.");
                     }
+
                     volume.setQuantity(volume.getQuantity() - itemDto.quantity());
                     volumeRepository.save(volume);
+
                     return OrderItems.builder()
                             .volumeId(volume.getId())
                             .title(volume.getManga().getTitle()  + " Vol. " + volume.getVolumeNumber())
@@ -168,5 +170,6 @@ public class OrderService {
             throw new IllegalStateException("This order has already been confirmed.");
         }
     }
+
 
 }

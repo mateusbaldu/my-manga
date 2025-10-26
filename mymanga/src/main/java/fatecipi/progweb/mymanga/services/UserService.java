@@ -84,6 +84,8 @@ public class UserService {
         return userMapper.responseMapping(newUser);
     }
 
+    //TODO: remover a logica de enviar email e jogar para outro método
+
     public void activateAccount(String token) {
         Users user = userRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token de ativação inválido."));

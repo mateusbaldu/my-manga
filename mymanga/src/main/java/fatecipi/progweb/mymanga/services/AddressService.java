@@ -64,8 +64,7 @@ public class AddressService {
 
     public void deleteAddressById(String username, Long addressid) {
         Address a = getAddressAssociatedWithUser(username, addressid);
-        addressRepository.deleteById(a.getId());
-        //TODO: DELEÇÃO NAO TA FUNCIONANDO
+        addressRepository.delete(a);
     }
 
     public Page<AddressResponse> getUserAddresses(String username, Pageable pageable) {

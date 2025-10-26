@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
+import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
@@ -34,8 +35,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userCreate));
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username, JwtAuthenticationToken token) {
+    @GetMapping
+    public ResponseEntity<UserResponse> getUserByUsername(@RequestParam String username, JwtAuthenticationToken token) {
         return ResponseEntity.ok(userService.getUserResponseByUsername(username));
     }
 
@@ -43,7 +44,7 @@ public class UserController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
         Users user = userService.getUserById(id);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new NotAvailableException("User don't have permission to delete another account");
+            throw new PermissionDeniedException("User don't have permission to delete another account");
         }
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -53,7 +54,7 @@ public class UserController {
     public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new NotAvailableException("User don't have permission to delete another account");
+            throw new PermissionDeniedException("User don't have permission to delete another account");
         }
         return ResponseEntity.ok(userService.update(userUpdate, username));
     }
@@ -64,7 +65,7 @@ public class UserController {
         return ResponseEntity.ok("Account activated successfully! You now can log in!");
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserResponseById(id));

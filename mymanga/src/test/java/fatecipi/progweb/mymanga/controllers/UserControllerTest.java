@@ -119,22 +119,23 @@ class UserControllerTest {
     @Nested
     class getUserByUsername {
         @Test
-        @DisplayName("GET /my-manga/users/{username} - should return User Response when everything is ok")
+        @DisplayName("GET /my-manga/users - should return User Response when everything is ok")
         void getUserByUsername_returnUserResponse_whenEverythingIsOk() {
             doReturn(userResponse).when(userService).getUserResponseByUsername(anyString());
 
             RestAssuredMockMvc
                     .given()
+                    .param("username", user.getUsername())
                     .postProcessors(
                             jwt().jwt(j -> j.subject(user.getId().toString())),
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/{username}", "test123")
+                    .get("/my-manga/users")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("name", equalTo("Test"));
-            verify(userService, times(1)).getUserResponseByUsername("test123");
+            verify(userService, times(1)).getUserResponseByUsername(user.getUsername());
         }
     }
 
@@ -174,7 +175,7 @@ class UserControllerTest {
                     .when()
                     .delete("/my-manga/users/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(userService, times(1)).getUserById(1L);
         }
     }
@@ -227,7 +228,7 @@ class UserControllerTest {
                     .when()
                     .patch("/my-manga/users/{username}", "test123")
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(userService, times(1)).getUserByUsername("test123");
         }
     }
@@ -258,7 +259,7 @@ class UserControllerTest {
     @Nested
     class getUserById {
         @Test
-        @DisplayName("GET /my-manga/users/id/{id} - should return User Response when everything is ok")
+        @DisplayName("GET /my-manga/users/{id} - should return User Response when everything is ok")
         void getUserById_returnUserResponse_whenEverythingIsOk() {
             doReturn(userResponse).when(userService).getUserResponseById(anyLong());
 
@@ -269,7 +270,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/id/{id}", 1L)
+                    .get("/my-manga/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("username", equalTo("test123"));

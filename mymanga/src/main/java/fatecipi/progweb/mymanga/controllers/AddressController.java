@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
+import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
 import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
@@ -61,7 +62,7 @@ public class AddressController {
     private void verifyUserPermission(String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new NotAvailableException("User don't have permission to access the address by other account");
+            throw new PermissionDeniedException("User don't have permission to access the address by other account");
         }
     }
 }

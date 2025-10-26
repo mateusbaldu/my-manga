@@ -235,7 +235,7 @@ class OrderControllerTest {
                     .when()
                     .delete("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -258,7 +258,7 @@ class OrderControllerTest {
                     .when()
                     .delete("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -307,7 +307,7 @@ class OrderControllerTest {
                     .when()
                     .put("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -332,7 +332,7 @@ class OrderControllerTest {
                     .when()
                     .put("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
