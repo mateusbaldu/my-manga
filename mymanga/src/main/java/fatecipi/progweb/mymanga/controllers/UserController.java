@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
@@ -8,7 +9,6 @@ import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
-import fatecipi.progweb.mymanga.services.AddressService;
 import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
 import jakarta.validation.Valid;
@@ -28,16 +28,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final LoginService loginService;
-    private final AddressService addressService;
 
     @PostMapping("/new")
     public ResponseEntity<UserResponse> create(@Valid @RequestBody UserCreate userCreate) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userCreate));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(loginService.login(loginRequest));
     }
 
     @GetMapping("/{username}")
@@ -49,7 +43,7 @@ public class UserController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
         Users user = userService.getUserById(id);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new BadCredentialsException("User don't have permission to delete another account");
+            throw new NotAvailableException("User don't have permission to delete another account");
         }
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -59,7 +53,7 @@ public class UserController {
     public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new BadCredentialsException("User don't have permission to delete another account");
+            throw new NotAvailableException("User don't have permission to delete another account");
         }
         return ResponseEntity.ok(userService.update(userUpdate, username));
     }
@@ -68,18 +62,6 @@ public class UserController {
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
         loginService.activateAccount(token);
         return ResponseEntity.ok("Account activated successfully! You now can log in!");
-    }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        loginService.requestPasswordReset(request.email());
-        return ResponseEntity.ok("If the user exists, a reset link has been sent to the email.");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        loginService.resetPassword(request.token(), request.newPassword());
-        return ResponseEntity.ok("Successful password reset! You now can log in with the new password.");
     }
 
     @GetMapping("/id/{id}")

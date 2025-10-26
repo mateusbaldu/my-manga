@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.models.Order;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
@@ -71,13 +72,12 @@ public class OrderController {
         Order order = orderService.getOrderById(id);
         Users user = userService.getUserById(Long.valueOf(token.getName()));
         if (!user.isActive()) {
-            throw new BadCredentialsException("This account is inactive.");
+            throw new NotAvailableException("This account is inactive.");
         }
-        //TODO: essa Exception retorna 500, procurar uma diferente ou formas de alterar o codigo de retorno
         boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
         if(!order.getUsers().getId().equals(user.getId()) && !isAdmin) {
-            throw new BadCredentialsException("This order is not associated with user " + user.getName());
+            throw new NotAvailableException("This order is not associated with user " + user.getName());
         }
     }
 }

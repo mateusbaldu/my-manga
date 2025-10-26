@@ -54,6 +54,8 @@ class OrderControllerTest {
 
     @BeforeEach
     void setUp() {
+        RestAssuredMockMvc.mockMvc(mockMvc);
+
         Role role = new Role();
         role.setId(1L);
         role.setName("BASIC");
@@ -73,8 +75,6 @@ class OrderControllerTest {
                 roleSet,
                 null
         );
-
-        RestAssuredMockMvc.mockMvc(mockMvc);
 
         OrderItemsCreate orderItemsCreate = new OrderItemsCreate(
                 1L,
@@ -235,7 +235,7 @@ class OrderControllerTest {
                     .when()
                     .delete("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -258,7 +258,7 @@ class OrderControllerTest {
                     .when()
                     .delete("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -307,7 +307,7 @@ class OrderControllerTest {
                     .when()
                     .put("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
@@ -332,7 +332,7 @@ class OrderControllerTest {
                     .when()
                     .put("/my-manga/orders/{id}", 1L)
                     .then()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    .statusCode(HttpStatus.BAD_REQUEST.value());
             verify(orderService, times(1)).getOrderById(1L);
             verify(userService, times(1)).getUserById(user.getId());
         }
