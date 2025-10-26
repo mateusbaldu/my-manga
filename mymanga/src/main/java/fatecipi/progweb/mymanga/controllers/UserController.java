@@ -60,7 +60,7 @@ public class UserController {
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
-        loginService.activateAccount(token);
+        userService.activateAccount(token);
         return ResponseEntity.ok("Account activated successfully! You now can log in!");
     }
 

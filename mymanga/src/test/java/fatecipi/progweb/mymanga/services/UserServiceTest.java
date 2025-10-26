@@ -26,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -281,6 +282,32 @@ class UserServiceTest {
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
 
             assertThrows(ResourceAlreadyExistsException.class, () -> userService.create(userCreate));
+        }
+    }
+
+    @Nested
+    class activateAccount {
+        @Test
+        @DisplayName("should return void when everything is ok")
+        void activateAccount_returnVoid_WhenEverythingIsOk() {
+            String token = UUID.randomUUID().toString();
+            doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(anyString());
+
+            userService.activateAccount(token);
+
+            assertTrue(user.isActive());
+            assertNull(user.getConfirmationToken());
+            verify(userRepository, times(1)).findByConfirmationToken(token);
+        }
+
+        @Test
+        @DisplayName("Should throw a ResourceNotFoundException when the User isn't found by the token")
+        void activateAccount_throwResourceNotFoundException_WhenUserIsNotFound() {
+            String token = UUID.randomUUID().toString();
+            doReturn(Optional.empty()).when(userRepository).findByConfirmationToken(anyString());
+
+            assertThrows(ResourceNotFoundException.class, () -> userService.activateAccount(token));
+            verify(userRepository, times(1)).findByConfirmationToken(token);
         }
     }
 }

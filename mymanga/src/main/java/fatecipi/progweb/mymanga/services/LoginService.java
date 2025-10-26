@@ -43,15 +43,6 @@ public class LoginService {
         return new LoginResponse(jwtValue, expiresIn);
     }
 
-    public void activateAccount(String token) {
-        Users user = userRepository.findByConfirmationToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Token de ativação inválido."));
-
-        user.setActive(true);
-        user.setConfirmationToken(null);
-        userRepository.save(user);
-    }
-
     public void requestPasswordReset(String email) {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));

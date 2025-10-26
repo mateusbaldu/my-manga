@@ -18,6 +18,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -27,6 +31,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -223,6 +229,76 @@ class UserControllerTest {
                     .then()
                     .statusCode(HttpStatus.BAD_REQUEST.value());
             verify(userService, times(1)).getUserByUsername("test123");
+        }
+    }
+
+    @Nested
+    class activateAccount {
+        @Test
+        @DisplayName("GET /my-manga/users/activate - should return a confirmation message when everything is ok")
+        void activateAccount_returnConfirmMessage_whenEverythingIsOk() {
+            String token = UUID.randomUUID().toString();
+            doNothing().when(userService).activateAccount(anyString());
+
+            RestAssuredMockMvc
+                    .given()
+                    .param("token", token)
+                    .postProcessors(
+                            jwt().jwt(j -> j.subject(user.getId().toString())),
+                            csrf()
+                    )
+                    .when()
+                    .get("/my-manga/users/activate")
+                    .then()
+                    .statusCode(HttpStatus.OK.value());
+            verify(userService, times(1)).activateAccount(token);
+        }
+    }
+
+    @Nested
+    class getUserById {
+        @Test
+        @DisplayName("GET /my-manga/users/id/{id} - should return User Response when everything is ok")
+        void getUserById_returnUserResponse_whenEverythingIsOk() {
+            doReturn(userResponse).when(userService).getUserResponseById(anyLong());
+
+            RestAssuredMockMvc
+                    .given()
+                    .postProcessors(
+                            jwt().jwt(j -> j.subject(user.getId().toString())),
+                            csrf()
+                    )
+                    .when()
+                    .get("/my-manga/users/id/{id}", 1L)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("username", equalTo("test123"));
+            verify(userService, times(1)).getUserResponseById(1L);
+        }
+    }
+
+    @Nested
+    class listAll {
+        @Test
+        @DisplayName("GET /my-manga/users/all - return Page of User Response when everything is ok")
+        void listAll_returnPageUserResponse_whenEverythingIsOk() {
+            Page<UserResponse> pageResponse = new PageImpl<>(List.of(userResponse), PageRequest.of(0, 10), 1);
+            doReturn(pageResponse).when(userService).findAll(any(Pageable.class));
+
+            RestAssuredMockMvc
+                    .given()
+                    .postProcessors(
+                            jwt().jwt(j -> j.subject(user.getId().toString())),
+                            csrf()
+                    )
+                    .when()
+                    .get("/my-manga/users/all")
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("size", equalTo(10))
+                    .body("totalElements", equalTo(1))
+                    .body("content[0].username", equalTo("test123"));
+            verify(userService, times(1)).findAll(any(Pageable.class));
         }
     }
 }

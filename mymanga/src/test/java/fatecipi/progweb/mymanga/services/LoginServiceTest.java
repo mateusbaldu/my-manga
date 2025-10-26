@@ -152,30 +152,6 @@ class LoginServiceTest {
     }
 
     @Nested
-    class activateAccount {
-        @Test
-        @DisplayName("should return void when everything is ok")
-        void activateAccount_returnVoid_WhenEverythingIsOk() {
-            doReturn(Optional.of(user)).when(userRepository).findByConfirmationToken(anyString());
-
-            loginService.activateAccount(token);
-
-            assertTrue(user.isActive());
-            assertNull(user.getConfirmationToken());
-            verify(userRepository, times(1)).findByConfirmationToken(token);
-        }
-
-        @Test
-        @DisplayName("Should throw a ResourceNotFoundException when the User isn't found by the token")
-        void activateAccount_throwResourceNotFoundException_WhenUserIsNotFound() {
-            doReturn(Optional.empty()).when(userRepository).findByConfirmationToken(anyString());
-
-            assertThrows(ResourceNotFoundException.class, () -> loginService.activateAccount(token));
-            verify(userRepository, times(1)).findByConfirmationToken(token);
-        }
-    }
-
-    @Nested
     class requestPasswordReset {
         @Test
         @DisplayName("should return void when everything is working successfully")
