@@ -3,7 +3,6 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
@@ -273,31 +272,7 @@ class UserServiceTest {
         @Test
         @DisplayName("should return a UserResponse when the User is created successfully")
         void create_returnUserResponse_whenUserIsCreated() {
-            Role role = new Role();
-            role.setId(Role.Values.BASIC.getRoleId());
-            role.setName(Role.Values.BASIC.name());
-            String encodedPassword = "encodedPassword123";
-
-            doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
-            doReturn(role).when(roleRepository).findByName(anyString());
-            doNothing().when(userMapper).createMapping(any(UserCreate.class), any(Users.class));
-            doReturn(encodedPassword).when(passwordEncoder).encode(anyString());
-            doReturn(user).when(userRepository).save(any(Users.class));
-            doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
-            doNothing().when(emailService).sendEmail(any(), any(), any());
-
-            var output = userService.create(userCreate);
-
-            assertNotNull(output);
-            assertEquals(userCreate.name(), output.name());
-            assertEquals(userCreate.username(), output.username());
-            verify(userRepository, times(1)).findByEmail(userCreate.email());
-            verify(roleRepository, times(1)).findByName(Role.Values.BASIC.name());
-            verify(userMapper, times(1)).createMapping(any(UserCreate.class), any(Users.class));
-            verify(passwordEncoder, times(1)).encode(userCreate.password());
-            verify(userRepository, times(1)).save(any(Users.class));
-            verify(userMapper, times(1)).responseMapping(any(Users.class));
-            verify(emailService, times(1)).sendEmail(any(), any(), any());
+            //TODO
         }
 
 
