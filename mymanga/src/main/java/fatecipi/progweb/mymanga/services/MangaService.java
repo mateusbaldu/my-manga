@@ -40,7 +40,7 @@ public class MangaService {
     }
 
     public Manga findMangaById(Long id) {
-        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
+        return mangaRepository.findByIdWithVolumes(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
     }
 
     public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {

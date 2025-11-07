@@ -1,8 +1,5 @@
-// 1. Vamos importar um tema PRONTO. Sem @use, sem função, sem erro.
-// Este tema usa "Deep Purple" (Roxo) como cor primária e "Amber" (Laranja/Âmbar) como cor de destaque.
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
-// 2. Seus estilos globais (o que já estava lá e funciona)
 html, body { height: 100%; }
 body { 
   margin: 0; 

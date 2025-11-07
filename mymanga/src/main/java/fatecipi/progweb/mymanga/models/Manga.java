@@ -32,7 +32,7 @@ public class Manga {
     @Enumerated(EnumType.STRING)
     private Genres genres;
 
-    @OneToMany(mappedBy = "manga", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "manga", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Volume> volume;
 }
 

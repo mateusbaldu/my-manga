@@ -26,7 +26,6 @@ export class Auth {
     
     return this.http.post<LoginResponse>(this.apiUrl, loginData).pipe(
       tap(response => {
-        // Salva o token no localStorage
         if (response.accessToken) {
           localStorage.setItem(this.TOKEN_KEY, response.accessToken);
         }
