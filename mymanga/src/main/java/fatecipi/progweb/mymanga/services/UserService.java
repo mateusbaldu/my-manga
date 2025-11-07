@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Set;
@@ -29,6 +30,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    @Transactional(readOnly = true)
     public Page<UserResponse> findAll(Pageable pageable) {
         return userRepository.findAll(pageable).map(userMapper::responseMapping);
     }
@@ -37,6 +39,7 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User with username "+ username +" not found"));
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getUserResponseByUsername(String username) {
         Users user = getUserByUsername(username);
         return userMapper.responseMapping(user);
@@ -46,21 +49,26 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id "+ id +" not found"));
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getUserResponseById(Long id) {
         Users user = getUserById(id);
         return userMapper.responseMapping(user);
     }
 
+    @Transactional
     public void deleteById(Long id) {
         userRepository.delete(getUserById(id));
     }
 
+    @Transactional
     public UserResponse update(UserUpdate dto, String username) {
         Users user = getUserByUsername(username);
         userMapper.updateMapping(dto, user);
         userRepository.save(user);
         return userMapper.responseMapping(user);
     }
+
+    @Transactional
     public UserResponse create(UserCreate dto) {
         if(userRepository.findByEmail(dto.email()).isPresent()) {
             throw new ResourceAlreadyExistsException("User with email"+ dto.email() +" already exists");
@@ -86,6 +94,7 @@ public class UserService {
 
     //TODO: remover a logica de enviar email e jogar para outro método
 
+    @Transactional
     public void activateAccount(String token) {
         Users user = userRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token de ativação inválido."));

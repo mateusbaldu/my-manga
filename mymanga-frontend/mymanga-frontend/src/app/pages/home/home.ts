@@ -1,17 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { Manga } from '../../services/manga';
 
 @Component({
   selector: 'app-home',
   imports: [
     CommonModule,
-    RouterLink,
-    MatCardModule,
-    MatButtonModule
+    RouterLink
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -29,7 +25,7 @@ export class Home implements OnInit {
 
   carregarMangas(): void {
     this.loading = true;
-    this.mangaService.getMangas(0, 12).subscribe({
+    this.mangaService.getMangas(0, 10).subscribe({
       next: (response: any) => {
         this.mangas = response.content;
         this.loading = false;
@@ -41,5 +37,9 @@ export class Home implements OnInit {
         console.error('Erro:', err);
       }
     });
+  }
+
+  trackByMangaId(index: number, manga: any): number {
+    return manga.id;
   }
 }

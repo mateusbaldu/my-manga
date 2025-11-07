@@ -1,30 +1,31 @@
-<div class="home-container">
-  <h1>Catálogo de Mangás</h1>
+<div class="container mt-4">
+  <h1 class="mb-4">Catálogo de Mangás</h1>
 
-  <div *ngIf="loading" class="loading">
+  <div *ngIf="loading" class="alert alert-info text-center">
     Carregando mangás...
   </div>
 
-  <div *ngIf="error" class="error">
+  <div *ngIf="error" class="alert alert-danger text-center">
     {{ error }}
   </div>
 
-  <div class="mangas-grid">
-    <mat-card *ngFor="let manga of mangas" class="manga-card">
-      <mat-card-header>
-        <mat-card-title>{{ manga.title }}</mat-card-title>
-        <mat-card-subtitle>{{ manga.author }}</mat-card-subtitle>
-      </mat-card-header>
-      
-      <mat-card-content>
-        <p *ngIf="manga.description">{{ manga.description }}</p>
-      </mat-card-content>
-      
-      <mat-card-actions>
-        <button mat-button color="primary" [routerLink]="['/manga', manga.id]">
-          Ver Detalhes
-        </button>
-      </mat-card-actions>
-    </mat-card>
+  <div class="row g-4">
+    <div class="col-md-4 col-sm-6" *ngFor="let manga of mangas; trackBy: trackByMangaId">
+      <div class="card h-100" [routerLink]="['/manga', manga.id]" style="cursor: pointer;">
+        <img [src]="manga.imageUrl" class="card-img-top" [alt]="manga.title" *ngIf="manga.imageUrl">
+        
+        <div class="card-body">
+          <h5 class="card-title">{{ manga.title }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ manga.author }}</h6>
+          <p class="card-text" *ngIf="manga.description">{{ manga.description }}</p>
+        </div>
+        
+        <div class="card-footer">
+          <button class="btn btn-primary w-100">
+            Ver Detalhes
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

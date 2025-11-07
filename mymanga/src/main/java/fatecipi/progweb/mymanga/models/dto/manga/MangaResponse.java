@@ -14,5 +14,6 @@ public record MangaResponse(Long id,
                             String keywords,
                             MangaStatus status,
                             Genres genres,
-                            Set<VolumeResponse> volumes) {
+                            Set<VolumeResponse> volumes,
+                            String imageUrl) {
 }

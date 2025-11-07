@@ -13,5 +13,6 @@ public record MangaUpdate(@NotNull(message = "Field can't be null")
                           Double rating,
                           MangaStatus status,
                           Genres genres,
-                          String keywords) {
+                          String keywords,
+                          String imageUrl) {
 }

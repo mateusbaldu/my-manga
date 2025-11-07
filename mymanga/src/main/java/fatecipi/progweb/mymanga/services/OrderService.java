@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,10 +32,13 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final VolumeRepository volumeRepository;
     private final EmailService emailService;
+
+    @Transactional(readOnly = true)
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable).map(orderMapper::toOrderResponse);
     }
 
+    @Transactional(readOnly = true)
     public OrderResponse getOrderResponseById(Long id) {
        Order order = getOrderById(id);
         return orderMapper.toOrderResponse(order);
@@ -44,6 +48,7 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " not found"));
     }
 
+    @Transactional(readOnly = true)
     public Page<OrderResponse> findAllByUserUsername(String username, Pageable pageable) {
         if (!userRepository.existsByUsername(username)) {
             throw new ResourceNotFoundException("User with username " + username + " not found");
@@ -52,10 +57,12 @@ public class OrderService {
         return orderPage.map(orderMapper::toOrderResponse);
     }
 
+    @Transactional
     public void delete(Long id) {
         orderRepository.delete(getOrderById(id));
     }
 
+    @Transactional
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = getOrderById(id);
 
@@ -77,6 +84,7 @@ public class OrderService {
         return orderMapper.toOrderResponse(order);
     }
 
+    @Transactional
     public OrderResponse create(OrderCreate orderDto, Users user) {
         if (!user.isActive()) {
             throw new BadCredentialsException("A conta do usuário não está ativa");
@@ -108,6 +116,7 @@ public class OrderService {
         return orderMapper.toOrderResponse(newOrder);
     }
 
+    @Transactional
     public void confirmOrder(String token) {
         Order order = orderRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired confirmation token"));
@@ -120,8 +129,6 @@ public class OrderService {
             throw new IllegalStateException("This order has already been confirmed.");
         }
     }
-
-
 
     private List<OrderItems> processOrderItems(List<OrderItemsCreate> itemDtos, Order order) {
         return itemDtos.stream()

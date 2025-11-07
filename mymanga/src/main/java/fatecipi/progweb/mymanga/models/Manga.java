@@ -25,6 +25,7 @@ public class Manga {
     private String description;
     private Double rating;
     private String keywords;
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     private MangaStatus status;

@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
@@ -48,6 +49,7 @@ class MangaControllerTest {
     private MangaResponse mangaResponse;
     private MangaUpdate mangaUpdate;
     private MangaCreate mangaCreate;
+    private MangaCardResponse mangaCardResponse;
 
     private VolumeResponse volumeResponse;
     private VolumeCreate volumeCreate;
@@ -65,7 +67,19 @@ class MangaControllerTest {
                 "Test",
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
-                null
+                null,
+                "imageUrl.com"
+        );
+
+        mangaCardResponse = new MangaCardResponse(
+                1L,
+                "Test",
+                "Test Author",
+                "Test Mangá description",
+                1.5,
+                MangaStatus.COMPLETED,
+                Genres.ACTION,
+                "imageUrl.com"
         );
 
         mangaUpdate = new MangaUpdate(
@@ -75,7 +89,8 @@ class MangaControllerTest {
                 1.5,
                 MangaStatus.PAUSED,
                 Genres.ADVENTURE,
-                "Updated Keywords"
+                "Updated Keywords",
+                "imageUrl.com"
         );
 
         mangaCreate = new MangaCreate(
@@ -85,7 +100,8 @@ class MangaControllerTest {
                 1.5,
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
-                "Test"
+                "Test",
+                "imageUrl.com"
         );
 
         volumeResponse = new VolumeResponse(
@@ -125,7 +141,7 @@ class MangaControllerTest {
         @Test
         @DisplayName("GET /my-manga/mangas/all - should return Page of MangaResponse when everything is ok")
         void listAll_returnPageMangaResponse_WhenEverythingIsOk() {
-            Page<MangaResponse> page = new PageImpl<>(List.of(mangaResponse), PageRequest.of(0,10) , 1);
+            Page<MangaCardResponse> page = new PageImpl<>(List.of(mangaCardResponse), PageRequest.of(0,10) , 1);
             when(mangaService.listAll(any(PageRequest.class))).thenReturn(page);
 
             RestAssuredMockMvc
@@ -176,7 +192,8 @@ class MangaControllerTest {
                     "Updated Keywords",
                     MangaStatus.PAUSED,
                     Genres.ADVENTURE,
-                    null
+                    null,
+                    "imageUrlUpdated"
             );
             when(mangaService.update(anyLong(), any(MangaUpdate.class))).thenReturn(mangaResponse);
 

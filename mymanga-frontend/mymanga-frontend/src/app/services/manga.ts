@@ -14,11 +14,19 @@ export class Manga {
     return this.http.get(`${this.apiUrl}/all`);
   }
 
-  getMangas(page: number = 0, size: number = 12): Observable<any> {
+  getMangas(page: number = 0, size: number = 10): Observable<any> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
     
     return this.http.get(`${this.apiUrl}/all`, { params });
+  }
+
+  createManga(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/new`, data);
+  }
+
+  getMangaById(id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 }

@@ -2,6 +2,7 @@ package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.mappers.MangaMapper;
 import fatecipi.progweb.mymanga.mappers.VolumeMapper;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
 import fatecipi.progweb.mymanga.models.enums.Genres;
@@ -35,6 +36,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,7 +95,8 @@ class MangaServiceTest {
                 "Test",
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
-                null
+                null,
+                "imageUrl.com"
         );
         mangaUpdate = new MangaUpdate(
                 "Test updated",
@@ -102,7 +105,8 @@ class MangaServiceTest {
                 1.5,
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
-                "Test"
+                "Test",
+                "imageUrlUpdated.com"
         );
         mangaCreate = new MangaCreate(
                 "Test",
@@ -111,7 +115,8 @@ class MangaServiceTest {
                 1.5,
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
-                null
+                null,
+                "imageUrl.com"
         );
         volumeResponse = new VolumeResponse(
                 1L,
@@ -160,7 +165,7 @@ class MangaServiceTest {
             when(mangaRepository.findAll(pageRequest)).thenReturn(page);
 
             //Act
-            Page<MangaResponse> pageResponse = mangaService.listAll(pageRequest);
+            Page<MangaCardResponse> pageResponse = mangaService.listAll(pageRequest);
 
             //Assert
             assertNotNull(pageResponse);

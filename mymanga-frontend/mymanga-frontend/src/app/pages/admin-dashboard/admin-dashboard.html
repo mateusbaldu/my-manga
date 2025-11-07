@@ -1,1 +1,149 @@
-<p>admin-dashboard works!</p>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h3>Criar Novo Mangá</h3>
+          <p class="text-muted mb-0">Preencha os dados do mangá</p>
+        </div>
+
+        <div class="card-body">
+          <form [formGroup]="mangaForm" (ngSubmit)="onSubmit()">
+            
+            <div class="mb-3">
+              <label for="title" class="form-label">Título <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="title"
+                formControlName="title" 
+                placeholder="Ex: One Piece">
+              <div class="invalid-feedback d-block" *ngIf="mangaForm.get('title')?.hasError('required') && mangaForm.get('title')?.touched">
+                O título é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="author" class="form-label">Autor <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="author"
+                formControlName="author" 
+                placeholder="Ex: Eiichiro Oda">
+              <div class="invalid-feedback d-block" *ngIf="mangaForm.get('author')?.hasError('required') && mangaForm.get('author')?.touched">
+                O autor é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrição <span class="text-danger">*</span></label>
+              <textarea 
+                class="form-control" 
+                id="description"
+                formControlName="description" 
+                rows="4" 
+                placeholder="Descrição do mangá"></textarea>
+              <div class="invalid-feedback d-block" *ngIf="mangaForm.get('description')?.hasError('required') && mangaForm.get('description')?.touched">
+                A descrição é obrigatória
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="mangaForm.get('description')?.hasError('minlength') && mangaForm.get('description')?.touched">
+                A descrição deve ter pelo menos 10 caracteres
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="rating" class="form-label">Rating (0-10) <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="rating"
+                  formControlName="rating" 
+                  placeholder="Ex: 8.5" 
+                  min="0" 
+                  max="10" 
+                  step="0.1">
+                <div class="invalid-feedback d-block" *ngIf="(mangaForm.get('rating')?.hasError('min') || mangaForm.get('rating')?.hasError('max')) && mangaForm.get('rating')?.touched">
+                  O rating deve estar entre 0 e 10
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                <select class="form-select" id="status" formControlName="status">
+                  <option value="">Selecione o status</option>
+                  <option *ngFor="let status of statusOptions" [value]="status">
+                    {{ status }}
+                  </option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="mangaForm.get('status')?.hasError('required') && mangaForm.get('status')?.touched">
+                  O status é obrigatório
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="genres" class="form-label">Gênero <span class="text-danger">*</span></label>
+              <select class="form-select" id="genres" formControlName="genres">
+                <option value="">Selecione o gênero</option>
+                <option *ngFor="let genre of genreOptions" [value]="genre">
+                  {{ genre }}
+                </option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="mangaForm.get('genres')?.hasError('required') && mangaForm.get('genres')?.touched">
+                O gênero é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="keywords" class="form-label">Palavras-chave (opcional)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="keywords"
+                formControlName="keywords" 
+                placeholder="Ex: pirata, tesouro, aventura">
+              <small class="form-text text-muted">Separe as palavras-chave por vírgula</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="imageUrl" class="form-label">URL da Imagem (opcional)</label>
+              <input 
+                type="url" 
+                class="form-control" 
+                id="imageUrl"
+                formControlName="imageUrl" 
+                placeholder="https://example.com/imagem.jpg">
+              <small class="form-text text-muted">Cole a URL de uma imagem da capa do mangá</small>
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success" role="alert">
+              {{ successMessage }}
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+              {{ errorMessage }}
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="loading || mangaForm.invalid">
+                {{ loading ? 'Criando...' : 'Criar Mangá' }}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                routerLink="/" 
+                [disabled]="loading">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

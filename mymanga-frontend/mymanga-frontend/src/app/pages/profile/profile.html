@@ -1,1 +1,67 @@
-<p>profile works!</p>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h3>Meu Perfil</h3>
+        </div>
+        <div class="card-body" *ngIf="user">
+          <p><strong>Nome:</strong> {{ user.name }}</p>
+          <p><strong>Username:</strong> {{ user.username }}</p>
+          <p><strong>Nível:</strong> {{ user.roles.map(r => r.name).join(', ') }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <h3>Meus Endereços</h3>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Adicionar Novo Endereço</h5>
+          <form [formGroup]="addressForm" (ngSubmit)="handleAddAddress()">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="cep" class="form-label">CEP (só números)</label>
+                  <input type="text" id="cep" class="form-control" formControlName="cep" maxlength="8">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="number" class="form-label">Número</label>
+                  <input type="text" id="number" class="form-control" formControlName="number">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="complement" class="form-label">Complemento</label>
+                  <input type="text" id="complement" class="form-control" formControlName="complement">
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">Salvar Endereço</button>
+          </form>
+        </div>
+      </div>
+
+      <div *ngIf="addresses.length > 0; else noAddresses">
+        <div class="card mb-3" *ngFor="let address of addresses">
+          <div class="card-body">
+            <h5 class="card-title">{{ address.street }}, {{ address.number || 'S/N' }}</h5>
+            <p class="card-text mb-1">{{ address.complement }}</p>
+            <p class="card-text mb-1">{{ address.locality }}, {{ address.city }} - {{ address.state }}</p>
+            <p class="card-text"><small class="text-muted">CEP: {{ address.cep }}</small></p>
+            </div>
+        </div>
+      </div>
+      <ng-template #noAddresses>
+        <p>Nenhum endereço cadastrado.</p>
+      </ng-template>
+
+    </div>
+  </div>
+</div>

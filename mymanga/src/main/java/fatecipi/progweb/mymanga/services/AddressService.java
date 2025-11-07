@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -24,6 +25,7 @@ public class AddressService {
     private final RestTemplate restTemplate;
     private final AddressMapper addressMapper;
 
+    @Transactional
     public AddressResponse addNewAddressToUser(String username, AddressCreate dto) {
         if (dto.cep().length() != 8) {
             throw new IllegalArgumentException("Cep length must be 8");
@@ -53,24 +55,29 @@ public class AddressService {
         return addressMapper.toAddressResponse(savedAddress);
     }
 
+    @Transactional(readOnly = true)
     public AddressResponse getAddressResponseById(String username, Long addressid) {
         Address a = getAddressAssociatedWithUser(username, addressid);
         return addressMapper.toAddressResponse(a);
     }
 
+    @Transactional(readOnly = true)
     public Address getAddressById(Long addressid) {
         return addressRepository.findById(addressid).orElseThrow(() -> new ResourceNotFoundException("Address with id " + addressid + " not found"));
     }
 
+    @Transactional
     public void deleteAddressById(String username, Long addressid) {
         Address a = getAddressAssociatedWithUser(username, addressid);
         addressRepository.delete(a);
     }
 
+    @Transactional(readOnly = true)
     public Page<AddressResponse> getUserAddresses(String username, Pageable pageable) {
         return addressRepository.findByUsers_Username(username, pageable).map(addressMapper::toAddressResponse);
     }
 
+    @Transactional
     public AddressResponse updateAddressById(String username, Long addressid, AddressUpdate dto) {
         Address address = getAddressAssociatedWithUser(username, addressid);
         addressMapper.updateMapping(dto, address);

@@ -6,6 +6,7 @@ import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Manga;
 import fatecipi.progweb.mymanga.models.Volume;
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,25 +31,28 @@ public class MangaService {
     private final VolumeRepository volumeRepository;
     private final VolumeMapper volumeMapper;
 
-
-    public Page<MangaResponse> listAll(Pageable pageable)  {
-        return mangaRepository.findAll(pageable).map(mangaMapper::responseMapping);
+    @Transactional(readOnly = true)
+    public Page<MangaCardResponse> listAll(Pageable pageable)  {
+        return mangaRepository.findAll(pageable).map(mangaMapper::toMangaCardResponse);
     }
 
+    @Transactional(readOnly = true)
     public MangaResponse getMangaResponseById(Long id) {
         Manga m = findMangaById(id);
         return mangaMapper.responseMapping(m);
     }
 
     public Manga findMangaById(Long id) {
-        return mangaRepository.findByIdWithVolumes(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
+        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
     }
 
+    @Transactional(readOnly = true)
     public Page<MangaResponse> findByKeyword(String keyword, Pageable pageable) {
         Page<Manga> mangaPage = mangaRepository.findByKeyword(keyword, pageable);
         return mangaPage.map(mangaMapper::responseMapping);
     }
 
+    @Transactional(readOnly = true)
     public void deleteMangaById(Long id) {
         if(!mangaRepository.existsById(id)) {
             throw new IllegalArgumentException("Manga with id " + id + " dont exists");
@@ -55,6 +60,7 @@ public class MangaService {
         mangaRepository.deleteById(id);
     }
 
+    @Transactional
     public MangaResponse update(Long id, MangaUpdate mangaDto) {
         Manga m = findMangaById(id);
         mangaMapper.updateMapping(mangaDto, m);
@@ -62,6 +68,7 @@ public class MangaService {
         return mangaMapper.responseMapping(m);
     }
 
+    @Transactional
     public MangaResponse create(MangaCreate mangaDto) {
         if (mangaRepository.existsByTitle(mangaDto.title())) {
             throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
@@ -73,7 +80,7 @@ public class MangaService {
     }
 
 
-
+    @Transactional
     public List<VolumeResponse> addVolumesToManga(Long mangaId, List<VolumeCreate> volDto) {
         if (volDto.isEmpty()) throw new IllegalArgumentException("The list of volumes cannot be empty.");
         Manga m = findMangaById(mangaId);
@@ -90,6 +97,7 @@ public class MangaService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public Page<VolumeResponse> getAllVolumesForManga(Long mangaId, Pageable pageable) {
         if (!mangaRepository.existsById(mangaId)) {
             throw new ResourceNotFoundException("Manga with id " + mangaId + " not found");
@@ -98,6 +106,7 @@ public class MangaService {
         return volumePage.map(volumeMapper::responseMapping);
     }
 
+    @Transactional(readOnly = true)
     public VolumeResponse getVolumeResponseById(Long mangaId, Long volumeId) {
         Volume vol = getVolumeAssociatedWithManga(mangaId, volumeId);
         return volumeMapper.responseMapping(vol);
@@ -109,6 +118,7 @@ public class MangaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Volume with id " + id + " not found"));
     }
 
+    @Transactional
     public VolumeResponse updateVolume(Long mangaId, Long volumeId, VolumeUpdate dto) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeMapper.updateMapping(dto, v);
@@ -117,6 +127,7 @@ public class MangaService {
         return volumeMapper.responseMapping(v);
     }
 
+    @Transactional
     public void deleteVolumeById(Long mangaId, Long volumeId) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeRepository.deleteById(v.getId());

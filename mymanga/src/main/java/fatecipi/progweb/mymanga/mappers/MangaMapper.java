@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.mappers;
 
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.Manga;
@@ -15,4 +16,6 @@ public interface MangaMapper {
 
     @Mapping(source = "volume", target = "volumes")
     MangaResponse responseMapping(Manga manga);
+
+    MangaCardResponse toMangaCardResponse(Manga manga);
 }

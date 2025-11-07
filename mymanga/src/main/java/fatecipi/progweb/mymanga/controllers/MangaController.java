@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
+import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
 import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
@@ -30,7 +31,7 @@ public class MangaController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<MangaResponse>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<MangaCardResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(mangaService.listAll(pageable));
     }
 

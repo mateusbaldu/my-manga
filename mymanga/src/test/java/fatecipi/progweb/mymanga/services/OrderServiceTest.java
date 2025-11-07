@@ -70,6 +70,7 @@ class OrderServiceTest {
                 "Test description",
                 8.5,
                 "test",
+                "imageUrl.com",
                 MangaStatus.COMPLETED,
                 Genres.ACTION,
                 null
@@ -381,9 +382,9 @@ class OrderServiceTest {
             assertEquals(orderCreate.paymentMethod(), output.paymentMethod());
             verify(orderRepository, times(1)).findById(1L);
             verify(orderRepository, times(1)).save(any(Order.class));
-            verify(volumeRepository, times(1)).save(any(Volume.class));
+            verify(volumeRepository, times(2)).save(any(Volume.class));
             verify(orderMapper, times(1)).toOrderResponse(any(Order.class));
-            verify(volumeRepository, times(1)).findById(1L);
+            verify(volumeRepository, times(2)).findById(1L);
         }
 
         @Test

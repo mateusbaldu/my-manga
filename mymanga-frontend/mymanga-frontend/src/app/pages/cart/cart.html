@@ -1,1 +1,142 @@
-<p>cart works!</p>
+<div class="container my-5"><div class="cart-container">
+
+  <h1 class="mb-4">Meu Carrinho</h1>  <h1>Meu Carrinho</h1>
+
+
+
+  @if (cartItems.length === 0 && !loading) {  <div *ngIf="cartItems.length === 0 && !loading" class="empty-cart">
+
+    <div class="text-center py-5">    <p>Seu carrinho está vazio.</p>
+
+      <p class="lead">Seu carrinho está vazio.</p>    <button mat-raised-button color="primary" routerLink="/">
+
+      <a class="btn btn-primary mt-3" routerLink="/">      Voltar para a Home
+
+        Voltar para a Home    </button>
+
+      </a>  </div>
+
+    </div>
+
+  }  <div *ngIf="cartItems.length > 0" class="cart-content">
+
+    <div class="items-list">
+
+  @if (cartItems.length > 0) {      <mat-card *ngFor="let item of cartItems; let i = index" class="cart-item">
+
+    <div class="row g-4">        <mat-card-content>
+
+      <!-- Items List -->          <div class="item-info">
+
+      <div class="col-12 col-lg-8">            <h3>{{ item.mangaTitle }}</h3>
+
+        @for (item of cartItems; track $index) {            <p class="volume">Volume {{ item.volumeNumber }}</p>
+
+          <div class="card mb-3">            <p class="price">R$ {{ item.price | number:'1.2-2' }}</p>
+
+            <div class="card-body">          </div>
+
+              <div class="d-flex justify-content-between align-items-center">          <div class="item-actions">
+
+                <div>            <button mat-icon-button color="warn" (click)="removeItem(i)">
+
+                  <h5 class="card-title mb-1">{{ item.mangaTitle }}</h5>              <mat-icon>delete</mat-icon>
+
+                  <p class="text-muted mb-1">Volume {{ item.volumeNumber }}</p>            </button>
+
+                  <p class="fw-bold mb-0">R$ {{ item.price | number:'1.2-2' }}</p>          </div>
+
+                </div>        </mat-card-content>
+
+                <button class="btn btn-danger btn-sm" (click)="removeItem($index)">      </mat-card>
+
+                  <i class="bi bi-trash"></i> Remover    </div>
+
+                </button>
+
+              </div>    <mat-card class="checkout-card">
+
+            </div>      <mat-card-header>
+
+          </div>        <mat-card-title>Finalizar Compra</mat-card-title>
+
+        }      </mat-card-header>
+
+      </div>
+
+      <mat-card-content>
+
+      <!-- Checkout Card -->        <mat-form-field appearance="outline" class="full-width">
+
+      <div class="col-12 col-lg-4">          <mat-label>Método de Pagamento</mat-label>
+
+        <div class="card">          <mat-select [(ngModel)]="paymentMethod" required>
+
+          <div class="card-header">            <mat-option value="PIX">PIX</mat-option>
+
+            <h5 class="mb-0">Finalizar Compra</h5>            <mat-option value="CREDIT">Cartão de Crédito</mat-option>
+
+          </div>            <mat-option value="DEBIT">Cartão de Débito</mat-option>
+
+          <div class="card-body">            <mat-option value="BOLETO">Boleto</mat-option>
+
+            <div class="mb-3">          </mat-select>
+
+              <label for="paymentMethod" class="form-label">Método de Pagamento</label>        </mat-form-field>
+
+              <select class="form-select" id="paymentMethod" [(ngModel)]="paymentMethod" required>
+
+                <option value="">Selecione...</option>        <div class="total">
+
+                <option value="PIX">PIX</option>          <h3>Total: R$ {{ getTotal() | number:'1.2-2' }}</h3>
+
+                <option value="CREDIT">Cartão de Crédito</option>        </div>
+
+                <option value="DEBIT">Cartão de Débito</option>
+
+                <option value="BOLETO">Boleto</option>        <div *ngIf="successMessage" class="success-message">
+
+              </select>          {{ successMessage }}
+
+            </div>        </div>
+
+
+
+            <div class="mb-3">        <div *ngIf="errorMessage" class="error-message">
+
+              <h4 class="mb-0">Total: R$ {{ getTotal() | number:'1.2-2' }}</h4>          {{ errorMessage }}
+
+            </div>        </div>
+
+      </mat-card-content>
+
+            @if (successMessage) {
+
+              <div class="alert alert-success">{{ successMessage }}</div>      <mat-card-actions>
+
+            }        <button mat-raised-button color="primary" 
+
+                (click)="finalizarCompra()" 
+
+            @if (errorMessage) {                [disabled]="loading || !paymentMethod">
+
+              <div class="alert alert-danger">{{ errorMessage }}</div>          {{ loading ? 'Processando...' : 'Finalizar Compra' }}
+
+            }        </button>
+
+      </mat-card-actions>
+
+            <button class="btn btn-primary w-100"     </mat-card>
+
+                    (click)="finalizarCompra()"   </div>
+
+                    [disabled]="loading || !paymentMethod"></div>
+
+              {{ loading ? 'Processando...' : 'Finalizar Compra' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

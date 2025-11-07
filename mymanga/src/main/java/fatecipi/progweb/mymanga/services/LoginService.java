@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class LoginService {
     private final EmailService emailService;
     private final TokenConfig tokenConfig;
 
+    @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User with email "+ loginRequest.email() +" not found"));
@@ -44,6 +46,7 @@ public class LoginService {
         return new LoginResponse(jwtValue, expiresIn);
     }
 
+    @Transactional
     public void requestPasswordReset(String email) {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));
@@ -78,6 +81,7 @@ public class LoginService {
         emailService.sendEmail(user.getEmail(), subject, body);
     }
 
+    @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         Users user = userRepository.findByConfirmationToken(request.token())
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token."));

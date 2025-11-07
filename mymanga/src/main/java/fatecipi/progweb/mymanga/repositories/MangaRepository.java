@@ -20,9 +20,11 @@ public interface MangaRepository extends JpaRepository<Manga, Long> {
     Page<Manga> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Override
+    @Query(value = "SELECT m FROM Manga m",
+            countQuery = "SELECT COUNT(m) FROM Manga m")
     Page<Manga> findAll(Pageable pageable);
 
-    @Query("SELECT m FROM Manga m LEFT JOIN FETCH m.volume WHERE m.id = :id")
+    @Query("SELECT DISTINCT m FROM Manga m LEFT JOIN FETCH m.volume WHERE m.id = :id")
     Optional<Manga> findByIdWithVolumes(@Param("id") Long id);
 
     boolean existsByTitle(String title);

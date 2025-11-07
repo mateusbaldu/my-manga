@@ -1,0 +1,11 @@
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/variables-dark";
+
+$orange: #FFA500;
+$red: #DC3545;   
+
+$primary:       $orange;
+$danger:        $red;   
+
+@import "../node_modules/bootstrap/scss/bootstrap";
