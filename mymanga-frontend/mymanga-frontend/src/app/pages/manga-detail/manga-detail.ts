@@ -19,6 +19,7 @@ export class MangaDetail implements OnInit {
   selectedVolume: any;
   loading = false;
   error = '';
+  successMessage = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -53,10 +54,13 @@ export class MangaDetail implements OnInit {
         mangaTitle: this.manga.title,
         mangaId: this.manga.id
       });
-      alert(`Volume ${this.selectedVolume.volumeNumber} adicionado ao carrinho!`);
+      this.successMessage = `Volume ${this.selectedVolume.volumeNumber} adicionado ao carrinho!`;
       this.selectedVolume = null; // Limpa a seleção
-    } else {
-      alert('Por favor, selecione um volume.');
+
+      // Limpa a mensagem após 3 segundos
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
     }
   }
 }

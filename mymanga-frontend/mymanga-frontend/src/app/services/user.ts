@@ -14,4 +14,9 @@ export class User {
     const params = new HttpParams().set('username', username);
     return this.http.get(this.apiUrl, { params });
   }
+
+  activateAccount(token: string): Observable<any> {
+    const params = new HttpParams().set('token', token);
+    return this.http.get(`${this.apiUrl}/activate`, { params });
+  }
 }

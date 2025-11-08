@@ -42,7 +42,11 @@ export class Login {
       },
       error: (err: any) => {
         console.error('Erro no login:', err);
-        this.errorMessage = 'Email ou senha inválidos';
+        if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Email ou senha inválidos';
+        }
         this.loading = false;
       }
     });

@@ -1,11 +1,22 @@
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/variables-dark";
+@import "../node_modules/bootstrap/scss/functions";@import "../node_modules/bootstrap/scss/functions";
 
-$orange: #FFA500;
-$red: #DC3545;   
+@import "../node_modules/bootstrap/scss/variables";@import "../node_modules/bootstrap/scss/variables";
 
-$primary:       $orange;
-$danger:        $red;   
+@import "../node_modules/bootstrap/scss/variables-dark";@import "../node_modules/bootstrap/scss/variables-dark";
 
-@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+$orange: #FFA500;$orange: #FFA500;
+
+$red: #DC3545;   $red: #DC3545;   
+
+
+
+$primary:       $orange;$primary:       $orange;
+
+$danger:        $red;   $danger:        $red;   
+
+
+
+@import "../node_modules/bootstrap/scss/bootstrap";@import "../node_modules/bootstrap/scss/bootstrap";
+

@@ -13,11 +13,18 @@ interface LoginResponse {
   expiresIn?: number;
 }
 
+interface JwtPayload {
+  sub: string;
+  scope: string;
+  username: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
   private readonly apiUrl = 'http://localhost:8080/my-manga/login';
+  private readonly registerUrl = 'http://localhost:8080/my-manga/users/new';
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) {}
@@ -35,6 +42,10 @@ export class Auth {
         }
       })
     );
+  }
+
+  register(data: any): Observable<any> {
+    return this.http.post(this.registerUrl, data);
   }
 
   logout(): void {
@@ -96,11 +107,19 @@ export class Auth {
     }
 
     try {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.sub || null;
+      const decodedToken = jwtDecode<JwtPayload>(token); 
+      return decodedToken.username || null;
     } catch (error) {
       console.error('Erro ao decodificar token:', error);
       return null;
     }
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
   }
 }

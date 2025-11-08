@@ -5,10 +5,10 @@
         <div class="card-header">
           <h3>Meu Perfil</h3>
         </div>
-        <div class="card-body" *ngIf="user">
-          <p><strong>Nome:</strong> {{ user.name }}</p>
-          <p><strong>Username:</strong> {{ user.username }}</p>
-          <p><strong>Nível:</strong> {{ user.roles.map(r => r.name).join(', ') }}</p>
+        <div class="card-body" *ngIf="userProfile">
+          <p><strong>Nome:</strong> {{ userProfile.name }}</p>
+          <p><strong>Username:</strong> {{ userProfile.username }}</p>
+          <p><strong>Nível:</strong> {{ userRole }}</p>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
       <div class="card mb-4">
         <div class="card-body">
           <h5 class="card-title">Adicionar Novo Endereço</h5>
-          <form [formGroup]="addressForm" (ngSubmit)="handleAddAddress()">
+          <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
             <div class="row">
               <div class="col-md-4">
                 <div class="mb-3">

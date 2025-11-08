@@ -51,7 +51,6 @@ export class Cart implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Formata os dados no formato que o DTO OrderCreate espera
     const orderData = {
       paymentMethod: this.paymentMethod,
       items: this.cartItems.map(item => ({
@@ -70,7 +69,6 @@ export class Cart implements OnInit {
         this.cartService.clearCart();
         this.cartItems = [];
         
-        // Redireciona após 2 segundos
         setTimeout(() => {
           this.router.navigate(['/orders']);
         }, 2000);

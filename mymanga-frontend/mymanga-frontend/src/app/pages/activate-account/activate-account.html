@@ -1,0 +1,45 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body text-center">
+          <h2 class="card-title mb-4">Ativação de Conta</h2>
+
+          @if (isActivating) {
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Ativando...</span>
+              </div>
+              <p class="text-muted">Ativando sua conta, aguarde...</p>
+            </div>
+          }
+
+          @if (successMessage) {
+            <div class="alert alert-success" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              {{ successMessage }}
+            </div>
+            <a routerLink="/login" class="btn btn-primary">
+              Ir para o Login
+            </a>
+          }
+
+          @if (errorMessage) {
+            <div class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {{ errorMessage }}
+            </div>
+            <div class="d-grid gap-2">
+              <a routerLink="/login" class="btn btn-secondary">
+                Voltar para o Login
+              </a>
+              <a routerLink="/register" class="btn btn-outline-primary">
+                Criar Nova Conta
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

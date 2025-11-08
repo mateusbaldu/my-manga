@@ -1,129 +1,88 @@
-<div class="container my-5"><div class="manga-detail-container">
+<div class="container my-5">
+  <div class="manga-detail-container">
 
-  @if (loading) {  <div *ngIf="loading" class="loading">
+    @if (loading) {
+      <div class="loading alert alert-info">
+        Carregando detalhes do mangá...
+      </div>
+    }
 
-    <div class="alert alert-info">Carregando detalhes do mangá...</div>    Carregando detalhes do mangá...
+    @if (error) {
+      <div class="error alert alert-danger">
+        {{ error }}
+      </div>
+    }
 
-  }  </div>
+    @if (successMessage) {
+      <div class="alert alert-success">
+        {{ successMessage }}
+      </div>
+    }
 
-
-
-  @if (error) {  <div *ngIf="error" class="error">
-
-    <div class="alert alert-danger">{{ error }}</div>    {{ error }}
-
-  }  </div>
-
-
-
-  @if (manga && !loading) {  <div *ngIf="manga && !loading" class="manga-content">
-
-    <div class="row g-4">    <mat-card class="manga-info">
-
-      <!-- Manga Info Card -->      <img mat-card-image [src]="manga.imageUrl" alt="{{manga.title}}" *ngIf="manga.imageUrl">
-
-      <div class="col-12 col-lg-8">      
-
-        <div class="card">      <mat-card-header>
-
-          @if (manga.imageUrl) {        <mat-card-title>{{ manga.title }}</mat-card-title>
-
-            <img [src]="manga.imageUrl" class="card-img-top" alt="{{manga.title}}" style="max-height: 500px; object-fit: cover;">        <mat-card-subtitle>Por {{ manga.author }}</mat-card-subtitle>
-
-          }      </mat-card-header>
-
-          <div class="card-body">
-
-            <h1 class="card-title">{{ manga.title }}</h1>      <mat-card-content>
-
-            <h5 class="card-subtitle mb-3 text-muted">Por {{ manga.author }}</h5>        <p class="description">{{ manga.description }}</p>
-
-                    
-
-            <p class="card-text">{{ manga.description }}</p>        <div class="manga-meta">
-
-                      <p *ngIf="manga.rating"><strong>Rating:</strong> {{ manga.rating }}/10</p>
-
-            <div class="mt-4">          <p *ngIf="manga.status"><strong>Status:</strong> {{ manga.status }}</p>
-
-              @if (manga.rating) {          <p *ngIf="manga.genres"><strong>Gênero:</strong> {{ manga.genres }}</p>
-
-                <p><strong>Rating:</strong> {{ manga.rating }}/10</p>        </div>
-
-              }      </mat-card-content>
-
-              @if (manga.status) {    </mat-card>
-
-                <p><strong>Status:</strong> {{ manga.status }}</p>
-
-              }    <div class="volumes-section">
-
-              @if (manga.genres) {      <h2>Volumes Disponíveis</h2>
-
-                <p><strong>Gênero:</strong> {{ manga.genres }}</p>      
-
-              }      <div *ngIf="!manga.volumes || manga.volumes.length === 0" class="no-volumes">
-
-            </div>        Nenhum volume disponível no momento.
-
-          </div>      </div>
-
-        </div>
-
-      </div>      <div *ngIf="manga.volumes && manga.volumes.length > 0" class="volume-selector">
-
-        <mat-form-field appearance="outline" class="full-width">
-
-      <!-- Volumes Section -->          <mat-label>Selecione o Volume</mat-label>
-
-      <div class="col-12 col-lg-4">          <mat-select [(ngModel)]="selectedVolume">
-
-        <div class="card">            <mat-option *ngFor="let volume of manga.volumes" [value]="volume">
-
-          <div class="card-header">              Volume {{ volume.volumeNumber }} - R$ {{ volume.price | number:'1.2-2' }}
-
-            <h5 class="mb-0">Volumes Disponíveis</h5>            </mat-option>
-
-          </div>          </mat-select>
-
-          <div class="card-body">        </mat-form-field>
-
-            @if (!manga.volumes || manga.volumes.length === 0) {
-
-              <p class="text-muted">Nenhum volume disponível no momento.</p>        <button mat-raised-button color="primary" 
-
-            }                (click)="adicionarAoCarrinho()"
-
-                class="add-to-cart-btn">
-
-            @if (manga.volumes && manga.volumes.length > 0) {          Adicionar ao Carrinho
-
-              <div class="mb-3">        </button>
-
-                <label for="volumeSelect" class="form-label">Selecione o Volume</label>      </div>
-
-                <select class="form-select" id="volumeSelect" [(ngModel)]="selectedVolume">    </div>
-
-                  <option [ngValue]="null">Escolha um volume...</option>  </div>
-
-                  @for (volume of manga.volumes; track volume.id) {</div>
-
-                    <option [ngValue]="volume">
-                      Volume {{ volume.volumeNumber }} - R$ {{ volume.price | number:'1.2-2' }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <button class="btn btn-primary w-100" 
-                      (click)="adicionarAoCarrinho()"
-                      [disabled]="!selectedVolume">
-                Adicionar ao Carrinho
-              </button>
+    @if (manga && !loading) {
+      <div class="manga-content row g-4">
+        
+        <div class="col-lg-8">
+          <div class="card manga-info">
+            @if (manga.imageUrl) {
+              <img [src]="manga.imageUrl" class="card-img-top" alt="{{manga.title}}" style="max-height: 500px; object-fit: cover;">
             }
+            <div class="card-body">
+              <h1 class="card-title">{{ manga.title }}</h1>
+              <h5 class="card-subtitle mb-3 text-muted">Por {{ manga.author }}</h5>
+              <p class="description card-text">{{ manga.description }}</p>
+              
+              <div class="manga-meta mt-4">
+                @if (manga.rating) {
+                  <p><strong>Rating:</strong> <span class="badge bg-primary">{{ manga.rating }}/10</span></p>
+                }
+                @if (manga.status) {
+                  <p><strong>Status:</strong> <span class="badge bg-secondary">{{ manga.status }}</span></p>
+                }
+                @if (manga.genres) {
+                  <p><strong>Gênero:</strong> <span class="badge bg-info text-dark">{{ manga.genres }}</span></p>
+                }
+              </div>
+            </div>
           </div>
         </div>
+
+        <div class="col-lg-4">
+          <div class="card volumes-section shadow-sm">
+            <div class="card-header">
+              <h5 class="mb-0">Volumes Disponíveis</h5>
+            </div>
+            <div class="card-body">
+              @if (!manga.volumes || manga.volumes.length === 0) {
+                <div class="no-volumes text-center p-3 text-muted">
+                  Nenhum volume disponível no momento.
+                </div>
+              } @else {
+                <div class="volume-selector">
+                  <div class="mb-3">
+                    <label for="volumeSelect" class="form-label">Selecione o Volume</label>
+                    <select class="form-select" id="volumeSelect" [(ngModel)]="selectedVolume">
+                      <option [ngValue]="null">Escolha um volume...</option>
+                      @for (volume of manga.volumes; track volume.id) {
+                        <option [ngValue]="volume" [disabled]="volume.quantity === 0">
+                          Volume {{ volume.volumeNumber }} - R$ {{ volume.price | number:'1.2-2' }}
+                          (Estoque: {{ volume.quantity }})
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  <button class="btn btn-primary w-100 add-to-cart-btn" 
+                          (click)="adicionarAoCarrinho()"
+                          [disabled]="!selectedVolume">
+                    Adicionar ao Carrinho
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        
       </div>
-    </div>
-  }
+    }
+  </div>
 </div>

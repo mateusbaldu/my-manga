@@ -1,6 +1,20 @@
 <div class="container mt-4">
   <h1 class="mb-4">Catálogo de Mangás</h1>
 
+  <form (ngSubmit)="searchMangas()" class="row g-3 mb-4">
+    <div class="col-9">
+      <input type="text" class="form-control" placeholder="Buscar por título ou palavra-chave..." 
+             [(ngModel)]="searchTerm" name="searchTerm">
+    </div>
+    <div class="col-3">
+      <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+  </form>
+
+  @if (isSearching && !loading) {
+    <h4 class="mb-3">Resultados para: "{{ searchTerm }}"</h4>
+  }
+
   <div *ngIf="loading" class="alert alert-info text-center">
     Carregando mangás...
   </div>
@@ -15,7 +29,7 @@
         <img [src]="manga.imageUrl" class="card-img-top" [alt]="manga.title" *ngIf="manga.imageUrl">
         
         <div class="card-body">
-          <h5 class="card-title">{{ manga.title }}</h5>
+          <h4 class="card-title">{{ manga.title }}</h4>
           <h6 class="card-subtitle mb-2 text-muted">{{ manga.author }}</h6>
           <p class="card-text" *ngIf="manga.description">{{ manga.description }}</p>
         </div>
@@ -28,4 +42,18 @@
       </div>
     </div>
   </div>
+
+  @if (!loading && totalPages > 1) {
+    <div class="d-flex justify-content-center align-items-center mt-4">
+      <button class="btn btn-primary" (click)="prevPage()" [disabled]="page === 0">
+        Anterior
+      </button>
+      <span class="mx-3">
+        Página {{ page + 1 }} de {{ totalPages }}
+      </span>
+      <button class="btn btn-primary" (click)="nextPage()" [disabled]="page >= totalPages - 1">
+        Próxima
+      </button>
+    </div>
+  }
 </div>

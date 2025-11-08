@@ -32,7 +32,7 @@ export class Orders implements OnInit {
     const token = this.authService.getToken();
     if (token) {
       const decoded: any = jwtDecode(token);
-      const username = decoded.sub;
+      const username = decoded.username;
 
       this.loading = true;
       this.errorMessage = '';
@@ -50,17 +50,6 @@ export class Orders implements OnInit {
         }
       });
     }
-  }
-
-  getStatusColor(status: string): string {
-    const statusColors: { [key: string]: string } = {
-      'PENDING': 'warn',
-      'CONFIRMED': 'primary',
-      'SHIPPED': 'accent',
-      'DELIVERED': 'primary',
-      'CANCELLED': 'warn'
-    };
-    return statusColors[status] || 'primary';
   }
 
   formatDate(dateString: string): string {

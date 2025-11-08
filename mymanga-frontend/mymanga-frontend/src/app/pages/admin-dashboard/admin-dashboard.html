@@ -1,6 +1,7 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <!-- Criar Novo Mangá -->
+    <div class="col-lg-8 mb-4">
       <div class="card">
         <div class="card-header">
           <h3>Criar Novo Mangá</h3>
@@ -139,6 +140,132 @@
                 routerLink="/" 
                 [disabled]="loading">
                 Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adicionar Volume a um Mangá -->
+    <div class="col-lg-8 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h3>Adicionar Volume a um Mangá</h3>
+          <p class="text-muted mb-0">Adicione volumes aos mangás existentes</p>
+        </div>
+
+        <div class="card-body">
+          <form [formGroup]="volumeForm" (ngSubmit)="onSubmitVolume()">
+            
+            <div class="mb-3">
+              <label for="mangaId" class="form-label">ID do Mangá <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="mangaId"
+                formControlName="mangaId" 
+                placeholder="Ex: 123e4567-e89b-12d3-a456-426614174000">
+              <small class="form-text text-muted">Copie o ID do mangá da URL ou da lista de mangás</small>
+              <div class="invalid-feedback d-block" *ngIf="volumeForm.get('mangaId')?.hasError('required') && volumeForm.get('mangaId')?.touched">
+                O ID do mangá é obrigatório
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="volumeNumber" class="form-label">Número do Volume <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="volumeNumber"
+                  formControlName="volumeNumber" 
+                  placeholder="Ex: 1"
+                  min="1">
+                <div class="invalid-feedback d-block" *ngIf="volumeForm.get('volumeNumber')?.hasError('required') && volumeForm.get('volumeNumber')?.touched">
+                  O número do volume é obrigatório
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Preço (R$) <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="price"
+                  formControlName="price" 
+                  placeholder="Ex: 29.90"
+                  min="0"
+                  step="0.01">
+                <div class="invalid-feedback d-block" *ngIf="volumeForm.get('price')?.hasError('required') && volumeForm.get('price')?.touched">
+                  O preço é obrigatório
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="chapters" class="form-label">Número de Capítulos <span class="text-danger">*</span></label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="chapters"
+                  formControlName="chapters" 
+                  placeholder="Ex: 10"
+                  min="1">
+                <div class="invalid-feedback d-block" *ngIf="volumeForm.get('chapters')?.hasError('required') && volumeForm.get('chapters')?.touched">
+                  O número de capítulos é obrigatório
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="releaseDate" class="form-label">Data de Lançamento <span class="text-danger">*</span></label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  id="releaseDate"
+                  formControlName="releaseDate">
+                <div class="invalid-feedback d-block" *ngIf="volumeForm.get('releaseDate')?.hasError('required') && volumeForm.get('releaseDate')?.touched">
+                  A data de lançamento é obrigatória
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Quantidade em Estoque <span class="text-danger">*</span></label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="quantity"
+                formControlName="quantity" 
+                placeholder="Ex: 50"
+                min="0">
+              <div class="invalid-feedback d-block" *ngIf="volumeForm.get('quantity')?.hasError('required') && volumeForm.get('quantity')?.touched">
+                A quantidade é obrigatória
+              </div>
+            </div>
+
+            <div *ngIf="volumeSuccessMessage" class="alert alert-success" role="alert">
+              {{ volumeSuccessMessage }}
+            </div>
+
+            <div *ngIf="volumeErrorMessage" class="alert alert-danger" role="alert">
+              {{ volumeErrorMessage }}
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-success" 
+                [disabled]="volumeLoading || volumeForm.invalid">
+                {{ volumeLoading ? 'Adicionando...' : 'Adicionar Volume' }}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="volumeForm.reset()"
+                [disabled]="volumeLoading">
+                Limpar
               </button>
             </div>
           </form>

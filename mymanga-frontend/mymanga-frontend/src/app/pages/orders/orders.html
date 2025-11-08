@@ -1,289 +1,93 @@
-<div class="container my-5"><div class="container my-5"><div class="orders-container">
-
-  <h1 class="mb-4">Meus Pedidos</h1>
-
-  <h1 class="mb-4">Meus Pedidos</h1>  <h1>Meus Pedidos</h1>
-
-  @if (loading) {
-
-    <div class="alert alert-info">Carregando seus pedidos...</div>
-
-  }
-
-  @if (loading) {  <div *ngIf="loading" class="loading">
-
-  @if (errorMessage) {
-
-    <div class="alert alert-danger">{{ errorMessage }}</div>    <div class="alert alert-info">Carregando seus pedidos...</div>    Carregando seus pedidos...
-
-  }
-
-  }  </div>
-
-  @if (!loading && orders.length === 0) {
-
-    <div class="text-center py-5">
-
-      <div class="display-1 text-muted">🛍️</div>
-
-      <p class="lead mt-3">Você ainda não fez nenhum pedido.</p>  @if (errorMessage) {  <div *ngIf="errorMessage" class="error-message">
-
-      <a class="btn btn-primary mt-3" routerLink="/">
-
-        Começar a Comprar    <div class="alert alert-danger">{{ errorMessage }}</div>    {{ errorMessage }}
-
-      </a>
-
-    </div>  }  </div>
-
-  }
-
-
-
-  @if (!loading && orders.length > 0) {
-
-    <div class="accordion" id="ordersAccordion">  @if (!loading && orders.length === 0) {  <div *ngIf="!loading && orders.length === 0" class="no-orders">
-
-      @for (order of orders; track order.id) {
-
-        <div class="accordion-item">    <div class="text-center py-5">    <mat-icon>shopping_bag</mat-icon>
-
-          <h2 class="accordion-header" [id]="'heading' + order.id">
-
-            <button class="accordion-button collapsed" type="button"       <div class="display-1 text-muted">🛍️</div>    <p>Você ainda não fez nenhum pedido.</p>
-
-                    data-bs-toggle="collapse" 
-
-                    [attr.data-bs-target]="'#collapse' + order.id"       <p class="lead mt-3">Você ainda não fez nenhum pedido.</p>    <button mat-raised-button color="primary" routerLink="/">
-
-                    aria-expanded="false" 
-
-                    [attr.aria-controls]="'collapse' + order.id">      <a class="btn btn-primary mt-3" routerLink="/">      Começar a Comprar
-
-              <div class="d-flex w-100 justify-content-between align-items-center me-3">
-
-                <div>        Começar a Comprar    </button>
-
-                  <span class="fw-bold">Pedido #{{ order.id }}</span>
-
-                  <span class="badge ms-2" [ngClass]="{      </a>  </div>
-
-                    'bg-warning': order.status === 'PENDING',
-
-                    'bg-info': order.status === 'PROCESSING',    </div>
-
-                    'bg-success': order.status === 'DELIVERED',
-
-                    'bg-danger': order.status === 'CANCELLED'  }  <div *ngIf="!loading && orders.length > 0" class="orders-list">
-
-                  }">{{ order.status }}</span>
-
-                </div>    <mat-accordion>
-
-                <div class="text-end">
-
-                  <div class="text-muted small">{{ formatDate(order.createdAt) }}</div>  @if (!loading && orders.length > 0) {      <mat-expansion-panel *ngFor="let order of orders" class="order-panel">
-
-                  <div class="fw-bold">R$ {{ order.totalPrice | number:'1.2-2' }}</div>
-
-                </div>    <div class="accordion" id="ordersAccordion">        <mat-expansion-panel-header>
-
-              </div>
-
-            </button>      @for (order of orders; track order.id) {          <mat-panel-title>
-
-          </h2>
-
-          <div [id]="'collapse' + order.id"         <div class="accordion-item">            <div class="order-header">
-
-               class="accordion-collapse collapse" 
-
-               [attr.aria-labelledby]="'heading' + order.id"           <h2 class="accordion-header" [id]="'heading' + order.id">              <span class="order-id">Pedido #{{ order.id }}</span>
-
-               data-bs-parent="#ordersAccordion">
-
-            <div class="accordion-body">            <button class="accordion-button collapsed" type="button"               <mat-chip [color]="getStatusColor(order.status)" selected>
-
-              <div class="mb-4">
-
-                <p><strong>Método de Pagamento:</strong> {{ order.paymentMethod }}</p>                    data-bs-toggle="collapse"                 {{ order.status }}
-
-                <p><strong>Total de Itens:</strong> {{ getTotalItems(order) }}</p>
-
-                @if (order.createdAt) {                    [attr.data-bs-target]="'#collapse' + order.id"               </mat-chip>
-
-                  <p><strong>Data do Pedido:</strong> {{ formatDate(order.createdAt) }}</p>
-
-                }                    aria-expanded="false"             </div>
-
-              </div>
-
-                    [attr.aria-controls]="'collapse' + order.id">          </mat-panel-title>
-
-              <h5 class="mb-3">Itens do Pedido</h5>
-
-              <div class="row g-3 mb-4">              <div class="d-flex w-100 justify-content-between align-items-center me-3">          <mat-panel-description>
-
-                @for (item of order.items; track item.id) {
-
-                  <div class="col-12 col-md-6">                <div>            <div class="order-summary">
-
-                    <div class="card h-100">
-
-                      <div class="card-body">                  <span class="fw-bold">Pedido #{{ order.id }}</span>              <span class="order-date">{{ formatDate(order.createdAt) }}</span>
-
-                        <div class="d-flex justify-content-between">
-
-                          <div>                  <span class="badge ms-2" [ngClass]="{              <span class="order-total">R$ {{ order.totalPrice | number:'1.2-2' }}</span>
-
-                            <h6 class="card-title mb-1">{{ item.volume?.manga?.title || 'Mangá' }}</h6>
-
-                            <p class="text-muted mb-1">Volume {{ item.volume?.volumeNumber || item.volumeId }}</p>                    'bg-warning': order.status === 'PENDING',            </div>
-
-                            <p class="mb-0">Quantidade: {{ item.quantity || 1 }}</p>
-
-                          </div>                    'bg-info': order.status === 'PROCESSING',          </mat-panel-description>
-
-                          <div class="text-end">
-
-                            <p class="fw-bold mb-0">R$ {{ item.volume?.price || item.price || 0 | number:'1.2-2' }}</p>                    'bg-success': order.status === 'DELIVERED',        </mat-expansion-panel-header>
-
-                          </div>
-
-                        </div>                    'bg-danger': order.status === 'CANCELLED'
-
-                      </div>
-
-                    </div>                  }">{{ order.status }}</span>        <div class="order-details">
-
+<div class="container my-5">
+  <div class="orders-container">
+    <h1 class="mb-4">Meus Pedidos</h1>
+
+    @if (loading) {
+      <div class="alert alert-info">Carregando seus pedidos...</div>
+    }
+
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+
+    @if (!loading && orders.length === 0 && !errorMessage) {
+      <div class="text-center py-5">
+        <div style="font-size: 3rem; opacity: 0.6;">🛍️</div>
+        <p class="lead mt-3">Você ainda não fez nenhum pedido.</p>
+        <a class="btn btn-primary mt-3" routerLink="/">
+          Começar a Comprar
+        </a>
+      </div>
+    }
+
+    @if (!loading && orders.length > 0) {
+      <div class="accordion" id="ordersAccordion">
+        @for (order of orders; track order.id) {
+          <div class="accordion-item">
+            <h2 class="accordion-header" [id]="'heading' + order.id">
+              <button class="accordion-button collapsed" type="button" 
+                      data-bs-toggle="collapse" 
+                      [attr.data-bs-target]="'#collapse' + order.id" 
+                      aria-expanded="false" 
+                      [attr.aria-controls]="'collapse' + order.id">
+                
+                <div class="d-flex w-100 justify-content-between align-items-center pe-3">
+                  <div>
+                    <span class="fw-bold">Pedido #{{ order.id }}</span>
+                    <span class="badge ms-2" [ngClass]="{
+                      'bg-warning text-dark': order.status === 'WAITING_CONFIRMATION',
+                      'bg-info text-dark': order.status === 'CONFIRMED',
+                      'bg-primary': order.status === 'SHIPPED',
+                      'bg-success': order.status === 'DELIVERED',
+                      'bg-danger': order.status === 'CANCELLED'
+                    }">{{ order.status }}</span>
                   </div>
-
-                }                </div>          <div class="order-info">
-
-              </div>
-
-                <div class="text-end">            <p><strong>Método de Pagamento:</strong> {{ order.paymentMethod }}</p>
-
-              @if (order.address) {
-
-                <h5 class="mb-3">Endereço de Entrega</h5>                  <div class="text-muted small">{{ formatDate(order.createdAt) }}</div>            <p><strong>Total de Itens:</strong> {{ getTotalItems(order) }}</p>
-
-                <div class="card">
-
-                  <div class="card-body">                  <div class="fw-bold">R$ {{ order.totalPrice | number:'1.2-2' }}</div>            <p *ngIf="order.createdAt"><strong>Data do Pedido:</strong> {{ formatDate(order.createdAt) }}</p>
-
-                    <p class="mb-1">{{ order.address.street }}, {{ order.address.number }}</p>
-
-                    @if (order.address.complement) {                </div>          </div>
-
-                      <p class="mb-1">{{ order.address.complement }}</p>
-
-                    }              </div>
-
-                    <p class="mb-1">{{ order.address.neighborhood }} - {{ order.address.city }}/{{ order.address.state }}</p>
-
-                    <p class="mb-0">CEP: {{ order.address.zipCode }}</p>            </button>          <div class="order-items">
-
-                  </div>
-
-                </div>          </h2>            <h3>Itens do Pedido</h3>
-
-              }
-
-            </div>          <div [id]="'collapse' + order.id"             <mat-card *ngFor="let item of order.items" class="item-card">
-
-          </div>
-
-        </div>               class="accordion-collapse collapse"               <mat-card-content>
-
-      }
-
-    </div>               [attr.aria-labelledby]="'heading' + order.id"                 <div class="item-info">
-
-  }
-
-</div>               data-bs-parent="#ordersAccordion">                  <div class="item-details">
-
-
-            <div class="accordion-body">                    <p class="manga-title">{{ item.volume?.manga?.title || 'Mangá' }}</p>
-
-              <!-- Order Info -->                    <p class="volume-number">Volume {{ item.volume?.volumeNumber || item.volumeId }}</p>
-
-              <div class="mb-4">                    <p class="quantity">Quantidade: {{ item.quantity || 1 }}</p>
-
-                <p><strong>Método de Pagamento:</strong> {{ order.paymentMethod }}</p>                  </div>
-
-                <p><strong>Total de Itens:</strong> {{ getTotalItems(order) }}</p>                  <div class="item-price">
-
-                @if (order.createdAt) {                    <p class="price">R$ {{ item.volume?.price || item.price || 0 | number:'1.2-2' }}</p>
-
-                  <p><strong>Data do Pedido:</strong> {{ formatDate(order.createdAt) }}</p>                  </div>
-
-                }                </div>
-
-              </div>              </mat-card-content>
-
-            </mat-card>
-
-              <!-- Order Items -->          </div>
-
-              <h5 class="mb-3">Itens do Pedido</h5>
-
-              <div class="row g-3 mb-4">          <div class="order-address" *ngIf="order.address">
-
-                @for (item of order.items; track item.id) {            <h3>Endereço de Entrega</h3>
-
-                  <div class="col-12 col-md-6">            <mat-card>
-
-                    <div class="card h-100">              <mat-card-content>
-
-                      <div class="card-body">                <p>{{ order.address.street }}, {{ order.address.number }}</p>
-
-                        <div class="d-flex justify-content-between">                <p *ngIf="order.address.complement">{{ order.address.complement }}</p>
-
-                          <div>                <p>{{ order.address.neighborhood }} - {{ order.address.city }}/{{ order.address.state }}</p>
-
-                            <h6 class="card-title mb-1">{{ item.volume?.manga?.title || 'Mangá' }}</h6>                <p>CEP: {{ order.address.zipCode }}</p>
-
-                            <p class="text-muted mb-1">Volume {{ item.volume?.volumeNumber || item.volumeId }}</p>              </mat-card-content>
-
-                            <p class="mb-0">Quantidade: {{ item.quantity || 1 }}</p>            </mat-card>
-
-                          </div>          </div>
-
-                          <div class="text-end">        </div>
-
-                            <p class="fw-bold mb-0">R$ {{ item.volume?.price || item.price || 0 | number:'1.2-2' }}</p>      </mat-expansion-panel>
-
-                          </div>    </mat-accordion>
-
-                        </div>  </div>
-
-                      </div></div>
-
-                    </div>
-                  </div>
-                }
-              </div>
-
-              <!-- Delivery Address -->
-              @if (order.address) {
-                <h5 class="mb-3">Endereço de Entrega</h5>
-                <div class="card">
-                  <div class="card-body">
-                    <p class="mb-1">{{ order.address.street }}, {{ order.address.number }}</p>
-                    @if (order.address.complement) {
-                      <p class="mb-1">{{ order.address.complement }}</p>
-                    }
-                    <p class="mb-1">{{ order.address.neighborhood }} - {{ order.address.city }}/{{ order.address.state }}</p>
-                    <p class="mb-0">CEP: {{ order.address.zipCode }}</p>
+                  <div class="text-end">
+                    <div class="text-muted small">{{ formatDate(order.createdAt) }}</div>
+                    <div class="fw-bold">R$ {{ order.finalPrice | number:'1.2-2' }}</div>
                   </div>
                 </div>
-              }
+              </button>
+            </h2>
+            <div [id]="'collapse' + order.id" 
+                 class="accordion-collapse collapse" 
+                 [attr.aria-labelledby]="'heading' + order.id"
+                 data-bs-parent="#ordersAccordion">
+              <div class="accordion-body">
+                <div class="mb-4">
+                  <p><strong>Método de Pagamento:</strong> {{ order.paymentMethod }}</p>
+                  <p><strong>Total de Itens:</strong> {{ getTotalItems(order) }}</p>
+                  @if (order.createdAt) {
+                    <p><strong>Data do Pedido:</strong> {{ formatDate(order.createdAt) }}</p>
+                  }
+                </div>
+
+                <h5 class="mb-3">Itens do Pedido</h5>
+                <div class="row g-3 mb-4">
+                  @for (item of order.items; track item.mangaTitle + item.volumeNumber) {
+                    <div class="col-12 col-md-6">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between">
+                            <div>
+                              <h6 class="card-title mb-1">{{ item.mangaTitle }}</h6>
+                              <p class="text-muted mb-1">Volume {{ item.volumeNumber }}</p>
+                              <p class="mb-0">Quantidade: {{ item.quantity || 1 }}</p>
+                            </div>
+                            <div class="text-end">
+                              <p class="fw-bold mb-0">R$ {{ item.unitPrice | number:'1.2-2' }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      }
-    </div>
-  }
+        }
+      </div>
+    }
+  </div>
 </div>

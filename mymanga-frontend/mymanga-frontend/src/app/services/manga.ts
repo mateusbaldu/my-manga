@@ -29,4 +29,16 @@ export class Manga {
   getMangaById(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
+
+  addVolume(mangaId: string, volumeData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${mangaId}/volumes/new`, volumeData);
+  }
+
+  searchMangas(keyword: string, page: number = 0, size: number = 10): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get(`${this.apiUrl}/search/${keyword}`, { params });
+  }
 }

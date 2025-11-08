@@ -5,6 +5,8 @@ import { User } from '../../services/user';
 import { Address } from '../../services/address';
 import { Auth } from '../../services/auth';
 import { jwtDecode } from 'jwt-decode';
+import { UserResponse } from '../../models/user-response.model';
+import { Address as AddressModel } from '../../models/address.model'; // Renomeando o import
 
 @Component({
   selector: 'app-profile',
@@ -16,14 +18,15 @@ import { jwtDecode } from 'jwt-decode';
   styleUrl: './profile.scss',
 })
 export class Profile implements OnInit {
-  userProfile: any = null;
-  addresses: any[] = [];
+  userProfile: UserResponse | null = null;
+  addresses: AddressModel[] = [];
   addressForm: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
-  showAddressForm = false;
-
+  userRole: string = 'Carregando...';
+  
+  
   constructor(
     private userService: User,
     private addressService: Address,
@@ -31,13 +34,10 @@ export class Profile implements OnInit {
     private fb: FormBuilder
   ) {
     this.addressForm = this.fb.group({
-      street: ['', Validators.required],
+      // Corrigido para bater com o HTML e o DTO AddressCreate
+      cep: ['', [Validators.required, Validators.pattern('^[0-9]{8}$')]],
       number: ['', Validators.required],
-      complement: [''],
-      neighborhood: ['', Validators.required],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      zipCode: ['', Validators.required]
+      complement: ['']
     });
   }
 
@@ -46,15 +46,20 @@ export class Profile implements OnInit {
   }
 
   loadUserData(): void {
-    const token = this.authService.getToken();
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      const username = decoded.sub;
-
+    const username = this.authService.getUsernameFromToken(); // Usando o método do Auth
+    
+    if (username) {
       this.loading = true;
       
+      // Determina o papel do usuário
+      if (this.authService.hasRole('ADMIN')) {
+        this.userRole = 'Administrador';
+      } else {
+        this.userRole = 'Usuário';
+      }
+      
       this.userService.getProfile(username).subscribe({
-        next: (data: any) => {
+        next: (data: UserResponse) => {
           this.userProfile = data;
           this.loading = false;
         },
@@ -72,21 +77,13 @@ export class Profile implements OnInit {
   loadAddresses(username: string): void {
     this.addressService.getAddresses(username).subscribe({
       next: (data: any) => {
-        this.addresses = data;
+        this.addresses = data.content;
       },
       error: (err: any) => {
         console.error('Erro ao carregar endereços:', err);
+        this.errorMessage = 'Erro ao carregar endereços.';
       }
     });
-  }
-
-  toggleAddressForm(): void {
-    this.showAddressForm = !this.showAddressForm;
-    if (!this.showAddressForm) {
-      this.addressForm.reset();
-      this.successMessage = '';
-      this.errorMessage = '';
-    }
   }
 
   addAddress(): void {
@@ -95,24 +92,22 @@ export class Profile implements OnInit {
       return;
     }
 
-    const token = this.authService.getToken();
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      const username = decoded.sub;
-
+    const username = this.authService.getUsernameFromToken();
+    
+    if (username) {
       this.loading = true;
       this.errorMessage = '';
       this.successMessage = '';
 
       this.addressService.addAddress(username, this.addressForm.value).subscribe({
-        next: (response: any) => {
+        next: (response: AddressModel) => {
           console.log('Endereço adicionado:', response);
           this.successMessage = 'Endereço adicionado com sucesso!';
           this.loading = false;
           this.addressForm.reset();
-          this.showAddressForm = false;
           
-          this.loadAddresses(username);
+          // Recarrega a lista de endereços
+          this.loadAddresses(username); 
         },
         error: (err: any) => {
           console.error('Erro ao adicionar endereço:', err);

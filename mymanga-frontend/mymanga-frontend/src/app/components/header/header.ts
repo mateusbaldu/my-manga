@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart-service';
 import { Auth } from '../../services/auth';
@@ -8,7 +8,8 @@ import { Auth } from '../../services/auth';
   selector: 'app-header',
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss',
