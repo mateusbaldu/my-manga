@@ -92,8 +92,16 @@ export class AdminDashboard implements OnInit {
         }, 2000);
       },
       error: (err: any) => {
-        console.error('Erro ao criar mangá:', err);
-        this.errorMessage = 'Erro ao criar mangá. Tente novamente.';
+        console.error('Erro:', err);
+        if (err.error && err.error.message) {
+          if (err.error.errors && Array.isArray(err.error.errors)) {
+            this.errorMessage = err.error.errors[0].message;
+          } else {
+            this.errorMessage = err.error.message;
+          }
+        } else {
+          this.errorMessage = 'Erro ao criar mangá. Tente novamente.';
+        }
         this.loading = false;
       }
     });

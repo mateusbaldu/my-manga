@@ -22,9 +22,14 @@ public class Manga {
 
     private String title;
     private String author;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private Double rating;
     private String keywords;
+
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)

@@ -57,9 +57,24 @@ public class OrderService {
         return orderPage.map(orderMapper::toOrderResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<OrderResponse> findAllByUserId(Long id, Pageable pageable) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User with id " + id + " not found");
+        }
+        Page<Order> orderPage = orderRepository.findByUsers_Id(id, pageable);
+        return orderPage.map(orderMapper::toOrderResponse);
+    }
+
     @Transactional
-    public void delete(Long id) {
-        orderRepository.delete(getOrderById(id));
+    public void cancelOrder(Long id) {
+        Order order = getOrderById(id);
+
+        if (!(order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.WAITING_CONFIRMATION)) {
+            throw new NotAvailableException("Este pedido não pode ser cancelado (Status: " + order.getStatus() + ")");
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
     }
 
     @Transactional

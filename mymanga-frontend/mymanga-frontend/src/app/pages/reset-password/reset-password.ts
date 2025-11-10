@@ -68,7 +68,16 @@ export class ResetPassword implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = 'Erro ao redefinir senha. O token pode ter expirado.';
+        console.error('Erro:', err);
+        if (err.error && err.error.message) {
+          if (err.error.errors && Array.isArray(err.error.errors)) {
+            this.errorMessage = err.error.errors[0].message;
+          } else {
+            this.errorMessage = err.error.message;
+          }
+        } else {
+          this.errorMessage = 'Erro ao redefinir senha. O token pode ter expirado.';
+        }
       }
     });
   }

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByUsers_Username(String email, Pageable pageable);
     Optional<Order> findByConfirmationToken(String token);
+    Page<Order> findByUsers_Id(Long id, Pageable pageable);
 }

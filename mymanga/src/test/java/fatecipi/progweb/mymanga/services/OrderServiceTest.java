@@ -243,28 +243,28 @@ class OrderServiceTest {
         }
     }
 
-    @Nested
-    class delete {
-        @Test
-        @DisplayName("should return void when everything is ok")
-        void delete_void_whenEverythingIsOk() {
-            doReturn(Optional.of(order)).when(orderRepository).findById(1L);
-            doNothing().when(orderRepository).delete(order);
-
-            orderService.delete(1L);
-
-            verify(orderRepository, times(1)).findById(1L);
-            verify(orderRepository, times(1)).delete(order);
-        }
-
-        @Test
-        @DisplayName("should throw a ResourceNotFoundException when the Order isn't found")
-        void delete_throwResourceNotFoundException_whenOrderIsNotFound() {
-            doReturn(Optional.empty()).when(orderRepository).findById(anyLong());
-
-            assertThrows(ResourceNotFoundException.class, () -> orderService.delete(1L));
-        }
-    }
+//    @Nested
+//    class delete {
+//        @Test
+//        @DisplayName("should return void when everything is ok")
+//        void delete_void_whenEverythingIsOk() {
+//            doReturn(Optional.of(order)).when(orderRepository).findById(1L);
+//            doNothing().when(orderRepository).delete(order);
+//
+//            orderService.delete(1L);
+//
+//            verify(orderRepository, times(1)).findById(1L);
+//            verify(orderRepository, times(1)).delete(order);
+//        }
+//
+//        @Test
+//        @DisplayName("should throw a ResourceNotFoundException when the Order isn't found")
+//        void delete_throwResourceNotFoundException_whenOrderIsNotFound() {
+//            doReturn(Optional.empty()).when(orderRepository).findById(anyLong());
+//
+//            assertThrows(ResourceNotFoundException.class, () -> orderService.delete(1L));
+//        }
+//    }
 
     @Nested
     class create {

@@ -15,17 +15,29 @@
           @for (item of cartItems; track $index) {
             <div class="card mb-3 cart-item">
               <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="item-info">
-                    <h5 class="card-title mb-1">{{ item.mangaTitle }}</h5>
-                    <p class="text-muted mb-1">Volume {{ item.volumeNumber }}</p>
-                    <p class="fw-bold mb-0">R$ {{ item.price | number:'1.2-2' }}</p>
+                <div class="d-flex justify-content-between">
+                  
+                  <div class="d-flex">
+                    <img [src]="item.imageUrl" alt="{{ item.mangaTitle }}" 
+                         style="width: 60px; height: 90px; object-fit: cover; margin-right: 15px;" 
+                         class="rounded">
+                    
+                    <div>
+                      <h5 class="card-title mb-0">{{ item.mangaTitle }}</h5>
+                      <p class="card-text mb-1"><small>Volume {{ item.volumeNumber }}</small></p>
+                      <p class="card-text"><strong>{{ item.price | currency:'BRL' }}</strong></p>
+                      @if (item.quantity && item.quantity > 1) {
+                        <p class="text-muted small mb-0">Quantidade: {{ item.quantity }}</p>
+                      }
+                    </div>
                   </div>
-                  <div class="item-actions">
+
+                  <div>
                     <button class="btn btn-danger btn-sm" (click)="removeItem($index)">
                       <i class="bi bi-trash"></i> Remover
                     </button>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -49,8 +61,8 @@
                 </select>
               </div>
               
-              <div class_ ="total bg-light p-3 rounded text-end mb-3">
-                <h3 class="mb-0">Total: R$ {{ getTotal() | number:'1.2-2' }}</h3>
+              <div class="total p-3 rounded text-end mb-3 text-light">
+                <h3 class="mb-0">Total: {{ getTotal() | currency:'BRL' }}</h3>
               </div>
 
               @if (successMessage) {

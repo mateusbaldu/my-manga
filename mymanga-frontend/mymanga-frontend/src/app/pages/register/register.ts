@@ -56,9 +56,13 @@ export class Register implements OnInit {
         }, 3000); // Redireciona para o login após 3s
       },
       error: (err: any) => {
-        console.error('Erro no registro:', err);
+        console.error('Erro:', err);
         if (err.error && err.error.message) {
-          this.errorMessage = err.error.message;
+          if (err.error.errors && Array.isArray(err.error.errors)) {
+            this.errorMessage = err.error.errors[0].message;
+          } else {
+            this.errorMessage = err.error.message;
+          }
         } else {
           this.errorMessage = 'Erro ao realizar cadastro. Tente novamente.';
         }

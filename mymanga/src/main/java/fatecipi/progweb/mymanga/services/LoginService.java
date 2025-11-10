@@ -51,32 +51,27 @@ public class LoginService {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));
 
+        if (!user.isActive()) {
+            throw new InvalidLoginException("User account is not active");
+        }
+
         String token = UUID.randomUUID().toString();
         user.setConfirmationToken(token);
         userRepository.save(user);
 
+        String resetUrl = "http://localhost:4200/reset-password?token=" + token;
         String subject = "Instruções para Redefinição de Senha - My Mangá";
         String body = String.format("""
         Olá %s,
         
-        Você solicitou a redefinição da sua senha. Como não temos um frontend, por favor, siga as instruções abaixo para criar uma nova senha usando uma ferramenta de API (como Postman, Insomnia, etc.):
+        Você solicitou a redefinição da sua senha.
         
-        1. Método HTTP:
-           POST
-        2. URL do Endpoint:
-           http://localhost:8080/my-manga/users/reset-password
-        3. No corpo (Body) da requisição, envie o seguinte JSON:
-           (Lembre-se de configurar o Header 'Content-Type' para 'application/json')
-           {
-               "token": "%s",
-               "newPassword": "SUA_NOVA_SENHA_AQUI"
-           }
-        INSTRUÇÕES IMPORTANTES:
-        - Copie o token exatamente como está.
-        - Substitua "SUA_NOVA_SENHA_AQUI" pela nova senha que você deseja.
+        Por favor, clique no link abaixo para criar uma nova senha:
         
-        Se você não solicitou isso, pode ignorar este e-mail.
-        """, user.getName(), token);
+        %s
+        
+        (Se você não solicitou isso, pode ignorar este e-mail.)
+        """, user.getName(), resetUrl);
 
         emailService.sendEmail(user.getEmail(), subject, body);
     }

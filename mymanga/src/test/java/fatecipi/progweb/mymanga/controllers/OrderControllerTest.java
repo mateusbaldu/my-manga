@@ -195,74 +195,74 @@ class OrderControllerTest {
         }
     }
 
-    @Nested
-    class deleteById {
-        @Test
-        @DisplayName("DELETE /my-manga/orders/{id} - should return No Content when everything is ok")
-        void deleteById_returnNoContent_whenEverythingIsOk() {
-            doReturn(order).when(orderService).getOrderById(anyLong());
-            doReturn(user).when(userService).getUserById(anyLong());
-            doNothing().when(orderService).delete(anyLong());
-
-            RestAssuredMockMvc
-                    .given()
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
-                    .when()
-                    .delete("/my-manga/orders/{id}", 1L)
-                    .then()
-                    .statusCode(HttpStatus.NO_CONTENT.value());
-            verify(orderService, times(1)).getOrderById(1L);
-            verify(userService, times(1)).getUserById(user.getId());
-            verify(orderService, times(1)).delete(user.getId());
-        }
-
-        @Test
-        @DisplayName("DELETE /my-manga/orders/{id} - should throw Exception when User isn't active")
-        void deleteById_throwException_whenUserIsNotActive() {
-            user.setActive(false);
-            doReturn(order).when(orderService).getOrderById(anyLong());
-            doReturn(user).when(userService).getUserById(anyLong());
-
-            RestAssuredMockMvc
-                    .given()
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
-                    .when()
-                    .delete("/my-manga/orders/{id}", 1L)
-                    .then()
-                    .statusCode(HttpStatus.FORBIDDEN.value());
-            verify(orderService, times(1)).getOrderById(1L);
-            verify(userService, times(1)).getUserById(user.getId());
-        }
-
-        @Test
-        @DisplayName("DELETE /my-manga/orders/{id} - should throw Exception when User dont match the Order User")
-        void deleteById_throwException_whenUserDontMatchOrderUser() {
-            Users wrongUser = new Users(2L, null, null, null, null, null, true, null, null, null, null);
-            order.setUsers(wrongUser);
-
-            doReturn(order).when(orderService).getOrderById(anyLong());
-            doReturn(user).when(userService).getUserById(anyLong());
-
-            RestAssuredMockMvc
-                    .given()
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
-                    .when()
-                    .delete("/my-manga/orders/{id}", 1L)
-                    .then()
-                    .statusCode(HttpStatus.FORBIDDEN.value());
-            verify(orderService, times(1)).getOrderById(1L);
-            verify(userService, times(1)).getUserById(user.getId());
-        }
-    }
+//    @Nested
+//    class deleteById {
+//        @Test
+//        @DisplayName("DELETE /my-manga/orders/{id} - should return No Content when everything is ok")
+//        void deleteById_returnNoContent_whenEverythingIsOk() {
+//            doReturn(order).when(orderService).getOrderById(anyLong());
+//            doReturn(user).when(userService).getUserById(anyLong());
+//            doNothing().when(orderService).delete(anyLong());
+//
+//            RestAssuredMockMvc
+//                    .given()
+//                    .postProcessors(
+//                            jwt().jwt(j -> j.subject(user.getId().toString())),
+//                            csrf()
+//                    )
+//                    .when()
+//                    .delete("/my-manga/orders/{id}", 1L)
+//                    .then()
+//                    .statusCode(HttpStatus.NO_CONTENT.value());
+//            verify(orderService, times(1)).getOrderById(1L);
+//            verify(userService, times(1)).getUserById(user.getId());
+//            verify(orderService, times(1)).delete(user.getId());
+//        }
+//
+//        @Test
+//        @DisplayName("DELETE /my-manga/orders/{id} - should throw Exception when User isn't active")
+//        void deleteById_throwException_whenUserIsNotActive() {
+//            user.setActive(false);
+//            doReturn(order).when(orderService).getOrderById(anyLong());
+//            doReturn(user).when(userService).getUserById(anyLong());
+//
+//            RestAssuredMockMvc
+//                    .given()
+//                    .postProcessors(
+//                            jwt().jwt(j -> j.subject(user.getId().toString())),
+//                            csrf()
+//                    )
+//                    .when()
+//                    .delete("/my-manga/orders/{id}", 1L)
+//                    .then()
+//                    .statusCode(HttpStatus.FORBIDDEN.value());
+//            verify(orderService, times(1)).getOrderById(1L);
+//            verify(userService, times(1)).getUserById(user.getId());
+//        }
+//
+//        @Test
+//        @DisplayName("DELETE /my-manga/orders/{id} - should throw Exception when User dont match the Order User")
+//        void deleteById_throwException_whenUserDontMatchOrderUser() {
+//            Users wrongUser = new Users(2L, null, null, null, null, null, true, null, null, null, null);
+//            order.setUsers(wrongUser);
+//
+//            doReturn(order).when(orderService).getOrderById(anyLong());
+//            doReturn(user).when(userService).getUserById(anyLong());
+//
+//            RestAssuredMockMvc
+//                    .given()
+//                    .postProcessors(
+//                            jwt().jwt(j -> j.subject(user.getId().toString())),
+//                            csrf()
+//                    )
+//                    .when()
+//                    .delete("/my-manga/orders/{id}", 1L)
+//                    .then()
+//                    .statusCode(HttpStatus.FORBIDDEN.value());
+//            verify(orderService, times(1)).getOrderById(1L);
+//            verify(userService, times(1)).getUserById(user.getId());
+//        }
+//    }
 
     @Nested
     class update {

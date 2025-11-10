@@ -44,10 +44,20 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findAllByUserUsername(username, pageable));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
+    @GetMapping("/my-orders")
+    public ResponseEntity<Page<OrderResponse>> findByUserId(Pageable pageable, JwtAuthenticationToken token) {
+        long userId = Long.parseLong(token.getName());
+        Users user = userService.getUserById(userId);
+        if (!user.isActive()) {
+            throw new PermissionDeniedException("This account is inactive.");
+        }
+        return ResponseEntity.ok(orderService.findAllByUserId(userId, pageable));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrderById(@PathVariable Long id, JwtAuthenticationToken token) {
         isUserPermitted(id, token);
-        orderService.delete(id);
+        orderService.cancelOrder(id);
         return ResponseEntity.noContent().build();
     }
 

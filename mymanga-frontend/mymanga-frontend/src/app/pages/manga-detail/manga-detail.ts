@@ -39,9 +39,17 @@ export class MangaDetail implements OnInit {
           console.log('Mangá carregado:', this.manga);
         },
         error: (err: any) => {
-          this.error = 'Erro ao carregar detalhes do mangá';
-          this.loading = false;
           console.error('Erro:', err);
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.error = err.error.errors[0].message;
+            } else {
+              this.error = err.error.message;
+            }
+          } else {
+            this.error = 'Erro ao carregar detalhes do mangá';
+          }
+          this.loading = false;
         }
       });
     }
@@ -49,15 +57,10 @@ export class MangaDetail implements OnInit {
 
   adicionarAoCarrinho(): void {
     if (this.selectedVolume) {
-      this.cartService.addItem({
-        ...this.selectedVolume,
-        mangaTitle: this.manga.title,
-        mangaId: this.manga.id
-      });
+      this.cartService.addItem(this.manga, this.selectedVolume);
       this.successMessage = `Volume ${this.selectedVolume.volumeNumber} adicionado ao carrinho!`;
-      this.selectedVolume = null; // Limpa a seleção
+      this.selectedVolume = null;
 
-      // Limpa a mensagem após 3 segundos
       setTimeout(() => {
         this.successMessage = '';
       }, 3000);

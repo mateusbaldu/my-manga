@@ -6,9 +6,24 @@ import { Injectable } from '@angular/core';
 export class CartService {
   private items: any[] = [];
 
-  addItem(item: any): void {
-    this.items.push(item);
-    console.log('Item adicionado ao carrinho:', item);
+  addItem(manga: any, volume: any): void {
+    const existingItem = this.items.find(item => item.id === volume.id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+      console.log('Quantidade incrementada:', existingItem);
+    } else {
+      const newItem = {
+        id: volume.id,
+        mangaTitle: manga.title,
+        volumeNumber: volume.volumeNumber,
+        price: volume.price,
+        imageUrl: manga.imageUrl,
+        quantity: 1
+      };
+      this.items.push(newItem);
+      console.log('Novo item adicionado ao carrinho:', newItem);
+    }
   }
 
   getItems(): any[] {
@@ -24,10 +39,14 @@ export class CartService {
   }
 
   getCartItemCount(): number {
-    return this.items.length;
+    return this.items.reduce((total, item) => total + (item.quantity || 1), 0);
   }
 
   getTotal(): number {
-    return this.items.reduce((total, item) => total + (item.price || 0), 0);
+    return this.items.reduce((total, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      return total + (price * quantity);
+    }, 0);
   }
 }

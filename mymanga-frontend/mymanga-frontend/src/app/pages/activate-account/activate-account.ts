@@ -20,7 +20,6 @@ export class ActivateAccount implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get token from query params
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       
@@ -30,7 +29,6 @@ export class ActivateAccount implements OnInit {
         return;
       }
 
-      // Call activation endpoint
       this.userService.activateAccount(token).subscribe({
         next: (response) => {
           this.isActivating = false;
@@ -38,7 +36,15 @@ export class ActivateAccount implements OnInit {
         },
         error: (err) => {
           this.isActivating = false;
-          this.errorMessage = err.error?.message || 'Erro ao ativar conta. O token pode estar expirado ou inválido.';
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.errorMessage = err.error.errors[0].message;
+            } else {
+              this.errorMessage = err.error.message;
+            }
+          } else {
+            this.errorMessage = 'Erro ao ativar conta. O token pode estar expirado ou inválido.';
+          }
         }
       });
     });

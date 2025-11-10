@@ -14,7 +14,11 @@ export class Order {
     return this.http.post(`${this.apiUrl}/new`, data);
   }
 
-  getMyOrders(username: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user/${username}`);
+  getMyOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/my-orders`);
+  }
+
+  cancelOrder(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/cancel`, null);
   }
 }

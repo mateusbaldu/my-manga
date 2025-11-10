@@ -41,9 +41,13 @@ export class Login {
         this.router.navigate(['/']);
       },
       error: (err: any) => {
-        console.error('Erro no login:', err);
+        console.error('Erro:', err);
         if (err.error && err.error.message) {
-          this.errorMessage = err.error.message;
+          if (err.error.errors && Array.isArray(err.error.errors)) {
+            this.errorMessage = err.error.errors[0].message;
+          } else {
+            this.errorMessage = err.error.message;
+          }
         } else {
           this.errorMessage = 'Email ou senha inválidos';
         }

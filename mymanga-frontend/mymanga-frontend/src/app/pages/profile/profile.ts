@@ -34,7 +34,6 @@ export class Profile implements OnInit {
     private fb: FormBuilder
   ) {
     this.addressForm = this.fb.group({
-      // Corrigido para bater com o HTML e o DTO AddressCreate
       cep: ['', [Validators.required, Validators.pattern('^[0-9]{8}$')]],
       number: ['', Validators.required],
       complement: ['']
@@ -46,12 +45,11 @@ export class Profile implements OnInit {
   }
 
   loadUserData(): void {
-    const username = this.authService.getUsernameFromToken(); // Usando o método do Auth
+    const username = this.authService.getUsernameFromToken();
     
     if (username) {
       this.loading = true;
       
-      // Determina o papel do usuário
       if (this.authService.hasRole('ADMIN')) {
         this.userRole = 'Administrador';
       } else {
@@ -64,8 +62,16 @@ export class Profile implements OnInit {
           this.loading = false;
         },
         error: (err: any) => {
-          console.error('Erro ao carregar perfil:', err);
-          this.errorMessage = 'Erro ao carregar perfil do usuário';
+          console.error('Erro detalhado:', err);
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.errorMessage = err.error.errors[0].message;
+            } else {
+              this.errorMessage = err.error.message;
+            }
+          } else {
+            this.errorMessage = 'Erro ao carregar perfil do usuário';
+          }
           this.loading = false;
         }
       });
@@ -80,8 +86,16 @@ export class Profile implements OnInit {
         this.addresses = data.content;
       },
       error: (err: any) => {
-        console.error('Erro ao carregar endereços:', err);
-        this.errorMessage = 'Erro ao carregar endereços.';
+        console.error('Erro detalhado:', err);
+        if (err.error && err.error.message) {
+          if (err.error.errors && Array.isArray(err.error.errors)) {
+            this.errorMessage = err.error.errors[0].message;
+          } else {
+            this.errorMessage = err.error.message;
+          }
+        } else {
+          this.errorMessage = 'Erro ao carregar endereços.';
+        }
       }
     });
   }
@@ -106,12 +120,19 @@ export class Profile implements OnInit {
           this.loading = false;
           this.addressForm.reset();
           
-          // Recarrega a lista de endereços
           this.loadAddresses(username); 
         },
         error: (err: any) => {
-          console.error('Erro ao adicionar endereço:', err);
-          this.errorMessage = 'Erro ao adicionar endereço. Tente novamente.';
+          console.error('Erro detalhado:', err);
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.errorMessage = err.error.errors[0].message;
+            } else {
+              this.errorMessage = err.error.message;
+            }
+          } else {
+            this.errorMessage = 'Erro ao adicionar endereço. Tente novamente.';
+          }
           this.loading = false;
         }
       });
