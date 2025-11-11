@@ -2,6 +2,7 @@ package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.listeners.OrderCreatedEvent;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
 import fatecipi.progweb.mymanga.models.*;
 import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
@@ -12,6 +13,7 @@ import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +34,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final VolumeRepository volumeRepository;
     private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<OrderResponse> findAll(Pageable pageable) {
@@ -123,10 +126,7 @@ public class OrderService {
 
         orderRepository.save(newOrder);
 
-        String confirmationUrl = "http://localhost:8080/my-manga/orders/confirm?token=" + token;
-        String subject = "Confirm your order #" + newOrder.getId();
-        String body = "Hi " + user.getName() + ",\n\nThank you for buying with us! Please, confirm your order by clicking on the link down below:\n\n" + confirmationUrl;
-        emailService.sendEmail(user.getEmail(), subject, body);
+        eventPublisher.publishEvent(new OrderCreatedEvent(newOrder));
 
         return orderMapper.toOrderResponse(newOrder);
     }

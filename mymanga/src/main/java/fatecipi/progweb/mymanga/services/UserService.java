@@ -1,5 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.listeners.UserRegisteredEvent;
 import fatecipi.progweb.mymanga.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,6 +31,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -84,15 +87,10 @@ public class UserService {
         newUser.setConfirmationToken(token);
         userRepository.save(newUser);
 
-        String activationUrl = "http://localhost:8080/my-manga/users/activate?token=" + token;
-        String subject = "Activate your account on My Mangá!";
-        String body = "Welcome, " + newUser.getName() + "! Click on the link below to activate your account:\n\n" + activationUrl;
-        emailService.sendEmail(newUser.getEmail(), subject, body);
+        eventPublisher.publishEvent(new UserRegisteredEvent(newUser));
 
         return userMapper.responseMapping(newUser);
     }
-
-    //TODO: remover a logica de enviar email e jogar para outro método
 
     @Transactional
     public void activateAccount(String token) {
