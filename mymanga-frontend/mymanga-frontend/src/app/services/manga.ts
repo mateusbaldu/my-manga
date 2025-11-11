@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { MangaCardResponse } from '../models/manga-card-response.model';
+import { MangaResponse } from '../models/manga-response.model';
+import { VolumeResponse } from '../models/volume-response.model';
+import { Page } from '../models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -10,35 +14,35 @@ export class Manga {
 
   constructor(private http: HttpClient) {}
 
-  getAllMangas(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/all`);
+  getAllMangas(): Observable<Page<MangaCardResponse>> {
+    return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/all`);
   }
 
-  getMangas(page: number = 0, size: number = 10): Observable<any> {
+  getMangas(page: number = 0, size: number = 10): Observable<Page<MangaCardResponse>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get(`${this.apiUrl}/all`, { params });
+    return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/all`, { params });
   }
 
-  createManga(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/new`, data);
+  createManga(data: Partial<MangaResponse>): Observable<MangaResponse> {
+    return this.http.post<MangaResponse>(`${this.apiUrl}/new`, data);
   }
 
-  getMangaById(id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+  getMangaById(id: string): Observable<MangaResponse> {
+    return this.http.get<MangaResponse>(`${this.apiUrl}/${id}`);
   }
 
-  addVolume(mangaId: string, volumeData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${mangaId}/volumes/new`, volumeData);
+  addVolume(mangaId: string, volumeData: Partial<VolumeResponse>): Observable<VolumeResponse> {
+    return this.http.post<VolumeResponse>(`${this.apiUrl}/${mangaId}/volumes/new`, volumeData);
   }
 
-  searchMangas(keyword: string, page: number = 0, size: number = 10): Observable<any> {
+  searchMangas(keyword: string, page: number = 0, size: number = 10): Observable<Page<MangaCardResponse>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get(`${this.apiUrl}/search/${keyword}`, { params });
+    return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/search/${keyword}`, { params });
   }
 }

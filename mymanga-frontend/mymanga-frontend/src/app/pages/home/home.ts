@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Manga } from '../../services/manga';
 import { FormsModule } from '@angular/forms';
+import { MangaCardResponse } from '../../models/manga-card-response.model';
+import { Page } from '../../models/page.model';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +17,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  mangas: any[] = [];
+  mangas: MangaCardResponse[] = [];
   loading = false;
   error = '';
   searchTerm: string = '';
@@ -35,7 +37,7 @@ export class Home implements OnInit {
     this.loading = true;
     this.error = '';
     this.mangaService.getMangas(this.page, this.pageSize).subscribe({
-      next: (response: any) => {
+      next: (response: Page<MangaCardResponse>) => {
         this.mangas = response.content;
         this.totalPages = response.totalPages;
         this.loading = false;
@@ -74,7 +76,7 @@ export class Home implements OnInit {
     this.error = '';
     
     this.mangaService.searchMangas(this.searchTerm, this.page, this.pageSize).subscribe({
-      next: (response: any) => {
+      next: (response: Page<MangaCardResponse>) => {
         this.mangas = response.content;
         this.totalPages = response.totalPages;
         this.loading = false;
@@ -117,7 +119,7 @@ export class Home implements OnInit {
     }
   }
 
-  trackByMangaId(index: number, manga: any): number {
+  trackByMangaId(index: number, manga: MangaCardResponse): number {
     return manga.id;
   }
 }

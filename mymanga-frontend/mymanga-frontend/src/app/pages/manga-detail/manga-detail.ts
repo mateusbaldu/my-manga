@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Manga } from '../../services/manga';
 import { CartService } from '../../services/cart-service';
+import { MangaResponse } from '../../models/manga-response.model';
+import { VolumeResponse } from '../../models/volume-response.model';
 
 @Component({
   selector: 'app-manga-detail',
@@ -15,8 +17,8 @@ import { CartService } from '../../services/cart-service';
   styleUrl: './manga-detail.scss',
 })
 export class MangaDetail implements OnInit {
-  manga: any;
-  selectedVolume: any;
+  manga: MangaResponse | null = null;
+  selectedVolume: VolumeResponse | null = null;
   loading = false;
   error = '';
   successMessage = '';
@@ -33,7 +35,7 @@ export class MangaDetail implements OnInit {
     if (id) {
       this.loading = true;
       this.mangaService.getMangaById(id).subscribe({
-        next: (data: any) => {
+        next: (data: MangaResponse) => {
           this.manga = data;
           this.loading = false;
           console.log('Mangá carregado:', this.manga);
@@ -56,8 +58,8 @@ export class MangaDetail implements OnInit {
   }
 
   adicionarAoCarrinho(): void {
-    if (this.selectedVolume) {
-      this.cartService.addItem(this.manga, this.selectedVolume);
+    if (this.selectedVolume && this.manga) {
+      this.cartService.addItem(this.manga as MangaResponse, this.selectedVolume as VolumeResponse);
       this.successMessage = `Volume ${this.selectedVolume.volumeNumber} adicionado ao carrinho!`;
       this.selectedVolume = null;
 

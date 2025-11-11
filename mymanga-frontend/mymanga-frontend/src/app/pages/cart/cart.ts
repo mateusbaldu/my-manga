@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart-service';
 import { Order } from '../../services/order';
+import { CartItem } from '../../models/cart-item.model';
+import { OrderResponse } from '../../models/order-response.model';
 
 @Component({
   selector: 'app-cart',
@@ -16,7 +18,7 @@ import { Order } from '../../services/order';
   styleUrl: './cart.scss',
 })
 export class Cart implements OnInit {
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   paymentMethod: string = '';
   loading = false;
   errorMessage = '';
@@ -55,14 +57,14 @@ export class Cart implements OnInit {
       paymentMethod: this.paymentMethod,
       items: this.cartItems.map(item => ({
         volumeId: item.id,
-        quantity: item.quantity || 1
+        quantity: item.quantity
       }))
     };
 
     console.log('Dados do pedido:', orderData);
 
     this.orderService.checkout(orderData).subscribe({
-      next: (response: any) => {
+      next: (response: OrderResponse) => {
         console.log('Pedido criado com sucesso:', response);
         this.successMessage = 'Pedido realizado com sucesso!';
         this.loading = false;

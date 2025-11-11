@@ -17,4 +17,12 @@ export class Address {
   addAddress(username: string, data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${username}/address/new`, data);
   }
+
+  deleteAddress(username: string, addressId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${username}/address/${addressId}`);
+  }
+
+  updateAddress(username: string, addressId: number, data: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${username}/address/${addressId}`, data);
+  }
 }

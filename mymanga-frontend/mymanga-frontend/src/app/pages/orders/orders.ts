@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Order } from '../../services/order';
+import { OrderResponse } from '../../models/order-response.model';
+import { Page } from '../../models/page.model';
 
 @Component({
   selector: 'app-orders',
@@ -13,7 +15,7 @@ import { Order } from '../../services/order';
   styleUrl: './orders.scss',
 })
 export class Orders implements OnInit {
-  orders: any[] = [];
+  orders: OrderResponse[] = [];
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -24,7 +26,7 @@ export class Orders implements OnInit {
 
   ngOnInit(): void {
   this.orderService.getMyOrders().subscribe({
-    next: (response: any) => {
+    next: (response: Page<OrderResponse>) => {
       this.orders = response.content; 
       this.errorMessage = '';
     },
@@ -41,9 +43,9 @@ export class Orders implements OnInit {
     return date.toLocaleDateString('pt-BR');
   }
 
-  getTotalItems(order: any): number {
+  getTotalItems(order: OrderResponse): number {
     if (!order.items) return 0;
-    return order.items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+    return order.items.reduce((sum: number, item) => sum + item.quantity, 0);
   }
 
   cancelarPedido(id: number): void {
@@ -51,7 +53,7 @@ export class Orders implements OnInit {
       next: () => {
         this.successMessage = 'Pedido cancelado com sucesso!';
         this.errorMessage = '';
-        this.ngOnInit(); // Recarrega a lista
+        this.ngOnInit();
       },
       error: (err: any) => {
         this.errorMessage = err.error?.message || 'Falha ao cancelar o pedido.';
