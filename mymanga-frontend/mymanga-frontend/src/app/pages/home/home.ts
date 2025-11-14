@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Manga } from '../../services/manga';
 import { FormsModule } from '@angular/forms';
 import { MangaCardResponse } from '../../models/manga-card-response.model';
 import { Page } from '../../models/page.model';
+import { Navigation } from '../../services/navigation';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +19,7 @@ import { Page } from '../../models/page.model';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   mangas: MangaCardResponse[] = [];
   loading = false;
   error = '';
@@ -26,11 +29,21 @@ export class Home implements OnInit {
   page: number = 0;
   totalPages: number = 0;
   private pageSize: number = 12;
+  private destroy$ = new Subject<void>();
 
-  constructor(private mangaService: Manga) {}
+  constructor(
+    private mangaService: Manga,
+    private navigationService: Navigation
+  ) {}
 
   ngOnInit(): void {
     this.carregarMangas();
+
+    this.navigationService.homeClicked$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.clearSearchAndReload();
+      });
   }
 
   carregarMangas(): void {
@@ -121,5 +134,17 @@ export class Home implements OnInit {
 
   trackByMangaId(index: number, manga: MangaCardResponse): number {
     return manga.id;
+  }
+
+  clearSearchAndReload(): void {
+    this.searchTerm = '';
+    this.isSearching = false;
+    this.page = 0;
+    this.carregarMangas();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -40,9 +40,10 @@ export class Manga {
 
   searchMangas(keyword: string, page: number = 0, size: number = 10): Observable<Page<MangaCardResponse>> {
     const params = new HttpParams()
+      .set('keyword', keyword)
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/search/${keyword}`, { params });
+    return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/search`, { params });
   }
 }

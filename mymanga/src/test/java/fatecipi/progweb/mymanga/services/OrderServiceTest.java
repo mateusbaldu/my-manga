@@ -2,6 +2,7 @@ package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.listeners.OrderCreatedEvent;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
 import fatecipi.progweb.mymanga.models.*;
 import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +50,8 @@ class OrderServiceTest {
     private EmailService emailService;
     @Mock
     private VolumeRepository volumeRepository;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
     @InjectMocks
     private OrderService orderService;
 
@@ -243,28 +247,6 @@ class OrderServiceTest {
         }
     }
 
-//    @Nested
-//    class delete {
-//        @Test
-//        @DisplayName("should return void when everything is ok")
-//        void delete_void_whenEverythingIsOk() {
-//            doReturn(Optional.of(order)).when(orderRepository).findById(1L);
-//            doNothing().when(orderRepository).delete(order);
-//
-//            orderService.delete(1L);
-//
-//            verify(orderRepository, times(1)).findById(1L);
-//            verify(orderRepository, times(1)).delete(order);
-//        }
-//
-//        @Test
-//        @DisplayName("should throw a ResourceNotFoundException when the Order isn't found")
-//        void delete_throwResourceNotFoundException_whenOrderIsNotFound() {
-//            doReturn(Optional.empty()).when(orderRepository).findById(anyLong());
-//
-//            assertThrows(ResourceNotFoundException.class, () -> orderService.delete(1L));
-//        }
-//    }
 
     @Nested
     class create {
@@ -275,6 +257,7 @@ class OrderServiceTest {
             doReturn(volume).when(volumeRepository).save(any(Volume.class));
             doReturn(order).when(orderRepository).save(any(Order.class));
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
+            doNothing().when(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
 
             var output = orderService.create(orderCreate, user);
 

@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart-service';
 import { Auth } from '../../services/auth';
+import { Navigation } from '../../services/navigation';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,8 @@ export class Header {
   constructor(
     private cartService: CartService,
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private navigationService: Navigation
   ) {}
 
   getQuantidadeItens(): number {
@@ -31,6 +33,11 @@ export class Header {
 
   public get isAdmin(): boolean {
     return this.authService.hasRole('ADMIN');
+  }
+
+  goHome(): void {
+    this.navigationService.notifyHomeClicked();
+    this.router.navigate(['/']);
   }
 
   logout(): void {

@@ -167,7 +167,9 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .when().get("/my-manga/mangas/search/{keyword}", "Test")
+                    .param("keyword", "Test")
+                    .when()
+                    .get("/my-manga/mangas/search")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("totalElements", equalTo(1))

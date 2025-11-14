@@ -1,9 +1,10 @@
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
+  <h1 class="mb-4 display-4">Meu Perfil</h1>
   <div class="row">
     <div class="col-md-4">
       <div class="card mb-4">
         <div class="card-header">
-          <h3>Meu Perfil</h3>
+          <h5>Informações</h5>
         </div>
         <div class="card-body" *ngIf="userProfile">
           <p><strong>Nome:</strong> {{ userProfile.name }}</p>
@@ -38,7 +39,7 @@
     </div>
 
     <div class="col-md-8">
-      <h3>Meus Endereços</h3>
+      <h3 class="mb-4">Meus Endereços</h3>
 
       <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>

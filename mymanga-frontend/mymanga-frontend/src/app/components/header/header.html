@@ -9,7 +9,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Início</a>
+          <a class="nav-link" (click)="goHome()" style="cursor: pointer;">Início</a>
         </li>
         
         <li class="nav-item" *ngIf="!isAuthenticated">

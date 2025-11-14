@@ -35,8 +35,8 @@ public class MangaController {
         return ResponseEntity.ok(mangaService.listAll(pageable));
     }
 
-    @GetMapping("/search/{keyword}")
-    public ResponseEntity<Page<MangaResponse>> findByKeyword(Pageable pageable, @PathVariable String keyword) {
+    @GetMapping("/search")
+    public ResponseEntity<Page<MangaResponse>> findByKeyword(Pageable pageable, @RequestParam String keyword) {
         return ResponseEntity.ok(mangaService.findByKeyword(keyword, pageable));
     }
 

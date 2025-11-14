@@ -87,7 +87,8 @@ public class AddressService {
     }
 
     public Address getAddressAssociatedWithUser(String username, Long addressid) {
-        Address address = getAddressById(addressid);
+        Address address = addressRepository.findById(addressid).orElseThrow(
+                () -> new ResourceNotFoundException("Address with id " + addressid + " not found"));
         if (!address.getUsers().getUsername().equals(username)) {
             throw new IllegalArgumentException("User " + username + " is not associated with address with id " + addressid);
         }
