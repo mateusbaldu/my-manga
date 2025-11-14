@@ -46,4 +46,12 @@ export class Manga {
 
     return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/search`, { params });
   }
+
+  updateManga(id: number, data: Partial<MangaResponse>): Observable<MangaResponse> {
+    return this.http.patch<MangaResponse>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deleteManga(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

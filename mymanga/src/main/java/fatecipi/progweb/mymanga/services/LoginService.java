@@ -3,23 +3,18 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.configs.security.TokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
-import fatecipi.progweb.mymanga.models.Role;
-import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
-import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.dto.security.LoginRequest;
+import fatecipi.progweb.mymanga.dto.security.LoginResponse;
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
+import fatecipi.progweb.mymanga.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

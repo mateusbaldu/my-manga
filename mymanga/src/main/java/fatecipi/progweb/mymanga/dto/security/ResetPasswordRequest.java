@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.dto.security;
+package fatecipi.progweb.mymanga.dto.security;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

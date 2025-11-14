@@ -1,10 +1,8 @@
 package fatecipi.progweb.mymanga.mappers;
 
-import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.dto.order.OrderCreate;
 import fatecipi.progweb.mymanga.models.Order;
-import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
-import jakarta.validation.constraints.NotEmpty;
+import fatecipi.progweb.mymanga.dto.order.OrderResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

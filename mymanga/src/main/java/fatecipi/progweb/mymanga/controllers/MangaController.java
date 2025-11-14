@@ -1,12 +1,12 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.models.dto.manga.MangaCardResponse;
-import fatecipi.progweb.mymanga.models.dto.manga.MangaCreate;
-import fatecipi.progweb.mymanga.models.dto.manga.MangaResponse;
-import fatecipi.progweb.mymanga.models.dto.manga.MangaUpdate;
-import fatecipi.progweb.mymanga.models.dto.volume.VolumeCreate;
-import fatecipi.progweb.mymanga.models.dto.volume.VolumeResponse;
-import fatecipi.progweb.mymanga.models.dto.volume.VolumeUpdate;
+import fatecipi.progweb.mymanga.dto.manga.MangaCardResponse;
+import fatecipi.progweb.mymanga.dto.manga.MangaCreate;
+import fatecipi.progweb.mymanga.dto.manga.MangaResponse;
+import fatecipi.progweb.mymanga.dto.manga.MangaUpdate;
+import fatecipi.progweb.mymanga.dto.volume.VolumeCreate;
+import fatecipi.progweb.mymanga.dto.volume.VolumeResponse;
+import fatecipi.progweb.mymanga.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

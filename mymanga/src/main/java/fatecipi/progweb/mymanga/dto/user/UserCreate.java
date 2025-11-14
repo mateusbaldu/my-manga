@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.dto.user;
+package fatecipi.progweb.mymanga.dto.user;
 
 import fatecipi.progweb.mymanga.validation.ValidUsername;
 import jakarta.persistence.Column;

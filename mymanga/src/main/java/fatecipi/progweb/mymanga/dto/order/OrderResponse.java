@@ -1,8 +1,7 @@
-package fatecipi.progweb.mymanga.models.dto.order;
+package fatecipi.progweb.mymanga.dto.order;
 
 import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.models.enums.PaymentMethod;
-import fatecipi.progweb.mymanga.models.Users;
 
 import java.math.BigDecimal;
 import java.time.Instant;

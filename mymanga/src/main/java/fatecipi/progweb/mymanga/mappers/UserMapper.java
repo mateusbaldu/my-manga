@@ -1,8 +1,8 @@
 package fatecipi.progweb.mymanga.mappers;
 
-import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
-import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
-import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
+import fatecipi.progweb.mymanga.dto.user.UserCreate;
+import fatecipi.progweb.mymanga.dto.user.UserResponse;
+import fatecipi.progweb.mymanga.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.models.Users;
 import org.mapstruct.*;
 

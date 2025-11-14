@@ -58,25 +58,21 @@
                   Nenhum volume disponível no momento.
                 </div>
               } @else {
-                <div class="volume-selector">
-                  <div class="mb-3">
-                    <label for="volumeSelect" class="form-label">Selecione o Volume</label>
-                    <select class="form-select" id="volumeSelect" [(ngModel)]="selectedVolume">
-                      <option [ngValue]="null">Escolha um volume...</option>
-                      @for (volume of manga.volumes; track volume.id) {
-                        <option [ngValue]="volume" [disabled]="volume.quantity === 0">
-                          Volume {{ volume.volumeNumber }} - R$ {{ volume.price | number:'1.2-2' }}
-                          (Estoque: {{ volume.quantity }})
-                        </option>
-                      }
-                    </select>
-                  </div>
-                  <button class="btn btn-primary w-100 add-to-cart-btn" 
-                          (click)="adicionarAoCarrinho()"
-                          [disabled]="!selectedVolume">
-                    Adicionar ao Carrinho
-                  </button>
+                <div class="mb-3">
+                  <label for="volumeSelect" class="form-label">Selecione o Volume</label>
+                  <select class="form-select" id="volumeSelect" [(ngModel)]="selectedVolume">
+                    <option [ngValue]="null">Escolha um volume...</option>
+                    <option *ngFor="let volume of manga.volumes" [ngValue]="volume" [disabled]="volume.quantity === 0">
+                      Volume {{ volume.volumeNumber }} - {{ volume.price | currency:'BRL' }} (Estoque: {{ volume.quantity }})
+                    </option>
+                  </select>
                 </div>
+                <button 
+                  class="btn btn-primary w-100" 
+                  (click)="adicionarAoCarrinho()"
+                  [disabled]="!selectedVolume">
+                  <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
+                </button>
               }
             </div>
           </div>

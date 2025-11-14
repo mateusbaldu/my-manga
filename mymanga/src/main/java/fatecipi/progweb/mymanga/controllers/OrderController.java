@@ -1,12 +1,11 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.models.Order;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.order.OrderCreate;
-import fatecipi.progweb.mymanga.models.dto.order.OrderResponse;
+import fatecipi.progweb.mymanga.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.services.OrderService;
 import fatecipi.progweb.mymanga.services.UserService;
 import jakarta.validation.Valid;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 

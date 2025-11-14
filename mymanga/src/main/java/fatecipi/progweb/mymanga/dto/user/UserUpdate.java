@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.dto.user;
+package fatecipi.progweb.mymanga.dto.user;
 
 import lombok.Builder;
 

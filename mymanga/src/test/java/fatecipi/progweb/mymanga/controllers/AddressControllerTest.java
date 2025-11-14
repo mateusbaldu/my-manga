@@ -1,14 +1,13 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
-import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
-import fatecipi.progweb.mymanga.models.dto.address.AddressUpdate;
+import fatecipi.progweb.mymanga.dto.address.AddressCreate;
+import fatecipi.progweb.mymanga.dto.address.AddressResponse;
+import fatecipi.progweb.mymanga.dto.address.AddressUpdate;
 import fatecipi.progweb.mymanga.services.AddressService;
 import fatecipi.progweb.mymanga.services.UserService;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,6 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;

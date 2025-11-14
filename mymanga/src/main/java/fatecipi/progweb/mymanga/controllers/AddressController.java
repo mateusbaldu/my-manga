@@ -1,11 +1,10 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.address.AddressCreate;
-import fatecipi.progweb.mymanga.models.dto.address.AddressResponse;
-import fatecipi.progweb.mymanga.models.dto.address.AddressUpdate;
+import fatecipi.progweb.mymanga.dto.address.AddressCreate;
+import fatecipi.progweb.mymanga.dto.address.AddressResponse;
+import fatecipi.progweb.mymanga.dto.address.AddressUpdate;
 import fatecipi.progweb.mymanga.services.AddressService;
 import fatecipi.progweb.mymanga.services.UserService;
 import jakarta.validation.Valid;

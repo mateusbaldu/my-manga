@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.models;
 
-import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
+import fatecipi.progweb.mymanga.dto.security.LoginRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

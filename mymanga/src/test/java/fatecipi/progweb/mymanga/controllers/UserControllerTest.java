@@ -1,17 +1,13 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
-import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
-import fatecipi.progweb.mymanga.models.dto.user.UserCreate;
-import fatecipi.progweb.mymanga.models.dto.user.UserResponse;
-import fatecipi.progweb.mymanga.models.dto.user.UserUpdate;
+import fatecipi.progweb.mymanga.dto.user.UserCreate;
+import fatecipi.progweb.mymanga.dto.user.UserResponse;
+import fatecipi.progweb.mymanga.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.services.LoginService;
 import fatecipi.progweb.mymanga.services.UserService;
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import org.hibernate.annotations.DialectOverride;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,11 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -35,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

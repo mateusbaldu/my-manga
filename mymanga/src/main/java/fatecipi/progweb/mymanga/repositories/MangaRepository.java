@@ -24,8 +24,5 @@ public interface MangaRepository extends JpaRepository<Manga, Long> {
             countQuery = "SELECT COUNT(m) FROM Manga m")
     Page<Manga> findAll(Pageable pageable);
 
-    @Query("SELECT DISTINCT m FROM Manga m LEFT JOIN FETCH m.volume WHERE m.id = :id")
-    Optional<Manga> findByIdWithVolumes(@Param("id") Long id);
-
     boolean existsByTitle(String title);
 }

@@ -1,7 +1,7 @@
 package fatecipi.progweb.mymanga.mappers;
 
 import fatecipi.progweb.mymanga.models.OrderItems;
-import fatecipi.progweb.mymanga.models.dto.order.OrderItemsResponse;
+import fatecipi.progweb.mymanga.dto.order.OrderItemsResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

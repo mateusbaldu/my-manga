@@ -1,10 +1,10 @@
 package fatecipi.progweb.mymanga.controllers;
 
 import fatecipi.progweb.mymanga.models.Users;
-import fatecipi.progweb.mymanga.models.dto.security.ForgotPasswordRequest;
-import fatecipi.progweb.mymanga.models.dto.security.LoginRequest;
-import fatecipi.progweb.mymanga.models.dto.security.LoginResponse;
-import fatecipi.progweb.mymanga.models.dto.security.ResetPasswordRequest;
+import fatecipi.progweb.mymanga.dto.security.ForgotPasswordRequest;
+import fatecipi.progweb.mymanga.dto.security.LoginRequest;
+import fatecipi.progweb.mymanga.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.services.LoginService;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

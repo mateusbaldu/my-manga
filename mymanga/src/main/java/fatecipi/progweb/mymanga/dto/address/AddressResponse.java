@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.dto.address;
+package fatecipi.progweb.mymanga.dto.address;
 
 public record AddressResponse(
         Long id,

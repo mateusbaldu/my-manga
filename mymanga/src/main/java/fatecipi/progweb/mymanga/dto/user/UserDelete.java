@@ -1,12 +1,10 @@
-package fatecipi.progweb.mymanga.models.dto.security;
+package fatecipi.progweb.mymanga.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-public record LoginRequest(
-        @NotNull(message = "Field can't be null")
+public record UserDelete(
         @Email(message = "Invalid email")
-        String email,
         @NotNull(message = "Field can't be null")
-        String password) {
+        String email) {
 }

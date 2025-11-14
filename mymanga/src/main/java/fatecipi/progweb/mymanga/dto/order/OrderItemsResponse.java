@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.models.dto.order;
+package fatecipi.progweb.mymanga.dto.order;
 
 import java.math.BigDecimal;
 

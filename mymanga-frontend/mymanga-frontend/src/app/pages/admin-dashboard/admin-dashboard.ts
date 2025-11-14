@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Manga } from '../../services/manga';
+import { MangaCardResponse } from '../../models/manga-card-response.model';
+import { MangaResponse } from '../../models/manga-response.model';
+import { Page } from '../../models/page.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -17,6 +20,8 @@ import { Manga } from '../../services/manga';
 export class AdminDashboard implements OnInit {
   mangaForm!: FormGroup;
   volumeForm!: FormGroup;
+  mangas: MangaCardResponse[] = [];
+  editingMangaId: number | null = null;
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -53,6 +58,20 @@ export class AdminDashboard implements OnInit {
       releaseDate: ['', Validators.required],
       quantity: ['', [Validators.required, Validators.min(0)]]
     });
+
+    this.loadMangas();
+  }
+
+  loadMangas(): void {
+    this.mangaService.getMangas(0, 100).subscribe({
+      next: (response: Page<MangaCardResponse>) => {
+        this.mangas = response.content;
+        console.log('Mangás carregados:', this.mangas);
+      },
+      error: (err: any) => {
+        console.error('Erro ao carregar mangás:', err);
+      }
+    });
   }
 
   onSubmit(): void {
@@ -80,31 +99,63 @@ export class AdminDashboard implements OnInit {
 
     console.log('Dados enviados:', mangaData);
 
-    this.mangaService.createManga(mangaData).subscribe({
-      next: (response: any) => {
-        console.log('Mangá criado com sucesso:', response);
-        this.successMessage = 'Mangá criado com sucesso!';
-        this.loading = false;
-        this.mangaForm.reset();
-        
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 2000);
-      },
-      error: (err: any) => {
-        console.error('Erro:', err);
-        if (err.error && err.error.message) {
-          if (err.error.errors && Array.isArray(err.error.errors)) {
-            this.errorMessage = err.error.errors[0].message;
+    if (this.editingMangaId) {
+      this.mangaService.updateManga(this.editingMangaId, mangaData).subscribe({
+        next: (response: any) => {
+          console.log('Mangá atualizado com sucesso:', response);
+          this.successMessage = 'Mangá atualizado com sucesso!';
+          this.loading = false;
+          this.mangaForm.reset();
+          this.editingMangaId = null;
+          this.loadMangas();
+          
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err: any) => {
+          console.error('Erro:', err);
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.errorMessage = err.error.errors[0].message;
+            } else {
+              this.errorMessage = err.error.message;
+            }
           } else {
-            this.errorMessage = err.error.message;
+            this.errorMessage = 'Erro ao atualizar mangá. Tente novamente.';
           }
-        } else {
-          this.errorMessage = 'Erro ao criar mangá. Tente novamente.';
+          this.loading = false;
         }
-        this.loading = false;
-      }
-    });
+      });
+    } else {
+      this.mangaService.createManga(mangaData).subscribe({
+        next: (response: any) => {
+          console.log('Mangá criado com sucesso:', response);
+          this.successMessage = 'Mangá criado com sucesso!';
+          this.loading = false;
+          this.mangaForm.reset();
+          this.editingMangaId = null;
+          this.loadMangas();
+          
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err: any) => {
+          console.error('Erro:', err);
+          if (err.error && err.error.message) {
+            if (err.error.errors && Array.isArray(err.error.errors)) {
+              this.errorMessage = err.error.errors[0].message;
+            } else {
+              this.errorMessage = err.error.message;
+            }
+          } else {
+            this.errorMessage = 'Erro ao criar mangá. Tente novamente.';
+          }
+          this.loading = false;
+        }
+      });
+    }
   }
 
   onSubmitVolume(): void {
@@ -143,5 +194,47 @@ export class AdminDashboard implements OnInit {
         this.volumeLoading = false;
       }
     });
+  }
+
+  onEdit(manga: MangaCardResponse): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    const mangaId = manga.id.toString();
+
+    this.mangaService.getMangaById(mangaId).subscribe({
+      next: (fullManga: MangaResponse) => {
+        this.mangaForm.patchValue(fullManga);
+        this.editingMangaId = fullManga.id;
+        window.scrollTo(0, 0);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = 'Erro ao carregar dados do mangá para edição.';
+      }
+    });
+  }
+
+  onDelete(id: number): void {
+    if (confirm('Tem certeza que quer excluir este mangá?')) {
+      this.mangaService.deleteManga(id).subscribe({
+        next: () => {
+          console.log('Mangá excluído com sucesso');
+          this.successMessage = 'Mangá excluído com sucesso!';
+          this.loadMangas();
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err: any) => {
+          console.error('Erro ao excluir mangá:', err);
+          this.errorMessage = err.error?.message || 'Erro ao excluir mangá.';
+          setTimeout(() => {
+            this.errorMessage = '';
+          }, 3000);
+        }
+      });
+    }
   }
 }
