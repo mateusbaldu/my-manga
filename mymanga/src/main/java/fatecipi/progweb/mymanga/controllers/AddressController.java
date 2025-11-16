@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+//TODO: documentar respostas dos endpoints
+
 @Tag(name = "Address", description = "Endpoints for user address management")
 @RestController
 @RequestMapping("/users")

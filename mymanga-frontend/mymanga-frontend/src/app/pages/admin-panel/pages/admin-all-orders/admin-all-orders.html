@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <h1 class="mb-4">Todos os Pedidos</h1>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && pedidos.length > 0" class="card">
+    <div class="card-body">
+      <h3 class="mb-3">Total de Pedidos: {{ totalPedidos }}</h3>
+      <div class="table-responsive">
+        <table class="table table-dark table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuário</th>
+              <th>Data do Pedido</th>
+              <th>Preço Final</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pedido of pedidos">
+              <td>{{ pedido.id }}</td>
+              <td>{{ pedido.username }}</td>
+              <td>{{ pedido.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ pedido.finalPrice | currency:'BRL' }}</td>
+              <td>
+                <span class="badge" 
+                      [ngClass]="{
+                        'bg-warning': pedido.status === 'PENDING',
+                        'bg-primary': pedido.status === 'PROCESSING',
+                        'bg-info': pedido.status === 'SHIPPED',
+                        'bg-success': pedido.status === 'DELIVERED',
+                        'bg-danger': pedido.status === 'CANCELLED'
+                      }">
+                  {{ pedido.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button 
+          class="btn btn-secondary" 
+          (click)="prevPage()" 
+          [disabled]="page === 0">
+          Anterior
+        </button>
+        <span>Página {{ page + 1 }} de {{ totalPages }}</span>
+        <button 
+          class="btn btn-secondary" 
+          (click)="nextPage()" 
+          [disabled]="page >= totalPages - 1">
+          Próxima
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && pedidos.length === 0" class="alert alert-info" role="alert">
+    Nenhum pedido encontrado.
+  </div>
+</div>

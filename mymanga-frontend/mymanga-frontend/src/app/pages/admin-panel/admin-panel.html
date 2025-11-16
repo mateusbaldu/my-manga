@@ -1,0 +1,23 @@
+<div class="container mt-4">
+  <h1 class="display-4 mb-4">Painel de Admin</h1>
+  
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" 
+         routerLink="mangas" 
+         routerLinkActive="active"
+         aria-current="page">
+        Gerenciar Mangás
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" 
+         routerLink="pedidos" 
+         routerLinkActive="active">
+        Todos os Pedidos
+      </a>
+    </li>
+  </ul>
+
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,22 @@
+// Força as abas do Bootstrap a usarem as cores do nosso tema dark
+.nav-tabs {
+  border-bottom: 1px solid #495057; // Borda de baixo mais escura
+
+  .nav-link {
+    background-color: transparent;
+    border: none;
+    color: #adb5bd; // Cor do texto inativo (cinza claro)
+
+    &:hover {
+      color: #fff; // Texto branco no hover
+    }
+  }
+
+  // A aba ATIVA (selecionada)
+  .nav-link.active {
+    color: var(--bs-primary); // Usa nossa cor Laranja
+    background-color: transparent; // Fundo transparente
+    border-bottom: 3px solid var(--bs-primary); // Linha laranja embaixo
+    font-weight: 600;
+  }
+}

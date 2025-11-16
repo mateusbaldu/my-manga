@@ -2,22 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Manga } from '../../services/manga';
-import { MangaCardResponse } from '../../models/manga-card-response.model';
-import { MangaResponse } from '../../models/manga-response.model';
-import { Page } from '../../models/page.model';
+import { Manga } from '../../../../services/manga';
+import { MangaCardResponse } from '../../../../models/manga-card-response.model';
+import { MangaResponse } from '../../../../models/manga-response.model';
+import { Page } from '../../../../models/page.model';
 
 @Component({
-  selector: 'app-admin-dashboard',
+  selector: 'app-admin-manage-mangas',
   imports: [
     CommonModule,
     ReactiveFormsModule,
     RouterLink
   ],
-  templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.scss',
+  templateUrl: './admin-manage-mangas.html',
+  styleUrl: './admin-manage-mangas.scss',
 })
-export class AdminDashboard implements OnInit {
+export class AdminManageMangas implements OnInit {
   mangaForm!: FormGroup;
   volumeForm!: FormGroup;
   mangas: MangaCardResponse[] = [];

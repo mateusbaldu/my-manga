@@ -5,7 +5,9 @@ import { Register } from './pages/register/register';
 import { ActivateAccount } from './pages/activate-account/activate-account';
 import { Profile } from './pages/profile/profile';
 import { MangaDetail } from './pages/manga-detail/manga-detail';
-import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
+import { AdminPanel } from './pages/admin-panel/admin-panel';
+import { AdminManageMangas } from './pages/admin-panel/pages/admin-manage-mangas/admin-manage-mangas';
+import { AdminAllOrders } from './pages/admin-panel/pages/admin-all-orders/admin-all-orders';
 import { Cart } from './pages/cart/cart';
 import { Orders } from './pages/orders/orders';
 import { authGuard } from './guards/auth-guard';
@@ -69,9 +71,26 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    component: AdminDashboard,
+    component: AdminPanel,
     canActivate: [adminGuard],
-    title: 'Admin Dashboard - My Mangá'
+    title: 'Admin Panel - My Mangá',
+    children: [
+      {
+        path: 'mangas',
+        component: AdminManageMangas,
+        title: 'Gerenciar Mangás - My Mangá'
+      },
+      {
+        path: 'pedidos',
+        component: AdminAllOrders,
+        title: 'Gerenciar Pedidos - My Mangá'
+      },
+      {
+        path: '',
+        redirectTo: 'mangas',
+        pathMatch: 'full'
+      }
+    ]
   },
   {
     path: '**',

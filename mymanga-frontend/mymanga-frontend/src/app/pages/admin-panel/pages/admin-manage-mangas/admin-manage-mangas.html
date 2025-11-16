@@ -1,14 +1,14 @@
-<div class="container mt-5 mb-5">
-  <h1 class="mb-4 display-4">Painel Administrativo</h1>
-  <div class="row justify-content-center">
-    <div class="col-lg-8 mb-4">
-      <div class="card">
-        <div class="card-header">
-          <h3>{{ editingMangaId ? 'Editar Mangá' : 'Criar Novo Mangá' }}</h3>
-          <p class="text-muted mb-0">{{ editingMangaId ? 'Atualize os dados do mangá' : 'Preencha os dados do mangá' }}</p>
-        </div>
+<div class="container-fluid">
+  <h1 class="mb-4">Gerenciar Mangás</h1>
+  
+  <div class="mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h3>{{ editingMangaId ? 'Editar Mangá' : 'Criar Novo Mangá' }}</h3>
+        <p class="text-muted mb-0">{{ editingMangaId ? 'Atualize os dados do mangá' : 'Preencha os dados do mangá' }}</p>
+      </div>
 
-        <div class="card-body">
+      <div class="card-body">
           <form [formGroup]="mangaForm" (ngSubmit)="onSubmit()">
             
             <div class="mb-3">
@@ -147,7 +147,7 @@
       </div>
     </div>
 
-    <div class="col-lg-8 mb-4">
+    <div class="mb-4">
       <div class="card">
         <div class="card-header">
           <h3>Adicionar Volume a um Mangá</h3>
@@ -272,7 +272,7 @@
       </div>
     </div>
 
-    <div class="col-lg-10 mb-4">
+    <div class="mb-4">
       <div class="card">
         <div class="card-header">
           <h3>Gerenciar Mangás</h3>
@@ -315,4 +315,3 @@
       </div>
     </div>
   </div>
-</div>

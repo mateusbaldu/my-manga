@@ -20,6 +20,10 @@ export class Order {
     return this.http.get<Page<OrderResponse>>(`${this.apiUrl}/my-orders`);
   }
 
+  getAllOrders(page: number, size: number): Observable<Page<OrderResponse>> {
+    return this.http.get<Page<OrderResponse>>(`${this.apiUrl}/all?page=${page}&size=${size}`);
+  }
+
   cancelOrder(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/cancel`, null);
   }
