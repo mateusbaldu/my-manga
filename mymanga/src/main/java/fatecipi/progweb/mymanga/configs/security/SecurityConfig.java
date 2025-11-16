@@ -41,13 +41,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/my-manga/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/my-manga/login/forgot-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/my-manga/login/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/my-manga/users/new").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/my-manga/users/activate").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/my-manga/mangas/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/my-manga/orders/confirm").permitAll().anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/new").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/activate").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/mangas/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/orders/confirm").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

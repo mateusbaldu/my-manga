@@ -8,6 +8,8 @@ import fatecipi.progweb.mymanga.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.services.MangaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,39 +21,46 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Mangá", description = "Endpoints for mangá and volume management")
 @RestController
-@RequestMapping("/my-manga/mangas")
+@RequestMapping("/mangas")
 @RequiredArgsConstructor
 public class MangaController {
     private final MangaService mangaService;
 
+    @Operation(summary = "Search a mangá by id")
     @GetMapping("/{id}")
     public ResponseEntity<MangaResponse> getMangaById(@PathVariable Long id) {
         return ResponseEntity.ok(mangaService.getMangaResponseById(id));
     }
 
+    @Operation(summary = "List all available mangás")
     @GetMapping("/all")
     public ResponseEntity<Page<MangaCardResponse>> listAll(Pageable pageable) {
         return ResponseEntity.ok(mangaService.listAll(pageable));
     }
 
+    @Operation(summary = "Search a mangá by keyword")
     @GetMapping("/search")
     public ResponseEntity<Page<MangaResponse>> findByKeyword(Pageable pageable, @RequestParam String keyword) {
         return ResponseEntity.ok(mangaService.findByKeyword(keyword, pageable));
     }
 
+    @Operation(summary = "Updates a mangá by id and a mangá update body")
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<MangaResponse> update(@PathVariable Long id, @Valid @RequestBody MangaUpdate mangaDto) {
         return ResponseEntity.ok(mangaService.update(id, mangaDto));
     }
 
+    @Operation(summary = "Create a new mangá by a mangá create body")
     @PostMapping("/new")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<MangaResponse> create(@Valid @RequestBody MangaCreate mangaDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mangaService.create(mangaDto));
     }
 
+    @Operation(summary = "Delete a mangá by id")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
