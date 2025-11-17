@@ -1,6 +1,5 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.dto.security.ForgotPasswordRequest;
 import fatecipi.progweb.mymanga.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.dto.security.LoginResponse;
@@ -13,28 +12,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
-@WebMvcTest(LoginController.class)
+@WebMvcTest(
+        controllers = LoginController.class,
+        excludeAutoConfiguration = {SecurityAutoConfiguration.class}
+)
 class LoginControllerTest {
     @Autowired
     private MockMvc mvc;
     @MockitoBean
     private LoginService loginService;
 
-    private Users user;
     private LoginRequest loginRequest;
     private LoginResponse loginResponse;
     private ForgotPasswordRequest forgotPasswordRequest;
@@ -44,19 +43,6 @@ class LoginControllerTest {
     void setUp() {
         RestAssuredMockMvc.mockMvc(mvc);
 
-        user = new Users(
-                1L,
-                "email@email.com",
-                "test123",
-                "Test",
-                "password",
-                Instant.now(),
-                true,
-                null,
-                null,
-                null,
-                null
-        );
         loginRequest = new LoginRequest(
                 "email@email.com",
                 "password"
@@ -87,12 +73,8 @@ class LoginControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(loginRequest)
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
                     .when()
-                    .post("/my-manga/login")
+                    .post("/login")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("expiresIn", equalTo(1800));
@@ -111,12 +93,8 @@ class LoginControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(forgotPasswordRequest)
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
                     .when()
-                    .post("/my-manga/login/forgot-password")
+                    .post("/login/forgot-password")
                     .then()
                     .statusCode(HttpStatus.OK.value());
             verify(loginService, times(1)).requestPasswordReset(forgotPasswordRequest.email());
@@ -134,12 +112,8 @@ class LoginControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(resetPasswordRequest)
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(user.getId().toString())),
-                            csrf()
-                    )
                     .when()
-                    .post("/my-manga/login/reset-password")
+                    .post("/login/reset-password")
                     .then()
                     .statusCode(HttpStatus.OK.value());
             verify(loginService, times(1)).resetPassword(resetPasswordRequest);

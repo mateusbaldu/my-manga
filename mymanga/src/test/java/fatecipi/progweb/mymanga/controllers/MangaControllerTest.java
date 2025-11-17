@@ -126,7 +126,7 @@ class MangaControllerTest {
             RestAssuredMockMvc
                     .given()
                     .when()
-                        .get("my-manga/mangas/{id}", 1L)
+                        .get("/mangas/{id}", 1L)
                     .then()
                         .statusCode(HttpStatus.OK.value())
                         .body("id", equalTo(1))
@@ -146,7 +146,7 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .when().get("/my-manga/mangas/all?page=0&size=10")
+                    .when().get("/mangas/all?page=0&size=10")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("totalElements", equalTo(1))
@@ -169,7 +169,7 @@ class MangaControllerTest {
                     .given()
                     .param("keyword", "Test")
                     .when()
-                    .get("/my-manga/mangas/search")
+                    .get("/mangas/search")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("totalElements", equalTo(1))
@@ -203,7 +203,7 @@ class MangaControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(mangaUpdate)
-                    .when().patch("/my-manga/mangas/{id}", 1L)
+                    .when().patch("/mangas/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("title", equalTo("Test Updated"))
@@ -223,7 +223,7 @@ class MangaControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(mangaCreate)
-                    .when().post("/my-manga/mangas/new")
+                    .when().post("/mangas/new")
                     .then()
                     .statusCode(HttpStatus.CREATED.value())
                     .body("title", equalTo("Test"));
@@ -240,7 +240,7 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .delete("/my-manga/mangas/{id}", 1L)
+                    .delete("/mangas/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
             verify(mangaService, times(1)).deleteMangaById(anyLong());
@@ -259,7 +259,7 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .get("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .get("/mangas/{id}/volumes/{volId}", 1L, 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("id", equalTo(1));
@@ -278,7 +278,7 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .get("/my-manga/mangas/{id}/volumes/all", 1L)
+                    .get("/mangas/{id}/volumes/all", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("totalElements", equalTo(1))
@@ -302,7 +302,7 @@ class MangaControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(createList)
-                    .post("/my-manga/mangas/{id}/volumes/new", 1L)
+                    .post("/mangas/{id}/volumes/new", 1L)
                     .then()
                     .statusCode(HttpStatus.CREATED.value())
                     .body("[0].mangaTitle", equalTo("Test"));
@@ -322,7 +322,7 @@ class MangaControllerTest {
                     .given()
                     .contentType(ContentType.JSON)
                     .body(mangaUpdate)
-                    .patch("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .patch("/mangas/{id}/volumes/{volId}", 1L, 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("mangaTitle", equalTo("Test"));
@@ -340,7 +340,7 @@ class MangaControllerTest {
 
             RestAssuredMockMvc
                     .given()
-                    .delete("/my-manga/mangas/{id}/volumes/{volId}", 1L, 1L)
+                    .delete("/mangas/{id}/volumes/{volId}", 1L, 1L)
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
             verify(mangaService, times(1)).deleteVolumeById(anyLong(), anyLong());

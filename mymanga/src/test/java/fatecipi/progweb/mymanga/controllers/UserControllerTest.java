@@ -99,7 +99,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .post("/my-manga/users/new")
+                    .post("/users/new")
                     .then()
                     .statusCode(HttpStatus.CREATED.value())
                     .body("username", equalTo("test123"));
@@ -122,7 +122,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users")
+                    .get("/users")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("name", equalTo("Test"));
@@ -145,7 +145,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .delete("/my-manga/users/{id}", 1L)
+                    .delete("/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
             verify(userService, times(1)).getUserById(1L);
@@ -164,7 +164,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .delete("/my-manga/users/{id}", 1L)
+                    .delete("/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.FORBIDDEN.value());
             verify(userService, times(1)).getUserById(1L);
@@ -195,7 +195,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .patch("/my-manga/users/{username}", "test123")
+                    .patch("/users/{username}", "test123")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("username", equalTo("test123updated"));
@@ -217,7 +217,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .patch("/my-manga/users/{username}", "test123")
+                    .patch("/users/{username}", "test123")
                     .then()
                     .statusCode(HttpStatus.FORBIDDEN.value());
             verify(userService, times(1)).getUserByUsername("test123");
@@ -240,7 +240,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/activate")
+                    .get("/users/activate")
                     .then()
                     .statusCode(HttpStatus.OK.value());
             verify(userService, times(1)).activateAccount(token);
@@ -261,7 +261,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/{id}", 1L)
+                    .get("/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("username", equalTo("test123"));
@@ -284,7 +284,7 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/all")
+                    .get("/users/all")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("size", equalTo(10))

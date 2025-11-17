@@ -137,7 +137,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .post("/my-manga/orders/new")
+                    .post("/orders/new")
                     .then()
                     .statusCode(HttpStatus.CREATED.value())
                     .body("items[0].mangaTitle", equalTo("Test"));
@@ -163,7 +163,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/orders/{id}", 1L)
+                    .get("/orders/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("items[0].mangaTitle", equalTo("Test"));
@@ -187,7 +187,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/orders/user/{username}", "Test")
+                    .get("/orders/user/{username}", "Test")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("content[0].items[0].mangaTitle", equalTo("Test"));
@@ -214,7 +214,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .put("/my-manga/orders/{id}", 1L)
+                    .put("/orders/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("items[0].mangaTitle", equalTo("Test"));
@@ -237,7 +237,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .put("/my-manga/orders/{id}", 1L)
+                    .put("/orders/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
@@ -262,7 +262,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .put("/my-manga/orders/{id}", 1L)
+                    .put("/orders/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.FORBIDDEN.value());
             verify(orderService, times(1)).getOrderById(1L);
@@ -286,7 +286,7 @@ class OrderControllerTest {
                             jwt().jwt(j -> j.subject(user.getId().toString())),
                             csrf())
                     .when()
-                    .get("/my-manga/orders/confirm")
+                    .get("/orders/confirm")
                     .then()
                     .statusCode(HttpStatus.OK.value());
             verify(orderService, times(1)).confirmOrder(token);
@@ -308,7 +308,7 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/orders/all")
+                    .get("/orders/all")
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("totalElements", equalTo(1))

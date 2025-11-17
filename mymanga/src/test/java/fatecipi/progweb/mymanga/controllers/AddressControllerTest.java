@@ -97,7 +97,7 @@ class AddressControllerTest {
     @Nested
     class addNewAddressToUser {
         @Test
-        @DisplayName("POST /my/manga/users/{username}/address/new - should return a Address Response when everything is ok")
+        @DisplayName("POST /my-manga/users/{username}/address/new - should return a Address Response when everything is ok")
         void addNewAddressToUser_returnAddressResponse_whenEverythingIsOk() {
             doReturn(addressResponse).when(addressService).addNewAddressToUser(anyString(), any(AddressCreate.class));
             doReturn(user).when(userService).getUserByUsername(anyString());
@@ -111,7 +111,7 @@ class AddressControllerTest {
                             csrf()
                     )
                     .when()
-                    .post("/my-manga/users/{username}/address/new", userUsername)
+                    .post("/users/{username}/address/new", userUsername)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("cep", equalTo("01001000"));
@@ -135,7 +135,7 @@ class AddressControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/{username}/address/{addressid}", userUsername, addressId)
+                    .get("/users/{username}/address/{addressid}", userUsername, addressId)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("cep", equalTo("01001000"));
@@ -159,7 +159,7 @@ class AddressControllerTest {
                             csrf()
                     )
                     .when()
-                    .delete("/my-manga/users/{username}/address/{addressid}", userUsername, addressId)
+                    .delete("/users/{username}/address/{addressid}", userUsername, addressId)
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
             verify(addressService, times(1)).deleteAddressById(userUsername, addressId);
@@ -183,7 +183,7 @@ class AddressControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/my-manga/users/{username}/address/all", userUsername)
+                    .get("/users/{username}/address/all", userUsername)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("content[0].cep", equalTo("01001000"))
@@ -210,7 +210,7 @@ class AddressControllerTest {
                             csrf()
                     )
                     .when()
-                    .patch("/my-manga/users/{username}/address/{addressid}", userUsername, addressId)
+                    .patch("/users/{username}/address/{addressid}", userUsername, addressId)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("cep", equalTo("01001000"));
