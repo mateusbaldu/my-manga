@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
+import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.listeners.OrderCreatedEvent;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
@@ -74,7 +76,7 @@ public class OrderService {
         Order order = getOrderById(id);
 
         if (!(order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.WAITING_CONFIRMATION)) {
-            throw new NotAvailableException("Este pedido não pode ser cancelado (Status: " + order.getStatus() + ")");
+            throw new NotAvailableException("This order can't be cancelled (Status: " + order.getStatus() + ")");
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
@@ -105,7 +107,7 @@ public class OrderService {
     @Transactional
     public OrderResponse create(OrderCreate orderDto, Users user) {
         if (!user.isActive()) {
-            throw new BadCredentialsException("A conta do usuário não está ativa");
+            throw new PermissionDeniedException("User account isn't active");
         }
 
         String token = UUID.randomUUID().toString();
@@ -135,14 +137,12 @@ public class OrderService {
     public void confirmOrder(String token) {
         Order order = orderRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired confirmation token"));
-
-        if (order.getStatus() == OrderStatus.WAITING_CONFIRMATION) {
-            order.setStatus(OrderStatus.CONFIRMED);
-            order.setConfirmationToken(null);
-            orderRepository.save(order);
-        } else {
-            throw new IllegalStateException("This order has already been confirmed.");
+        if (!(order.getStatus() == OrderStatus.WAITING_CONFIRMATION)) {
+            throw new NotAvailableException("This order has already been confirmed.");
         }
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setConfirmationToken(null);
+        orderRepository.save(order);
     }
 
     private List<OrderItems> processOrderItems(List<OrderItemsCreate> itemDtos, Order order) {

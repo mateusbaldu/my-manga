@@ -95,7 +95,7 @@ public class UserService {
     @Transactional
     public void activateAccount(String token) {
         Users user = userRepository.findByConfirmationToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Token de ativação inválido."));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid authentication token"));
 
         user.setActive(true);
         user.setConfirmationToken(null);
