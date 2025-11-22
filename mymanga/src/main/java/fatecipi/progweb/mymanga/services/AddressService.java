@@ -27,9 +27,6 @@ public class AddressService {
 
     @Transactional
     public AddressResponse addNewAddressToUser(String username, AddressCreate dto) {
-        if (dto.cep().length() != 8) {
-            throw new IllegalArgumentException("Cep length must be 8");
-        }
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
 

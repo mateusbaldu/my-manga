@@ -5,10 +5,13 @@ import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.dto.security.LoginResponse;
+import fatecipi.progweb.mymanga.listeners.PasswordResetRequestedEvent;
+import fatecipi.progweb.mymanga.listeners.UserEventListener;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class LoginService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final TokenConfig tokenConfig;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
@@ -54,21 +58,7 @@ public class LoginService {
         user.setConfirmationToken(token);
         userRepository.save(user);
 
-        String resetUrl = "http://localhost:4200/reset-password?token=" + token;
-        String subject = "Instruções para Redefinição de Senha - My Mangá";
-        String body = String.format("""
-        Olá %s,
-        
-        Você solicitou a redefinição da sua senha.
-        
-        Por favor, clique no link abaixo para criar uma nova senha:
-        
-        %s
-        
-        (Se você não solicitou isso, pode ignorar este e-mail.)
-        """, user.getName(), resetUrl);
-
-        emailService.sendEmail(user.getEmail(), subject, body);
+        eventPublisher.publishEvent(new PasswordResetRequestedEvent(user));
     }
 
     @Transactional
