@@ -1,15 +1,17 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
+import fatecipi.progweb.mymanga.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.dto.order.OrderItemsCreate;
+import fatecipi.progweb.mymanga.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
 import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.listeners.OrderCreatedEvent;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
-import fatecipi.progweb.mymanga.models.*;
-import fatecipi.progweb.mymanga.dto.order.OrderCreate;
-import fatecipi.progweb.mymanga.dto.order.OrderItemsCreate;
-import fatecipi.progweb.mymanga.dto.order.OrderResponse;
+import fatecipi.progweb.mymanga.models.Order;
+import fatecipi.progweb.mymanga.models.OrderItems;
+import fatecipi.progweb.mymanga.models.Users;
+import fatecipi.progweb.mymanga.models.Volume;
 import fatecipi.progweb.mymanga.models.enums.OrderStatus;
 import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
@@ -18,12 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -94,11 +93,10 @@ public class OrderService {
         orderRepository.flush();
 
         List<OrderItems> newItems = processOrderItems(orderDto.items(), order);
-        BigDecimal finalPrice = calculateFinalPrice(newItems, order.getUsers());
-
         order.getItems().addAll(newItems);
-        order.setFinalPrice(finalPrice);
         order.setPaymentMethod(orderDto.paymentMethod());
+
+        order.calculateFinalPrice();
 
         orderRepository.save(order);
         return orderMapper.toOrderResponse(order);
@@ -121,10 +119,9 @@ public class OrderService {
                 .build();
 
         List<OrderItems> processedItems = processOrderItems(orderDto.items(), newOrder);
-        BigDecimal finalPrice = calculateFinalPrice(processedItems, user);
-
         newOrder.setItems(processedItems);
-        newOrder.setFinalPrice(finalPrice);
+
+        newOrder.calculateFinalPrice();
 
         orderRepository.save(newOrder);
 
@@ -137,7 +134,7 @@ public class OrderService {
     public void confirmOrder(String token) {
         Order order = orderRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired confirmation token"));
-        if (!(order.getStatus() == OrderStatus.WAITING_CONFIRMATION)) {
+        if (order.getStatus() != OrderStatus.WAITING_CONFIRMATION) {
             throw new NotAvailableException("This order has already been confirmed.");
         }
         order.setStatus(OrderStatus.CONFIRMED);
@@ -158,30 +155,18 @@ public class OrderService {
                     volume.setQuantity(volume.getQuantity() - itemDto.quantity());
                     volumeRepository.save(volume);
 
-                    return OrderItems.builder()
+                     OrderItems items = OrderItems.builder()
                             .volumeId(volume.getId())
                             .title(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber())
                             .quantity(itemDto.quantity())
                             .unitPrice(volume.getPrice())
-                            .totalPrice(volume.getPrice().multiply(BigDecimal.valueOf(itemDto.quantity())))
                             .order(order)
                             .build();
+
+                     items.calculateTotalPrice();
+
+                    return items;
                 })
                 .toList();
-    }
-
-    private BigDecimal calculateFinalPrice(List<OrderItems> items, Users user) {
-        BigDecimal totalPrice = items.stream()
-                .map(OrderItems::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        boolean isSubscriber = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equals(Role.Values.SUBSCRIBER.name()));
-
-        if (isSubscriber) {
-            return totalPrice.multiply(new BigDecimal("0.80")).setScale(2, RoundingMode.HALF_UP);
-        }
-
-        return totalPrice;
     }
 }

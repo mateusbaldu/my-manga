@@ -27,4 +27,11 @@ public class OrderItems {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    public void calculateTotalPrice() {
+        this.totalPrice = BigDecimal.ZERO;
+        if (this.unitPrice != null && this.quantity > 0) {
+            this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+        }
+    }
 }

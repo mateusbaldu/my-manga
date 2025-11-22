@@ -41,4 +41,18 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
 
+    public void calculateFinalPrice() {
+        BigDecimal total = this.items.stream()
+                .map(OrderItems::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        this.finalPrice = total;
+
+        boolean isSubscriber = this.users.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("SUBSCRIBER"));
+
+        if (isSubscriber) {
+            this.finalPrice = total.multiply(new BigDecimal("0.80"));
+        }
+    }
 }
