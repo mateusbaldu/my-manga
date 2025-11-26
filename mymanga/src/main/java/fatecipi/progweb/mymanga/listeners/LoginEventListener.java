@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LoginEventListener {
-    private EmailService emailService;
+    private final EmailService emailService;
 
     @EventListener
     public void onResetPasswordRequested(PasswordResetRequestedEvent event) {

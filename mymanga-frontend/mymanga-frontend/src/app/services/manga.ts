@@ -18,10 +18,11 @@ export class Manga {
     return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/all`);
   }
 
-  getMangas(page: number = 0, size: number = 10): Observable<Page<MangaCardResponse>> {
+  getMangas(page: number = 0, size: number = 10, sort: string = 'id,asc'): Observable<Page<MangaCardResponse>> {
     const params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
     
     return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/all`, { params });
   }
@@ -38,11 +39,12 @@ export class Manga {
     return this.http.post<VolumeResponse>(`${this.apiUrl}/${mangaId}/volumes/new`, volumeData);
   }
 
-  searchMangas(keyword: string, page: number = 0, size: number = 10): Observable<Page<MangaCardResponse>> {
+  searchMangas(keyword: string, page: number = 0, size: number = 10, sort: string = 'id,asc'): Observable<Page<MangaCardResponse>> {
     const params = new HttpParams()
       .set('keyword', keyword)
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
     return this.http.get<Page<MangaCardResponse>>(`${this.apiUrl}/search`, { params });
   }

@@ -10,6 +10,8 @@ import { AdminManageMangas } from './pages/admin-panel/pages/admin-manage-mangas
 import { AdminAllOrders } from './pages/admin-panel/pages/admin-all-orders/admin-all-orders';
 import { Cart } from './pages/cart/cart';
 import { Orders } from './pages/orders/orders';
+import { About } from './pages/about/about';
+import { Contact } from './pages/contact/contact';
 import { authGuard } from './guards/auth-guard';
 import { adminGuard } from './guards/admin-guard';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
@@ -68,6 +70,16 @@ export const routes: Routes = [
     path: 'manga/:id',
     component: MangaDetail,
     title: 'Detalhes do Mangá - My Mangá'
+  },
+  {
+    path: 'sobre',
+    component: About,
+    title: 'Sobre - My Mangá'
+  },
+  {
+    path: 'contato',
+    component: Contact,
+    title: 'Contato - My Mangá'
   },
   {
     path: 'admin',

@@ -1,72 +1,71 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-register',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink
-  ],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
+  styleUrl: './register.scss'
 })
-export class Register implements OnInit {
-  registerForm!: FormGroup;
-  isSubmitting = false;
+export class Register {
+  private fb = inject(FormBuilder);
+  private authService = inject(Auth);
+  private router = inject(Router);
+
+  registerForm: FormGroup;
+  loading = false;
   errorMessage = '';
   successMessage = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: Auth,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
+  constructor() {
     this.registerForm = this.fb.group({
-      name: ['', Validators.required],
-      username: ['', [Validators.required, Validators.minLength(5)]],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  // Validador customizado para checar se as senhas batem
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
+
+    // Se as senhas não batem, retorna um erro 'mismatch'
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ mismatch: true }); // Marca o campo confirmPassword com erro
+      return { mismatch: true };
+    }
+    return null;
   }
 
   onSubmit(): void {
     if (this.registerForm.invalid) {
-      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+      this.errorMessage = 'Por favor, corrija os erros no formulário.';
       return;
     }
 
-    this.isSubmitting = true;
+    this.loading = true;
     this.errorMessage = '';
-    this.successMessage = '';
-
-    this.authService.register(this.registerForm.value).subscribe({
-      next: (response: any) => {
-        console.log('Registro bem-sucedido!', response);
-        this.successMessage = 'Cadastro realizado! Verifique seu email para ativar a conta.';
-        this.isSubmitting = false;
-        this.registerForm.reset();
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 3000); // Redireciona para o login após 3s
+    
+    // Prepara os dados (remove o confirmPassword antes de mandar pro backend)
+    const { confirmPassword, ...registerData } = this.registerForm.value;
+    
+    this.authService.register(registerData).subscribe({
+      next: () => {
+        this.successMessage = 'Conta criada com sucesso! Redirecionando para o login...';
+        this.loading = false;
+        setTimeout(() => this.router.navigate(['/login']), 2000);
       },
-      error: (err: any) => {
-        console.error('Erro:', err);
-        if (err.error && err.error.message) {
-          if (err.error.errors && Array.isArray(err.error.errors)) {
-            this.errorMessage = err.error.errors[0].message;
-          } else {
-            this.errorMessage = err.error.message;
-          }
-        } else {
-          this.errorMessage = 'Erro ao realizar cadastro. Tente novamente.';
-        }
-        this.isSubmitting = false;
+      error: (err) => {
+        // O Interceptor já pode ter tratado, mas garantimos a mensagem aqui
+        this.errorMessage = err.error?.message || 'Erro ao criar conta.';
+        this.loading = false;
       }
     });
   }

@@ -43,6 +43,16 @@ export class Cart implements OnInit {
     this.cartItems = this.cartService.getItems();
   }
 
+  diminuir(item: CartItem): void {
+    this.cartService.decreaseItem(item.id);
+    this.cartItems = this.cartService.getItems();
+  }
+
+  aumentar(item: CartItem): void {
+    this.cartService.incrementItem(item.id);
+    this.cartItems = this.cartService.getItems();
+  }
+
   finalizarCompra(): void {
     if (this.cartItems.length === 0) {
       this.errorMessage = 'Seu carrinho está vazio!';

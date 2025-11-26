@@ -26,9 +26,11 @@
                       <h5 class="card-title mb-0">{{ item.mangaTitle }}</h5>
                       <p class="card-text mb-1"><small>Volume {{ item.volumeNumber }}</small></p>
                       <p class="card-text"><strong>{{ item.price | currency:'BRL' }}</strong></p>
-                      @if (item.quantity && item.quantity > 1) {
-                        <p class="text-muted small mb-0">Quantidade: {{ item.quantity }}</p>
-                      }
+                      <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm me-2" (click)="diminuir(item)">-</button>
+                        <span class="me-2">{{ item.quantity }}</span>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="aumentar(item)">+</button>
+                      </div>
                     </div>
                   </div>
 

@@ -25,6 +25,7 @@ export class Home implements OnInit, OnDestroy {
   error = '';
   searchTerm: string = '';
   isSearching: boolean = false;
+  currentSort: string = 'id,asc';
 
   page: number = 0;
   totalPages: number = 0;
@@ -49,7 +50,7 @@ export class Home implements OnInit, OnDestroy {
   carregarMangas(): void {
     this.loading = true;
     this.error = '';
-    this.mangaService.getMangas(this.page, this.pageSize).subscribe({
+    this.mangaService.getMangas(this.page, this.pageSize, this.currentSort).subscribe({
       next: (response: Page<MangaCardResponse>) => {
         this.mangas = response.content;
         this.totalPages = response.totalPages;
@@ -88,7 +89,7 @@ export class Home implements OnInit, OnDestroy {
     this.isSearching = true;
     this.error = '';
     
-    this.mangaService.searchMangas(this.searchTerm, this.page, this.pageSize).subscribe({
+    this.mangaService.searchMangas(this.searchTerm, this.page, this.pageSize, this.currentSort).subscribe({
       next: (response: Page<MangaCardResponse>) => {
         this.mangas = response.content;
         this.totalPages = response.totalPages;
@@ -141,6 +142,21 @@ export class Home implements OnInit, OnDestroy {
     this.isSearching = false;
     this.page = 0;
     this.carregarMangas();
+  }
+
+  ordenarPorNota(): void {
+    // Alterna entre Maior Nota (desc) e Menor Nota (asc) ou Padrão
+    if (this.currentSort === 'rating,desc') {
+      this.currentSort = 'id,asc'; // Volta ao padrão
+    } else {
+      this.currentSort = 'rating,desc'; // Ordena por melhor nota
+    }
+    this.page = 0; // Reset para primeira página
+    if (this.isSearching) {
+      this.searchMangas();
+    } else {
+      this.carregarMangas();
+    }
   }
 
   ngOnDestroy(): void {

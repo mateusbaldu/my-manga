@@ -25,7 +25,6 @@ public class LoginService {
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final EmailService emailService;
     private final TokenConfig tokenConfig;
     private final ApplicationEventPublisher eventPublisher;
 
