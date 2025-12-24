@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.configs.security;
+package fatecipi.progweb.mymanga.configs;
 
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;

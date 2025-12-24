@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.configs.security;
+package fatecipi.progweb.mymanga.configs;
 
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
@@ -11,11 +11,11 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @Component
-public class TokenConfig {
+public class AccessTokenConfig {
     private final JwtEncoder jwtEncoder;
 
 
-    public TokenConfig(JwtEncoder jwtEncoder) {
+    public AccessTokenConfig(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
     }
 

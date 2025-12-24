@@ -1,12 +1,11 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.security.TokenConfig;
+import fatecipi.progweb.mymanga.configs.AccessTokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.dto.security.LoginRequest;
 import fatecipi.progweb.mymanga.dto.security.LoginResponse;
 import fatecipi.progweb.mymanga.listeners.PasswordResetRequestedEvent;
-import fatecipi.progweb.mymanga.listeners.UserEventListener;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.dto.security.ResetPasswordRequest;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
@@ -25,7 +24,7 @@ public class LoginService {
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final TokenConfig tokenConfig;
+    private final AccessTokenConfig accessTokenConfig;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -40,7 +39,7 @@ public class LoginService {
         }
         long expiresIn = 1800L;
 
-        String jwtValue = tokenConfig.generateToken(user);
+        String jwtValue = accessTokenConfig.generateToken(user);
         return new LoginResponse(jwtValue, expiresIn);
     }
 

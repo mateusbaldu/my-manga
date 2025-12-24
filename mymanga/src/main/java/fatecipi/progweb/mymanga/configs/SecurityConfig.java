@@ -1,4 +1,4 @@
-package fatecipi.progweb.mymanga.configs.security;
+package fatecipi.progweb.mymanga.configs;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
