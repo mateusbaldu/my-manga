@@ -1,6 +1,6 @@
 package fatecipi.progweb.mymanga.services;
 
-import fatecipi.progweb.mymanga.configs.security.TokenConfig;
+import fatecipi.progweb.mymanga.configs.AccessTokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Role;
@@ -50,7 +50,7 @@ class LoginServiceTest {
     @Mock
     JwtEncoder jwtEncoder;
     @Mock
-    TokenConfig tokenConfig;
+    AccessTokenConfig accessTokenConfig;
 
     @InjectMocks
     LoginService loginService;
@@ -115,7 +115,7 @@ class LoginServiceTest {
 
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             when(user.isLoginCorrect(loginRequest, passwordEncoder)).thenReturn(true);
-            doReturn(fakeTokenValue).when(tokenConfig).generateToken(any(Users.class));
+            doReturn(fakeTokenValue).when(accessTokenConfig).generateToken(any(Users.class));
 
             var output = loginService.login(loginRequest);
 
