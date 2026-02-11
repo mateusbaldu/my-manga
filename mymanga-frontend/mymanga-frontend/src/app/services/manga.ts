@@ -5,12 +5,13 @@ import { MangaCardResponse } from '../models/manga-card-response.model';
 import { MangaResponse } from '../models/manga-response.model';
 import { VolumeResponse } from '../models/volume-response.model';
 import { Page } from '../models/page.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Manga {
-  private readonly apiUrl = 'http://localhost:8080/my-manga/mangas';
+  private readonly apiUrl = `${environment.apiUrl}/mangas`;
 
   constructor(private http: HttpClient) {}
 

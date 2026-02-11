@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../environments/environment';
 
 interface LoginRequest {
   email: string;
@@ -23,8 +24,8 @@ interface JwtPayload {
   providedIn: 'root',
 })
 export class Auth {
-  private readonly apiUrl = 'http://localhost:8080/my-manga/login';
-  private readonly registerUrl = 'http://localhost:8080/my-manga/users/new';
+  private readonly apiUrl = `${environment.apiUrl}/login`;
+  private readonly registerUrl = `${environment.apiUrl}/users/new`;
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) {}

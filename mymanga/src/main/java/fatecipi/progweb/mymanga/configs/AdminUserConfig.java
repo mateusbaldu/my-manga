@@ -30,7 +30,7 @@ public class AdminUserConfig implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        Role role = roleRepository.findByName(Role.Values.ADMIN.name());
+        Role role = findOrCreateRole(Role.Values.ADMIN);
         Optional<Users> user = userRepository.findByEmail("admin@mymanga.com");
         user.ifPresentOrElse(
                 users -> log.info("admin já existe"),
@@ -46,7 +46,8 @@ public class AdminUserConfig implements CommandLineRunner {
                     users.setCreatedAt(Instant.now());
                     userRepository.save(users);
                 });
-        Role basicRole = roleRepository.findByName(Role.Values.BASIC.name());
+        Role basicRole = findOrCreateRole(Role.Values.BASIC);
+        findOrCreateRole(Role.Values.SUBSCRIBER);
         userRepository.findByEmail("usertest@mymanga.com").ifPresentOrElse(
                 userTest -> log.info("Usuário de teste já existe"),
                 () -> {
@@ -61,5 +62,16 @@ public class AdminUserConfig implements CommandLineRunner {
                     userRepository.save(testUser);
                 }
         );
+    }
+
+    private Role findOrCreateRole(Role.Values roleValue) {
+        Role role = roleRepository.findByName(roleValue.name());
+        if (role == null) {
+            role = new Role();
+            role.setName(roleValue.name());
+            roleRepository.saveAndFlush(role);
+            log.info("Role '{}' criada com sucesso", roleValue.name());
+        }
+        return role;
     }
 }

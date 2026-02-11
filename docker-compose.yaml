@@ -1,0 +1,52 @@
+services:
+  mymanga-postgres:
+    image: postgres:15-alpine
+    container_name: mymanga-postgres-container
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: banco_manga
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mymanga-api:
+    build: ./mymanga
+    container_name: mymanga-api-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mymanga-postgres
+    env_file:
+      - ./mymanga/.env 
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://mymanga-postgres:5432/banco_manga
+      
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: DEBUG
+      SERVER_ERROR_INCLUDE_STACKTRACE: NEVER 
+      
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: never
+      SPRING_JPA_DEFERDATASOURCEINITIALIZATION: true
+
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+
+  frontend:
+    build: ./mymanga-frontend/mymanga-frontend
+    container_name: frontend-app
+    ports:
+      - "4200:80"
+    depends_on:
+      - mymanga-api
+
+volumes:
+  postgres-data:
