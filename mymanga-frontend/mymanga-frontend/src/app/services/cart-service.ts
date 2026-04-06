@@ -8,11 +8,7 @@ import { VolumeResponse } from '../models/volume-response.model';
 })
 export class CartService {
   private items: CartItem[] = [];
-  private readonly STORAGE_KEY = 'cart_items';
-
-  constructor() {
-    this.loadFromStorage();
-  }
+  constructor() {}
 
   addItem(manga: MangaResponse, volume: VolumeResponse): void {
     const existingItem = this.items.find(item => item.id === volume.id);
@@ -33,7 +29,6 @@ export class CartService {
       this.items.push(newItem);
       console.log('Novo item adicionado ao carrinho:', newItem);
     }
-    this.saveToStorage();
   }
 
   getItems(): CartItem[] {
@@ -45,7 +40,6 @@ export class CartService {
     
     if (item && item.quantity < item.maxQuantity) {
       item.quantity++;
-      this.saveToStorage();
     }
   }
 
@@ -58,20 +52,16 @@ export class CartService {
       if (item.quantity === 0) {
         const index = this.items.indexOf(item);
         this.removeItem(index);
-      } else {
-        this.saveToStorage();
       }
     }
   }
 
   removeItem(index: number): void {
     this.items.splice(index, 1);
-    this.saveToStorage();
   }
 
   clearCart(): void {
     this.items = [];
-    this.saveToStorage();
   }
 
   getCartItemCount(): number {
@@ -84,14 +74,4 @@ export class CartService {
     }, 0);
   }
 
-  private saveToStorage(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.items));
-  }
-
-  private loadFromStorage(): void {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    if (stored) {
-      this.items = JSON.parse(stored);
-    }
-  }
 }

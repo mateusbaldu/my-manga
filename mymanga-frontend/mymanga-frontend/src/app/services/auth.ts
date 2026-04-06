@@ -26,7 +26,8 @@ interface JwtPayload {
 export class Auth {
   private readonly apiUrl = `${environment.apiUrl}/login`;
   private readonly registerUrl = `${environment.apiUrl}/users/new`;
-  private readonly TOKEN_KEY = 'auth_token';
+  private token: string | null = null;
+  private tokenExpiresAt: number | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -35,11 +36,12 @@ export class Auth {
     
     return this.http.post<LoginResponse>(this.apiUrl, loginData).pipe(
       tap(response => {
-        if (response.accessToken && response.expiresIn) {
-          localStorage.setItem(this.TOKEN_KEY, response.accessToken);
-          const expiresInMs = response.expiresIn * 1000;
-          const expirationTime = new Date().getTime() + expiresInMs;
-          localStorage.setItem('token_expires_at', JSON.stringify(expirationTime));
+        if (response.accessToken) {
+          this.token = response.accessToken;
+          this.tokenExpiresAt =
+            typeof response.expiresIn === 'number'
+              ? new Date().getTime() + response.expiresIn * 1000
+              : null;
         }
       })
     );
@@ -50,11 +52,12 @@ export class Auth {
   }
 
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    this.token = null;
+    this.tokenExpiresAt = null;
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.token;
   }
 
   isAuthenticated(): boolean {
@@ -63,16 +66,7 @@ export class Auth {
       return false;
     }
     
-    const expirationTimeItem = localStorage.getItem('token_expires_at');
-    if (!expirationTimeItem) {
-      this.logout();
-      return false;
-    }
-    
-    const expirationTime = JSON.parse(expirationTimeItem);
-    const agora = new Date().getTime();
-    
-    if (agora > expirationTime) {
+    if (this.tokenExpiresAt !== null && new Date().getTime() > this.tokenExpiresAt) {
       console.log('Token expirado, deslogando...');
       this.logout(); 
       return false;
