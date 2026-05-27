@@ -52,10 +52,9 @@ public class MangaService {
         return mangaPage.map(mangaMapper::responseMapping);
     }
 
-    @Transactional(readOnly = true)
     public void deleteMangaById(Long id) {
         if(!mangaRepository.existsById(id)) {
-            throw new IllegalArgumentException("Manga with id " + id + " dont exists");
+            throw new ResourceNotFoundException("Manga with id " + id + " dont exists");
         }
         mangaRepository.deleteById(id);
     }

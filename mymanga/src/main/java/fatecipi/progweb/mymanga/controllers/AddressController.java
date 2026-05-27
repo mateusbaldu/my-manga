@@ -32,7 +32,7 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "Address created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "403", description = "User don't have permission to access address from other account")
+            @ApiResponse(responseCode = "403", description = "User doesn't have permission to access address from other account")
     })
     @PostMapping("/{username}/address/new")
     public ResponseEntity<AddressResponse> addNewAddressToUser(@PathVariable("username") String username, @Valid @RequestBody AddressCreate dto, JwtAuthenticationToken token
@@ -45,7 +45,7 @@ public class AddressController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Address found successfully"),
             @ApiResponse(responseCode = "404", description = "User not found / Address not found"),
-            @ApiResponse(responseCode = "403", description = "User don't have permission to access address from other account")
+            @ApiResponse(responseCode = "403", description = "User doesn't have permission to access address from other account")
     })
     @GetMapping("/{username}/address/{addressid}")
     public ResponseEntity<AddressResponse> getAddressById(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, JwtAuthenticationToken token
@@ -58,7 +58,7 @@ public class AddressController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Address deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found / Address not found"),
-            @ApiResponse(responseCode = "403", description = "User don't have permission to access address from other account")
+            @ApiResponse(responseCode = "403", description = "User doesn't have permission to access address from other account")
     })
     @DeleteMapping("/{username}/address/{addressid}")
     public ResponseEntity<Void> deleteAddressById(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, JwtAuthenticationToken token
@@ -72,7 +72,7 @@ public class AddressController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Addresses found successfully"),
             @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "403", description = "User don't have permission to access address from other account")
+            @ApiResponse(responseCode = "403", description = "User doesn't have permission to access address from other account")
     })
     @GetMapping("/{username}/address/all")
     public ResponseEntity<Page<AddressResponse>> getAllAddressesFromUser(@PathVariable("username") String username, Pageable pageable, JwtAuthenticationToken token
@@ -86,7 +86,7 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "Address updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "User not found / Address not found"),
-            @ApiResponse(responseCode = "403", description = "User don't have permission to access address from other account")
+            @ApiResponse(responseCode = "403", description = "User doesn't have permission to access address from other account")
     })
     @PatchMapping("/{username}/address/{addressid}")
     public ResponseEntity<AddressResponse> updateAddress(@PathVariable("username") String username, @PathVariable("addressid") Long addressid, @Valid @RequestBody AddressUpdate update, JwtAuthenticationToken token) {
@@ -98,7 +98,7 @@ public class AddressController {
     private void verifyUserPermission(String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new PermissionDeniedException("User don't have permission to access the address by other account");
+            throw new PermissionDeniedException("User doesn't have permission to access the address by other account");
         }
     }
 }

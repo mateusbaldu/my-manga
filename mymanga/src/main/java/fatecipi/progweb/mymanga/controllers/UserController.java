@@ -42,7 +42,7 @@ public class UserController {
 
     @Operation(summary = "Search a user by username")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found successully"),
+            @ApiResponse(responseCode = "200", description = "User found successfully"),
             @ApiResponse(responseCode = "404", description = "User with username not found")
     })
     @GetMapping
@@ -52,7 +52,7 @@ public class UserController {
 
     @Operation(summary = "Delete a user by user id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "User deleted sucessfully"),
+            @ApiResponse(responseCode = "204", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User with id not found"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
@@ -60,7 +60,7 @@ public class UserController {
     public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
         Users user = userService.getUserById(id);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new PermissionDeniedException("User don't have permission to delete another account");
+            throw new PermissionDeniedException("User doesn't have permission to update another account");
         }
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -77,7 +77,7 @@ public class UserController {
     public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
         Users user = userService.getUserByUsername(username);
         if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new PermissionDeniedException("User don't have permission to delete another account");
+            throw new PermissionDeniedException("User doesn't have permission to delete another account");
         }
         return ResponseEntity.ok(userService.update(userUpdate, username));
     }
@@ -85,7 +85,7 @@ public class UserController {
     @Operation(summary = "activate a user account by a token",
             description = "activate a non-active user account based on a token (random uuid), which is required as a parameter of the request")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account activated sucessfully"),
+            @ApiResponse(responseCode = "200", description = "Account activated successfully"),
             @ApiResponse(responseCode = "404", description = "Invalid activation token")
     })
     @GetMapping("/activate")
