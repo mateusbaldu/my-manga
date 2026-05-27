@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -14,6 +15,9 @@ import java.util.stream.Collectors;
 public class AccessTokenConfig {
     private final JwtEncoder jwtEncoder;
 
+    @Value("${app.jwt.expires-in}")
+    private long expiresIn;
+
 
     public AccessTokenConfig(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
@@ -21,7 +25,6 @@ public class AccessTokenConfig {
 
     public String generateToken(Users user) {
         Instant now = Instant.now();
-        long expiresIn = 1800L;
 
         String scopes = user.getRoles()
                 .stream()

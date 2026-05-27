@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
 @Service
@@ -14,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailService {
     private final JavaMailSender mailSender;
 
-    @Transactional
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
     public void sendEmail(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("storemymanga@gmail.com");
+            message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
