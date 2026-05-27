@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 
 @Log4j2
 @Configuration
@@ -20,6 +21,12 @@ public class AdminUserConfig implements CommandLineRunner {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
+
+    @Value("${app.test-user.password}")
+    private String testUserPassword;
 
     public AdminUserConfig(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -42,7 +49,7 @@ public class AdminUserConfig implements CommandLineRunner {
                     users.setRoles(set);
                     users.setActive(true);
                     users.setUsername("admin");
-                    users.setPassword(passwordEncoder.encode("admin123"));
+                    users.setPassword(passwordEncoder.encode(adminPassword));
                     users.setCreatedAt(Instant.now());
                     userRepository.save(users);
                 });
@@ -57,7 +64,7 @@ public class AdminUserConfig implements CommandLineRunner {
                     testUser.setRoles(Set.of(basicRole));
                     testUser.setActive(true);
                     testUser.setUsername("usertest");
-                    testUser.setPassword(passwordEncoder.encode("teste123"));
+                    testUser.setPassword(passwordEncoder.encode(testUserPassword));
                     testUser.setCreatedAt(Instant.now());
                     userRepository.save(testUser);
                 }
