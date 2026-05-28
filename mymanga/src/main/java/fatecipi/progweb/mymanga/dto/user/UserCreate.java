@@ -1,7 +1,6 @@
 package fatecipi.progweb.mymanga.dto.user;
 
 import fatecipi.progweb.mymanga.validation.ValidUsername;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -11,7 +10,6 @@ public record UserCreate(
         @NotNull(message = "Field can't be null")
         String name,
         @Email(message = "Invalid email")
-        @Column(unique = true)
         @NotNull(message = "Field can't be null")
         String email,
         @ValidUsername(message = "Invalid username")

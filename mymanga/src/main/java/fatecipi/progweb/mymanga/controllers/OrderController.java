@@ -51,7 +51,8 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order with id not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id, JwtAuthenticationToken token) {
+        isUserPermitted(id, token);
         return ResponseEntity.ok(orderService.getOrderResponseById(id));
     }
 
@@ -61,7 +62,13 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "User with username not found")
     })
     @GetMapping("/user/{username}")
-    public ResponseEntity<Page<OrderResponse>> findByUserUsername(@PathVariable String username, Pageable pageable) {
+    public ResponseEntity<Page<OrderResponse>> findByUserUsername(@PathVariable String username, Pageable pageable, JwtAuthenticationToken token) {
+        Users user = userService.getUserById(Long.valueOf(token.getName()));
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
+        if (!user.getUsername().equals(username) && !isAdmin) {
+            throw new PermissionDeniedException("User doesn't have permission to view orders from another account");
+        }
         return ResponseEntity.ok(orderService.findAllByUserUsername(username, pageable));
     }
 
@@ -112,7 +119,7 @@ public class OrderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Order confirmed successfully!"),
             @ApiResponse(responseCode = "404", description = "Invalid or expired confirmation token"),
-            @ApiResponse(responseCode = "400", description = "Order alredy confirmed")
+            @ApiResponse(responseCode = "400", description = "Order already confirmed")
     })
     @GetMapping("/confirm")
     public ResponseEntity<String> confirmOrder(@RequestParam("token") String token) {

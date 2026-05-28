@@ -3,6 +3,7 @@ package fatecipi.progweb.mymanga.controllers;
 import fatecipi.progweb.mymanga.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.dto.manga.MangaCreate;
 import fatecipi.progweb.mymanga.dto.manga.MangaResponse;
+import fatecipi.progweb.mymanga.dto.manga.MangaSearchFilter;
 import fatecipi.progweb.mymanga.dto.manga.MangaUpdate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeResponse;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -142,7 +144,7 @@ class MangaControllerTest {
         @DisplayName("GET /my-manga/mangas/all - should return Page of MangaResponse when everything is ok")
         void listAll_returnPageMangaResponse_WhenEverythingIsOk() {
             Page<MangaCardResponse> page = new PageImpl<>(List.of(mangaCardResponse), PageRequest.of(0,10) , 1);
-            when(mangaService.listAll(any(PageRequest.class))).thenReturn(page);
+            when(mangaService.listAll(any(Pageable.class), any(MangaSearchFilter.class))).thenReturn(page);
 
             RestAssuredMockMvc
                     .given()
@@ -153,7 +155,7 @@ class MangaControllerTest {
                     .body("totalPages", equalTo(1))
                     .body("content[0].id", equalTo(1))
                     .body("content[0].title", equalTo("Test"));
-            verify(mangaService, times(1)).listAll(any(PageRequest.class));
+            verify(mangaService, times(1)).listAll(any(Pageable.class), any(MangaSearchFilter.class));
         }
     }
 
@@ -163,7 +165,7 @@ class MangaControllerTest {
         @DisplayName("GET /my-manga/mangas/{keyword} - should return Page of MangaResponse when everything is ok")
         void listByKeyword_returnPageMangaResponse_WhenEverythingIsOk() {
             Page<MangaResponse> page = new PageImpl<>(List.of(mangaResponse), PageRequest.of(0,10) , 1);
-            when(mangaService.findByKeyword(anyString(), any(PageRequest.class))).thenReturn(page);
+            when(mangaService.findByKeyword(anyString(), any(Pageable.class))).thenReturn(page);
 
             RestAssuredMockMvc
                     .given()
@@ -176,7 +178,7 @@ class MangaControllerTest {
                     .body("totalPages", equalTo(1))
                     .body("content[0].id", equalTo(1))
                     .body("content[0].title", equalTo("Test"));
-            verify(mangaService, times(1)).findByKeyword(eq("Test"), any(PageRequest.class));
+            verify(mangaService, times(1)).findByKeyword(eq("Test"), any(Pageable.class));
         }
     }
 

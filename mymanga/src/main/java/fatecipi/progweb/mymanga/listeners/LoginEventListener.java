@@ -5,17 +5,21 @@ import fatecipi.progweb.mymanga.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 @Component
 @RequiredArgsConstructor
 public class LoginEventListener {
     private final EmailService emailService;
 
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     @EventListener
     public void onResetPasswordRequested(PasswordResetRequestedEvent event) {
         Users user = event.user();
 
-        String resetUrl = "http://localhost:4200/reset-password?token=" + user.getConfirmationToken();
+        String resetUrl = frontendUrl + "/reset-password?token=" + user.getConfirmationToken();
         String subject = "Instruções para Redefinição de Senha - My Mangá";
         String body = String.format("""
         Olá %s,

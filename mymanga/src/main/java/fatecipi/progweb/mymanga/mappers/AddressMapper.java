@@ -11,5 +11,5 @@ public interface AddressMapper {
     AddressResponse toAddressResponse(Address address);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateMapping(AddressUpdate addressUpdate, @MappingTarget Address address);
+        void updateMapping(AddressUpdate addressUpdate, @MappingTarget Address address);
 }

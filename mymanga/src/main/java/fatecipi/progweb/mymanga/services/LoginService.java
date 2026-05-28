@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.UUID;
 
@@ -27,6 +28,9 @@ public class LoginService {
     private final AccessTokenConfig accessTokenConfig;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Value("${app.jwt.expires-in}")
+    private long expiresIn;
+
     @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
@@ -37,7 +41,6 @@ public class LoginService {
         if (!user.isActive()) {
             throw new InvalidLoginException("User account is not active");
         }
-        long expiresIn = 1800L;
 
         String jwtValue = accessTokenConfig.generateToken(user);
         return new LoginResponse(jwtValue, expiresIn);

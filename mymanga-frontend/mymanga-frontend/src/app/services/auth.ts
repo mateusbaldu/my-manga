@@ -51,6 +51,7 @@ export class Auth {
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem('token_expires_at');
   }
 
   getToken(): string | null {
