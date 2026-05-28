@@ -1,9 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.dto.manga.MangaCardResponse;
-import fatecipi.progweb.mymanga.dto.manga.MangaCreate;
-import fatecipi.progweb.mymanga.dto.manga.MangaResponse;
-import fatecipi.progweb.mymanga.dto.manga.MangaUpdate;
+import fatecipi.progweb.mymanga.dto.manga.*;
 import fatecipi.progweb.mymanga.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.dto.volume.VolumeUpdate;
@@ -45,8 +42,10 @@ public class MangaController {
             @ApiResponse(responseCode = "200", description = "Mangás found successfully")
     })
     @GetMapping("/all")
-    public ResponseEntity<Page<MangaCardResponse>> listAll(Pageable pageable) {
-        return ResponseEntity.ok(mangaService.listAll(pageable));
+    public ResponseEntity<Page<MangaCardResponse>> listAll(
+            Pageable pageable, MangaSearchFilter filter
+    ) {
+        return ResponseEntity.ok(mangaService.listAll(pageable, filter));
     }
 
     @Operation(summary = "Search a mangá by keyword")

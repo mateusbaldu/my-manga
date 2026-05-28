@@ -1,20 +1,18 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.dto.manga.*;
 import fatecipi.progweb.mymanga.mappers.MangaMapper;
 import fatecipi.progweb.mymanga.mappers.VolumeMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Manga;
 import fatecipi.progweb.mymanga.models.Volume;
-import fatecipi.progweb.mymanga.dto.manga.MangaCardResponse;
-import fatecipi.progweb.mymanga.dto.manga.MangaCreate;
-import fatecipi.progweb.mymanga.dto.manga.MangaResponse;
-import fatecipi.progweb.mymanga.dto.manga.MangaUpdate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeCreate;
 import fatecipi.progweb.mymanga.dto.volume.VolumeResponse;
 import fatecipi.progweb.mymanga.dto.volume.VolumeUpdate;
 import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
+import fatecipi.progweb.mymanga.specifications.MangaSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +30,8 @@ public class MangaService {
     private final VolumeMapper volumeMapper;
 
     @Transactional(readOnly = true)
-    public Page<MangaCardResponse> listAll(Pageable pageable)  {
-        return mangaRepository.findAll(pageable).map(mangaMapper::toMangaCardResponse);
+    public Page<MangaCardResponse> listAll(Pageable pageable, MangaSearchFilter filter)  {
+        return mangaRepository.findAll(MangaSpec.filter(filter), pageable).map(mangaMapper::toMangaCardResponse);
     }
 
     @Transactional(readOnly = true)

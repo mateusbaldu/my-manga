@@ -4,6 +4,7 @@ import fatecipi.progweb.mymanga.mappers.MangaMapper;
 import fatecipi.progweb.mymanga.mappers.VolumeMapper;
 import fatecipi.progweb.mymanga.dto.manga.MangaCardResponse;
 import fatecipi.progweb.mymanga.dto.manga.MangaCreate;
+import fatecipi.progweb.mymanga.dto.manga.MangaSearchFilter;
 import fatecipi.progweb.mymanga.dto.manga.MangaUpdate;
 import fatecipi.progweb.mymanga.models.enums.Genres;
 import fatecipi.progweb.mymanga.models.enums.MangaStatus;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -158,18 +160,18 @@ class MangaServiceTest {
         @DisplayName("should return a page of mangaresponse successfully")
         void listAll_returnPageMangaResponse_whenEverythingOk() {
             //Arrange
-            Pageable pageable = Pageable.ofSize(10);
+            Pageable pageable = PageRequest.of(0, 10);
             Page<Manga> page = new PageImpl<>(List.of(manga), pageable, 1);
-            PageRequest pageRequest = PageRequest.of(0, 10);
-            when(mangaRepository.findAll(pageRequest)).thenReturn(page);
+            MangaSearchFilter filter = new MangaSearchFilter(null, null, null, null, null, null);
+            when(mangaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
 
             //Act
-            Page<MangaCardResponse> pageResponse = mangaService.listAll(pageRequest);
+            Page<MangaCardResponse> pageResponse = mangaService.listAll(pageable, filter);
 
             //Assert
             assertNotNull(pageResponse);
             assertEquals(1, pageResponse.getTotalElements());
-            verify(mangaRepository, atLeastOnce()).findAll(pageRequest);
+            verify(mangaRepository, atLeastOnce()).findAll(any(Specification.class), eq(pageable));
         }
     }
 
@@ -196,7 +198,7 @@ class MangaServiceTest {
             when(mangaRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.findMangaById(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.findMangaById(1L));
         }
     }
 
@@ -267,13 +269,13 @@ class MangaServiceTest {
         }
 
         @Test
-        @DisplayName("should throw a IllegalArgumentException when the Mangá is not found")
+        @DisplayName("should throw a ResourceNotFoundException when the Mangá is not found")
         void deleteMangaById_throwIllegalArgumentException_whenTheMangaIsNotFound() {
             //Arrange
             doReturn(false).when(mangaRepository).existsById(anyLong());
 
             //Act & Assert
-            assertThrows(IllegalArgumentException.class, () -> mangaService.deleteMangaById(1L));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.deleteMangaById(1L));
             verify(mangaRepository, atLeastOnce()).existsById(1L);
         }
     }
@@ -467,7 +469,7 @@ class MangaServiceTest {
             doReturn(Optional.empty()).when(volumeRepository).findById(anyLong());
 
             //Act & Assert
-            assertThrows(ResourceNotFoundException.class, () -> mangaService.getVolumeById(anyLong()));
+            assertThrows(ResourceNotFoundException.class, () -> mangaService.getVolumeById(1L));
         }
     }
 
