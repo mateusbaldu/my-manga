@@ -12,6 +12,8 @@ import fatecipi.progweb.mymanga.dto.user.UserUpdate;
 import fatecipi.progweb.mymanga.repositories.RoleRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,17 +54,20 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id "+ id +" not found"));
     }
 
+    @Cacheable(value = "userCache", key = "#id")
     @Transactional(readOnly = true)
     public UserResponse getUserResponseById(Long id) {
         Users user = getUserById(id);
         return userMapper.responseMapping(user);
     }
 
+    @CacheEvict(value = "userCache", key = "#id")
     @Transactional
     public void deleteById(Long id) {
         userRepository.delete(getUserById(id));
     }
 
+    @CacheEvict(value = "userCache", key = "#id")
     @Transactional
     public UserResponse update(UserUpdate dto, String username) {
         Users user = getUserByUsername(username);
