@@ -14,6 +14,8 @@ import fatecipi.progweb.mymanga.repositories.MangaRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import fatecipi.progweb.mymanga.specifications.MangaSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,18 +32,21 @@ public class MangaService {
     private final VolumeMapper volumeMapper;
 
     @Transactional(readOnly = true)
-    public Page<MangaCardResponse> listAll(Pageable pageable, MangaSearchFilter filter)  {
+    public Page<MangaCardResponse> listAll(Pageable pageable, MangaSearchFilter filter) {
         return mangaRepository.findAll(MangaSpec.filter(filter), pageable).map(mangaMapper::toMangaCardResponse);
     }
 
+    @Cacheable(value = "mangaCache", key = "#id")
     @Transactional(readOnly = true)
     public MangaResponse getMangaResponseById(Long id) {
-        Manga m = findMangaById(id);
+        Manga m = mangaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
         return mangaMapper.responseMapping(m);
     }
 
     public Manga findMangaById(Long id) {
-        return mangaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
+        return mangaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
     }
 
     @Transactional(readOnly = true)
@@ -50,16 +55,19 @@ public class MangaService {
         return mangaPage.map(mangaMapper::responseMapping);
     }
 
+    @CacheEvict(value = "mangaCache", key = "#id")
     public void deleteMangaById(Long id) {
-        if(!mangaRepository.existsById(id)) {
+        if (!mangaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Manga with id " + id + " dont exists");
         }
         mangaRepository.deleteById(id);
     }
 
+    @CacheEvict(value = "mangaCache", key = "#id")
     @Transactional
     public MangaResponse update(Long id, MangaUpdate mangaDto) {
-        Manga m = findMangaById(id);
+        Manga m = mangaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
         mangaMapper.updateMapping(mangaDto, m);
         mangaRepository.save(m);
         return mangaMapper.responseMapping(m);
@@ -76,11 +84,12 @@ public class MangaService {
         return mangaMapper.responseMapping(m);
     }
 
-
     @Transactional
     public List<VolumeResponse> addVolumesToManga(Long mangaId, List<VolumeCreate> volDto) {
-        if (volDto.isEmpty()) throw new IllegalArgumentException("The list of volumes cannot be empty.");
-        Manga m = findMangaById(mangaId);
+        if (volDto.isEmpty())
+            throw new IllegalArgumentException("The list of volumes cannot be empty.");
+        Manga m = mangaRepository.findById(mangaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + mangaId + " was not found"));
 
         return volDto.stream()
                 .map(vol -> {
@@ -133,7 +142,8 @@ public class MangaService {
     public Volume getVolumeAssociatedWithManga(Long mangaId, Long volumeId) {
         Volume v = getVolumeById(volumeId);
         if (!mangaId.equals(v.getManga().getId())) {
-            throw new IllegalArgumentException("Volume " + volumeId + " isn't associated with manga with id " + mangaId);
+            throw new IllegalArgumentException(
+                    "Volume " + volumeId + " isn't associated with manga with id " + mangaId);
         }
         return v;
     }

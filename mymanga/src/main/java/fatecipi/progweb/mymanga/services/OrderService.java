@@ -17,6 +17,9 @@ import fatecipi.progweb.mymanga.repositories.OrderRepository;
 import fatecipi.progweb.mymanga.repositories.UserRepository;
 import fatecipi.progweb.mymanga.repositories.VolumeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +45,7 @@ public class OrderService {
         return orderRepository.findAll(pageable).map(orderMapper::toOrderResponse);
     }
 
+    @Cacheable(value = "orderCache", key = "#id")
     @Transactional(readOnly = true)
     public OrderResponse getOrderResponseById(Long id) {
        Order order = getOrderById(id);
@@ -70,6 +74,7 @@ public class OrderService {
         return orderPage.map(orderMapper::toOrderResponse);
     }
 
+    @CacheEvict(value = "orderCache", key = "#id")
     @Transactional
     public void cancelOrder(Long id) {
         Order order = getOrderById(id);
@@ -81,6 +86,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    @CacheEvict(value = "orderCache", key = "#id")
     @Transactional
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = getOrderById(id);
