@@ -91,15 +91,17 @@ public class MangaService {
         Manga m = mangaRepository.findById(mangaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + mangaId + " was not found"));
 
-        return volDto.stream()
+        List<Volume> volumesToSave = volDto.stream()
                 .map(vol -> {
                     Volume volume = new Volume();
                     volumeMapper.createMapping(vol, volume);
                     volume.setManga(m);
-                    Volume savedVolume = volumeRepository.save(volume);
-
-                    return volumeMapper.responseMapping(savedVolume);
+                    return volume;
                 })
+                .toList();
+
+        return volumeRepository.saveAll(volumesToSave).stream()
+                .map(volumeMapper::responseMapping)
                 .toList();
     }
 

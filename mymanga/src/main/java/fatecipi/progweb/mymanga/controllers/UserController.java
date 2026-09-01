@@ -1,7 +1,6 @@
 package fatecipi.progweb.mymanga.controllers;
 
-import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
-import fatecipi.progweb.mymanga.models.Users;
+
 import fatecipi.progweb.mymanga.dto.user.UserCreate;
 import fatecipi.progweb.mymanga.dto.user.UserResponse;
 import fatecipi.progweb.mymanga.dto.user.UserUpdate;
@@ -46,7 +45,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User with username not found")
     })
     @GetMapping
-    public ResponseEntity<UserResponse> getUserByUsername(@RequestParam String username, JwtAuthenticationToken token) {
+    public ResponseEntity<UserResponse> getUserByUsername(@RequestParam String username) {
         return ResponseEntity.ok(userService.getUserResponseByUsername(username));
     }
 
@@ -57,29 +56,23 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id, JwtAuthenticationToken token) {
-        Users user = userService.getUserById(id);
-        if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new PermissionDeniedException("User doesn't have permission to update another account");
-        }
+    @PreAuthorize("#id == authentication.name or hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Update a user from a username and a user update body")
+    @Operation(summary = "Update a user from a user id and a user update body")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found successfully"),
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "404", description = "User with username not found"),
+            @ApiResponse(responseCode = "404", description = "User with id not found"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
-    @PatchMapping("/{username}")
-    public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable String username, JwtAuthenticationToken token) {
-        Users user = userService.getUserByUsername(username);
-        if (!user.getId().equals(Long.valueOf(token.getName()))) {
-            throw new PermissionDeniedException("User doesn't have permission to delete another account");
-        }
-        return ResponseEntity.ok(userService.update(userUpdate, username));
+    @PatchMapping("/{id}")
+    @PreAuthorize("#id == authentication.name or hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdate userUpdate, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.update(userUpdate, id));
     }
 
     @Operation(summary = "activate a user account by a token",

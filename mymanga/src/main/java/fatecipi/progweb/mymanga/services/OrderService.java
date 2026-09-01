@@ -91,12 +91,18 @@ public class OrderService {
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = getOrderById(id);
 
-        order.getItems().forEach(item -> volumeRepository.findById(item.getVolumeId()).ifPresent(volume -> {
-            volume.setQuantity(volume.getQuantity() + item.getQuantity());
-            volumeRepository.save(volume);
-        }));
+        List<Long> existingVolumeIds = order.getItems().stream().map(OrderItems::getVolumeId).toList();
+        java.util.Map<Long, Volume> existingVolumes = volumeRepository.findAllById(existingVolumeIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Volume::getId, v -> v));
+
+        order.getItems().forEach(item -> {
+            Volume volume = existingVolumes.get(item.getVolumeId());
+            if (volume != null) {
+                volume.setQuantity(volume.getQuantity() + item.getQuantity());
+            }
+        });
+        
         order.getItems().clear();
-        orderRepository.flush();
 
         List<OrderItems> newItems = processOrderItems(orderDto.items(), order);
         order.getItems().addAll(newItems);
@@ -149,17 +155,22 @@ public class OrderService {
     }
 
     private List<OrderItems> processOrderItems(List<OrderItemsCreate> itemDtos, Order order) {
+        List<Long> volumeIds = itemDtos.stream().map(OrderItemsCreate::volumeId).toList();
+        java.util.Map<Long, Volume> volumes = volumeRepository.findAllById(volumeIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Volume::getId, v -> v));
+
         return itemDtos.stream()
                 .map(itemDto -> {
-                    Volume volume = volumeRepository.findById(itemDto.volumeId()).orElseThrow(
-                            () -> new ResourceNotFoundException("Volume com id " + itemDto.volumeId() + " não encontrado"));
+                    Volume volume = volumes.get(itemDto.volumeId());
+                    if (volume == null) {
+                        throw new ResourceNotFoundException("Volume com id " + itemDto.volumeId() + " não encontrado");
+                    }
 
                     if (volume.getQuantity() < itemDto.quantity()) {
                         throw new NotAvailableException(volume.getManga().getTitle() + " Vol. " + volume.getVolumeNumber() + " não está disponível na quantidade solicitada.");
                     }
 
                     volume.setQuantity(volume.getQuantity() - itemDto.quantity());
-                    volumeRepository.save(volume);
 
                      OrderItems items = OrderItems.builder()
                             .volumeId(volume.getId())

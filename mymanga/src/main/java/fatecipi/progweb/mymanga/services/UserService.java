@@ -69,8 +69,8 @@ public class UserService {
 
     @CacheEvict(value = "userCache", key = "#id")
     @Transactional
-    public UserResponse update(UserUpdate dto, String username) {
-        Users user = getUserByUsername(username);
+    public UserResponse update(UserUpdate dto, Long id) {
+        Users user = getUserById(id);
         userMapper.updateMapping(dto, user);
         userRepository.save(user);
         return userMapper.responseMapping(user);
@@ -79,7 +79,10 @@ public class UserService {
     @Transactional
     public UserResponse create(UserCreate dto) {
         if(userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new ResourceAlreadyExistsException("User with email"+ dto.email() +" already exists");
+            throw new ResourceAlreadyExistsException("User with email "+ dto.email() +" already exists");
+        }
+        if(userRepository.existsByUsername(dto.username())) {
+            throw new ResourceAlreadyExistsException("User with username "+ dto.username() +" already exists");
         }
         Role role = roleRepository.findByName(Role.Values.BASIC.name());
         Users newUser = new Users();
