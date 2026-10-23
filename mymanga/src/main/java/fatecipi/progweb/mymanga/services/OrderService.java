@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.annotations.Auditable;
 import fatecipi.progweb.mymanga.dto.order.OrderCreate;
+import fatecipi.progweb.mymanga.models.enums.AuditAction;
 import fatecipi.progweb.mymanga.dto.order.OrderItemsCreate;
 import fatecipi.progweb.mymanga.dto.order.OrderResponse;
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
@@ -76,6 +78,7 @@ public class OrderService {
 
     @CacheEvict(value = "orderCache", key = "#id")
     @Transactional
+    @Auditable(action = AuditAction.ORDER_CANCELLED, entityType = "Order")
     public void cancelOrder(Long id) {
         Order order = getOrderById(id);
 
@@ -88,6 +91,7 @@ public class OrderService {
 
     @CacheEvict(value = "orderCache", key = "#id")
     @Transactional
+    @Auditable(action = AuditAction.ORDER_UPDATED, entityType = "Order")
     public OrderResponse update(Long id, OrderCreate orderDto) {
         Order order = getOrderById(id);
 
@@ -115,6 +119,7 @@ public class OrderService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.ORDER_CREATED, entityType = "Order")
     public OrderResponse create(OrderCreate orderDto, Users user) {
         if (!user.isActive()) {
             throw new PermissionDeniedException("User account isn't active");
@@ -143,6 +148,7 @@ public class OrderService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.ORDER_CONFIRMED, entityType = "Order")
     public void confirmOrder(String token) {
         Order order = orderRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired confirmation token"));

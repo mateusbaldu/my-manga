@@ -16,6 +16,8 @@ services:
     container_name: mymanga-api-container
     ports:
       - "8080:8080"
+    volumes:
+      - api-logs:/app/logs
     depends_on:
       - mymanga-postgres
       - redis
@@ -66,3 +68,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  api-logs:

@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.annotations.Auditable;
 import fatecipi.progweb.mymanga.mappers.AddressMapper;
+import fatecipi.progweb.mymanga.models.enums.AuditAction;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.models.Address;
 import fatecipi.progweb.mymanga.models.Users;
@@ -26,6 +28,7 @@ public class AddressService {
     private final AddressMapper addressMapper;
 
     @Transactional
+    @Auditable(action = AuditAction.ADDRESS_CREATED, entityType = "Address")
     public AddressResponse addNewAddressToUser(String username, AddressCreate dto) {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
@@ -64,6 +67,7 @@ public class AddressService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.ADDRESS_DELETED, entityType = "Address")
     public void deleteAddressById(String username, Long addressid) {
         Address a = getAddressAssociatedWithUser(username, addressid);
         addressRepository.delete(a);
@@ -75,6 +79,7 @@ public class AddressService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.ADDRESS_UPDATED, entityType = "Address")
     public AddressResponse updateAddressById(String username, Long addressid, AddressUpdate dto) {
         Address address = getAddressAssociatedWithUser(username, addressid);
         addressMapper.updateMapping(dto, address);
