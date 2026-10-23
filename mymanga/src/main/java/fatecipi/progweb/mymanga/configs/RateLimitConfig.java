@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,12 +19,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimitConfig extends OncePerRequestFilter {
 
     private final Map<String, Bucket> bucketCache = new ConcurrentHashMap<>();
-    private static final Integer NUMBER_OF_TOKENS = 20;
+
+    @Value("${app.rate-limit.tokens:20}")
+    private int numberOfTokens;
+
+    @Value("${app.rate-limit.refill-minutes:1}")
+    private long refillMinutes;
 
     private Bucket createNewBucket() {
         return Bucket.builder()
-                .addLimit(limit -> limit.capacity(NUMBER_OF_TOKENS)
-                        .refillGreedy(NUMBER_OF_TOKENS, Duration.ofMinutes(1)))
+                .addLimit(limit -> limit.capacity(numberOfTokens)
+                        .refillGreedy(numberOfTokens, Duration.ofMinutes(refillMinutes)))
                 .build();
     }
 

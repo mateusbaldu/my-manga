@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -15,7 +16,8 @@ import java.time.Duration;
 
 @Configuration
 public class CacheConfig {
-    private static final Duration TIME_TO_LIVE = Duration.ofMinutes(180);
+    @Value("${app.cache.ttl-minutes:180}")
+    private long ttlMinutes;
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
@@ -31,7 +33,7 @@ public class CacheConfig {
         );
 
         return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(TIME_TO_LIVE)
+                .entryTtl(Duration.ofMinutes(ttlMinutes))
                 .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
