@@ -3,6 +3,7 @@ package fatecipi.progweb.mymanga.services;
 import fatecipi.progweb.mymanga.configs.AccessTokenConfig;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
+import fatecipi.progweb.mymanga.listeners.PasswordResetRequestedEvent;
 import fatecipi.progweb.mymanga.models.Role;
 import fatecipi.progweb.mymanga.models.Users;
 import fatecipi.progweb.mymanga.dto.security.LoginRequest;
@@ -20,6 +21,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -51,6 +53,8 @@ class LoginServiceTest {
     JwtEncoder jwtEncoder;
     @Mock
     AccessTokenConfig accessTokenConfig;
+    @Mock
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     LoginService loginService;
@@ -166,14 +170,14 @@ class LoginServiceTest {
 
             doReturn(Optional.of(user)).when(userRepository).findByEmail(anyString());
             doReturn(user).when(userRepository).save(any(Users.class));
-            doNothing().when(emailService).sendEmail(anyString(), anyString(), anyString());
+            doNothing().when(eventPublisher).publishEvent(any(PasswordResetRequestedEvent.class));
 
             loginService.requestPasswordReset(email);
 
             assertNotNull(user.getConfirmationToken());
             verify(userRepository, times(1)).findByEmail(email);
             verify(userRepository, times(1)).save(user);
-            verify(emailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+            verify(eventPublisher, times(1)).publishEvent(any(PasswordResetRequestedEvent.class));
         }
 
         @Test

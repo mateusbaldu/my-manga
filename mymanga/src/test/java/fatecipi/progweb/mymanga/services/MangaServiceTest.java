@@ -350,14 +350,14 @@ class MangaServiceTest {
 
             doReturn(Optional.of(manga)).when(mangaRepository).findById(mangaId);
             doNothing().when(volumeMapper).createMapping(any(VolumeCreate.class), any(Volume.class));
-            doReturn(volume).when(volumeRepository).save(any(Volume.class));
+            doReturn(List.of(volume)).when(volumeRepository).saveAll(anyList());
             doReturn(volumeResponse).when(volumeMapper).responseMapping(any(Volume.class));
 
             List<VolumeResponse> output = mangaService.addVolumesToManga(mangaId, input);
 
             assertNotNull(output);
             verify(mangaRepository, times(1)).findById(anyLong());
-            verify(volumeRepository, times(1)).save(any());
+            verify(volumeRepository, times(1)).saveAll(anyList());
             verify(volumeMapper, times(1)).createMapping(any(), any());
             verify(volumeMapper, times(1)).responseMapping(any());
             assertEquals(mangaId, output.getFirst().mangaId());

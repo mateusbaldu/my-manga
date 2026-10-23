@@ -239,18 +239,18 @@ class UserServiceTest {
         @Test
         @DisplayName("should return a UserResponse successfully when the user is updated")
         void update_returnUserResponse_whenUserIsUpdated() {
-            String username = "test123";
+            Long id = 1L;
 
-            doReturn(Optional.of(user)).when(userRepository).findByUsername(anyString());
+            doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
             doNothing().when(userMapper).updateMapping(any(UserUpdate.class), any(Users.class));
             doReturn(user).when(userRepository).save(any());
             doReturn(userResponse).when(userMapper).responseMapping(any(Users.class));
 
-            var output = userService.update(userUpdate, username);
+            var output = userService.update(userUpdate, id);
 
             assertNotNull(output);
             assertEquals(user.getName(), output.name());
-            verify(userRepository, times(1)).findByUsername(anyString());
+            verify(userRepository, times(1)).findById(anyLong());
             verify(userMapper, times(1)).updateMapping(userUpdate, user);
             verify(userRepository, times(1)).save(user);
             verify(userMapper, times(1)).responseMapping(user);
@@ -258,12 +258,12 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should throw a ResourceNotFoundException when the User isn't found")
-        void findByUsername_throwResourceNotFoundException_whenUserIsNotFound() {
-            String username = "test123";
+        void findById_throwResourceNotFoundException_whenUserIsNotFound() {
+            Long id = 1L;
 
-            doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());
+            doReturn(Optional.empty()).when(userRepository).findById(anyLong());
 
-            assertThrows(ResourceNotFoundException.class, () -> userService.update(userUpdate, username));
+            assertThrows(ResourceNotFoundException.class, () -> userService.update(userUpdate, id));
         }
     }
 

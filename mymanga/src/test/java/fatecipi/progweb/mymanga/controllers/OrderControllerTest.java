@@ -152,6 +152,8 @@ class OrderControllerTest {
         @DisplayName("GET /my-manga/orders/{id} - should return Order Response" +
                 "when everything is ok")
         void getOrderById_returnOrderResponse_whenEverythingIsOk() {
+            doReturn(order).when(orderService).getOrderById(anyLong());
+            doReturn(user).when(userService).getUserById(anyLong());
             doReturn(orderResponse).when(orderService).getOrderResponseById(anyLong());
 
             RestAssuredMockMvc
@@ -178,6 +180,7 @@ class OrderControllerTest {
                 "when everything is ok")
         void findByUserUsername_returnOrderResponse_whenEverythingIsOk() {
             Page<OrderResponse> pageResponse = new PageImpl<>(List.of(orderResponse), PageRequest.of(0, 10), 1);
+            doReturn(user).when(userService).getUserById(anyLong());
             doReturn(pageResponse).when(orderService).findAllByUserUsername(anyString(), any(Pageable.class));
 
             RestAssuredMockMvc
@@ -187,11 +190,11 @@ class OrderControllerTest {
                             csrf()
                     )
                     .when()
-                    .get("/orders/user/{username}", "Test")
+                    .get("/orders/user/{username}", user.getUsername())
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("content[0].items[0].mangaTitle", equalTo("Test"));
-            verify(orderService, times(1)).findAllByUserUsername(eq("Test"), any(Pageable.class));
+            verify(orderService, times(1)).findAllByUserUsername(eq(user.getUsername()), any(Pageable.class));
         }
     }
 
