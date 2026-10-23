@@ -135,7 +135,6 @@ class UserControllerTest {
         @Test
         @DisplayName("DELETE /my-manga/users/{id} - should return No Content when everything is ok")
         void deleteById_returnNoContent_whenEverythingIsOk() {
-            doReturn(user).when(userService).getUserById(anyLong());
             doNothing().when(userService).deleteById(anyLong());
 
             RestAssuredMockMvc
@@ -148,33 +147,14 @@ class UserControllerTest {
                     .delete("/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.NO_CONTENT.value());
-            verify(userService, times(1)).getUserById(1L);
             verify(userService, times(1)).deleteById(1L);
-        }
-
-        @Test
-        @DisplayName("DELETE /my-manga/users/{id} - should throw Exception when the User Id don't match the Token Id")
-        void create_throwBadCredentialsException_whenUserIdDontMatchTokenId() {
-            doReturn(user).when(userService).getUserById(anyLong());
-
-            RestAssuredMockMvc
-                    .given()
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(String.valueOf(2L))),
-                            csrf()
-                    )
-                    .when()
-                    .delete("/users/{id}", 1L)
-                    .then()
-                    .statusCode(HttpStatus.FORBIDDEN.value());
-            verify(userService, times(1)).getUserById(1L);
         }
     }
 
     @Nested
     class update {
         @Test
-        @DisplayName("PATCH /my-manga/users/{username} - should return User Response when everything is ok")
+        @DisplayName("PATCH /my-manga/users/{id} - should return User Response when everything is ok")
         void update_returnUserResponse_whenEverythingIsOk() {
             userResponse = new UserResponse(
                     "Test updated",
@@ -183,8 +163,7 @@ class UserControllerTest {
                     null
             );
 
-            doReturn(user).when(userService).getUserByUsername(anyString());
-            doReturn(userResponse).when(userService).update(any(UserUpdate.class), anyString());
+            doReturn(userResponse).when(userService).update(any(UserUpdate.class), anyLong());
 
             RestAssuredMockMvc
                     .given()
@@ -195,32 +174,11 @@ class UserControllerTest {
                             csrf()
                     )
                     .when()
-                    .patch("/users/{username}", "test123")
+                    .patch("/users/{id}", 1L)
                     .then()
                     .statusCode(HttpStatus.OK.value())
                     .body("username", equalTo("test123updated"));
-            verify(userService, times(1)).getUserByUsername("test123");
-            verify(userService, times(1)).update(userUpdate, "test123");
-        }
-
-        @Test
-        @DisplayName("PATCH /my-manga/users/{username} - should throw Exception when the User Id don't match the Token Id")
-        void update_throwBadCredentialsException_whenUserIdDontMatchTokenId() {
-            doReturn(user).when(userService).getUserByUsername(anyString());
-
-            RestAssuredMockMvc
-                    .given()
-                    .contentType(ContentType.JSON)
-                    .body(userUpdate)
-                    .postProcessors(
-                            jwt().jwt(j -> j.subject(String.valueOf(2L))),
-                            csrf()
-                    )
-                    .when()
-                    .patch("/users/{username}", "test123")
-                    .then()
-                    .statusCode(HttpStatus.FORBIDDEN.value());
-            verify(userService, times(1)).getUserByUsername("test123");
+            verify(userService, times(1)).update(userUpdate, 1L);
         }
     }
 

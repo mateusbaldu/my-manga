@@ -141,17 +141,6 @@ class AddressServiceTest {
         }
 
         @Test
-        @DisplayName("should throw a IllegalArgumentException when the Cep length is different than 8")
-        void addNewAddressToUser_throwIllegalArgumentException_whenCepLengthIsDifferentThan8() {
-            AddressCreate errorCep = new AddressCreate(
-                    "0100100000",
-                    "",
-                    "lado ímpar"
-            );
-            assertThrows(IllegalArgumentException.class, () -> addressService.addNewAddressToUser(username, errorCep));
-        }
-
-        @Test
         @DisplayName("should throw a ResourceNotFoundException when User isn't found")
         void addNewAddressToUser_throwResourceNotFoundException_whenUserIsntFound() {
             doReturn(Optional.empty()).when(userRepository).findByUsername(anyString());

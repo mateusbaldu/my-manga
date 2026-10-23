@@ -1,0 +1,109 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  backend-tests:
+    name: Backend Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: 'mymanga/pom.xml'
+
+      - name: Run Backend Tests with Maven
+        working-directory: ./mymanga
+        run: |
+          chmod +x ./mvnw
+          ./mvnw test -B
+
+  docker-compose-build:
+    name: Docker Build & Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate temporary RSA keys for JWT
+        run: |
+          mkdir -p mymanga/src/main/resources
+          openssl genpkey -algorithm RSA -out mymanga/src/main/resources/app.key -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -pubout -in mymanga/src/main/resources/app.key -out mymanga/src/main/resources/app.pub
+
+      - name: Create dummy .env files for Docker Compose
+        run: |
+          cat <<EOF > .env
+          DB_USERNAME=postgres
+          DB_PASSWORD=postgres_ci_pass
+          REDIS_PASSWORD=redis_ci_pass
+          MAIL_USERNAME=ci@mymanga.com
+          MAIL_PASSWORD=ci_dummy_mail_pass
+          EOF
+
+          cat <<EOF > mymanga/.env
+          DB_URL=jdbc:postgresql://mymanga-postgres:5432/banco_manga
+          DB_USERNAME=postgres
+          DB_PASSWORD=postgres_ci_pass
+          REDIS_PASSWORD=redis_ci_pass
+          MAIL_USERNAME=ci@mymanga.com
+          MAIL_PASSWORD=ci_dummy_mail_pass
+          TEST_DB_URL=jdbc:h2:mem:testdb
+          TEST_DB_USERNAME=sa
+          TEST_DB_PASSWORD=
+          EOF
+
+      - name: Build and start containers
+        run: docker compose up -d --build
+
+      - name: Wait for Frontend and Backend API to be healthy
+        run: |
+          echo "Waiting for Frontend (http://localhost:4200)..."
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4200 > /dev/null; then
+              echo "Frontend is up!"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Frontend failed to respond in time."
+              exit 1
+            fi
+            sleep 2
+          done
+
+          echo "Waiting for Backend API (http://localhost:8080/my-manga/mangas/all)..."
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/my-manga/mangas/all > /dev/null; then
+              echo "Backend API is up and responding!"
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "Backend API failed to respond in time."
+              exit 1
+            fi
+            sleep 3
+          done
+
+      - name: Dump Docker logs on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs
+
+      - name: Stop and remove containers
+        if: always()
+        run: docker compose down -v

@@ -1,6 +1,7 @@
 package fatecipi.progweb.mymanga.services;
 
 import fatecipi.progweb.mymanga.exceptions.NotAvailableException;
+import fatecipi.progweb.mymanga.exceptions.PermissionDeniedException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.listeners.OrderCreatedEvent;
 import fatecipi.progweb.mymanga.mappers.OrderMapper;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.BadCredentialsException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -253,8 +253,7 @@ class OrderServiceTest {
         @Test
         @DisplayName("should return a OrderResponse when everything is ok")
         void create_returnOrderResponse_whenEverythingIsOk() {
-            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
-            doReturn(volume).when(volumeRepository).save(any(Volume.class));
+            doReturn(List.of(volume)).when(volumeRepository).findAllById(anyIterable());
             doReturn(order).when(orderRepository).save(any(Order.class));
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
             doNothing().when(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
@@ -264,9 +263,8 @@ class OrderServiceTest {
             assertNotNull(output);
             assertEquals(orderCreate.paymentMethod(), output.paymentMethod());
             verify(orderRepository, times(1)).save(any(Order.class));
-            verify(volumeRepository, times(1)).save(any(Volume.class));
             verify(orderMapper, times(1)).toOrderResponse(any(Order.class));
-            verify(volumeRepository, times(1)).findById(1L);
+            verify(volumeRepository, times(1)).findAllById(anyIterable());
         }
 
         @Test
@@ -293,17 +291,17 @@ class OrderServiceTest {
                     orderItemsCreateList
             );
 
-            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
+            doReturn(List.of(volume)).when(volumeRepository).findAllById(anyIterable());
 
             assertThrows(NotAvailableException.class, () -> orderService.create(orderCreate, user));
         }
 
         @Test
-        @DisplayName("should throw BadCredentialsException when the User isn't active")
-        void create_throwBadCredentialsException_whenUserIsNotActive() {
+        @DisplayName("should throw PermissionDeniedException when the User isn't active")
+        void create_throwPermissionDeniedException_whenUserIsNotActive() {
             user.setActive(false);
 
-            assertThrows(BadCredentialsException.class, () -> orderService.create(orderCreate, user));
+            assertThrows(PermissionDeniedException.class, () -> orderService.create(orderCreate, user));
         }
     }
 
@@ -333,14 +331,14 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("should throw IllegalStateException when the OrderStatus isn't WAITING_CONFIRMATION")
-        void confirmOrder_throwIllegalStateException_whenOrderStatusIsnotWAITING_CONFIRMATION() {
+        @DisplayName("should throw NotAvailableException when the OrderStatus isn't WAITING_CONFIRMATION")
+        void confirmOrder_throwNotAvailableException_whenOrderStatusIsnotWAITING_CONFIRMATION() {
             String token = UUID.randomUUID().toString();
             order.setStatus(OrderStatus.CONFIRMED);
 
             doReturn(Optional.of(order)).when(orderRepository).findByConfirmationToken(anyString());
 
-            assertThrows(IllegalStateException.class, () -> orderService.confirmOrder(token));
+            assertThrows(NotAvailableException.class, () -> orderService.confirmOrder(token));
         }
     }
 
@@ -354,8 +352,7 @@ class OrderServiceTest {
             order.setItems(items);
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
-            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
-            doReturn(volume).when(volumeRepository).save(any(Volume.class));
+            doReturn(List.of(volume)).when(volumeRepository).findAllById(anyIterable());
             doReturn(order).when(orderRepository).save(any(Order.class));
             doReturn(orderResponse).when(orderMapper).toOrderResponse(any(Order.class));
 
@@ -365,9 +362,8 @@ class OrderServiceTest {
             assertEquals(orderCreate.paymentMethod(), output.paymentMethod());
             verify(orderRepository, times(1)).findById(1L);
             verify(orderRepository, times(1)).save(any(Order.class));
-            verify(volumeRepository, times(2)).save(any(Volume.class));
             verify(orderMapper, times(1)).toOrderResponse(any(Order.class));
-            verify(volumeRepository, times(2)).findById(1L);
+            verify(volumeRepository, times(2)).findAllById(anyIterable());
         }
 
         @Test
@@ -380,7 +376,7 @@ class OrderServiceTest {
             );
 
             doReturn(Optional.of(order)).when(orderRepository).findById(anyLong());
-            doReturn(Optional.of(volume)).when(volumeRepository).findById(anyLong());
+            doReturn(List.of(volume)).when(volumeRepository).findAllById(anyIterable());
 
             assertThrows(NotAvailableException.class, () -> orderService.update(1L, wrongItemsOrder));
         }
