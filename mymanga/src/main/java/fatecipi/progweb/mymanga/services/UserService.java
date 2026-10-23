@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.annotations.Auditable;
 import fatecipi.progweb.mymanga.listeners.UserRegisteredEvent;
+import fatecipi.progweb.mymanga.models.enums.AuditAction;
 import fatecipi.progweb.mymanga.mappers.UserMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
@@ -63,12 +65,14 @@ public class UserService {
 
     @CacheEvict(value = "userCache", key = "#id")
     @Transactional
+    @Auditable(action = AuditAction.USER_DELETED, entityType = "Users")
     public void deleteById(Long id) {
         userRepository.delete(getUserById(id));
     }
 
     @CacheEvict(value = "userCache", key = "#id")
     @Transactional
+    @Auditable(action = AuditAction.USER_UPDATED, entityType = "Users")
     public UserResponse update(UserUpdate dto, Long id) {
         Users user = getUserById(id);
         userMapper.updateMapping(dto, user);
@@ -77,6 +81,7 @@ public class UserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.USER_CREATED, entityType = "Users")
     public UserResponse create(UserCreate dto) {
         if(userRepository.findByEmail(dto.email()).isPresent()) {
             throw new ResourceAlreadyExistsException("User with email "+ dto.email() +" already exists");
@@ -101,6 +106,7 @@ public class UserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.USER_ACTIVATED, entityType = "Users")
     public void activateAccount(String token) {
         Users user = userRepository.findByConfirmationToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid authentication token"));

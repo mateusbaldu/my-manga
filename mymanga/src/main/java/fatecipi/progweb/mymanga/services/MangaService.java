@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.annotations.Auditable;
 import fatecipi.progweb.mymanga.dto.manga.*;
+import fatecipi.progweb.mymanga.models.enums.AuditAction;
 import fatecipi.progweb.mymanga.mappers.MangaMapper;
 import fatecipi.progweb.mymanga.mappers.VolumeMapper;
 import fatecipi.progweb.mymanga.exceptions.ResourceAlreadyExistsException;
@@ -56,6 +58,7 @@ public class MangaService {
     }
 
     @CacheEvict(value = "mangaCache", key = "#id")
+    @Auditable(action = AuditAction.MANGA_DELETED, entityType = "Manga")
     public void deleteMangaById(Long id) {
         if (!mangaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Manga with id " + id + " dont exists");
@@ -65,6 +68,7 @@ public class MangaService {
 
     @CacheEvict(value = "mangaCache", key = "#id")
     @Transactional
+    @Auditable(action = AuditAction.MANGA_UPDATED, entityType = "Manga")
     public MangaResponse update(Long id, MangaUpdate mangaDto) {
         Manga m = mangaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Manga with id " + id + " was not found"));
@@ -74,6 +78,7 @@ public class MangaService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.MANGA_CREATED, entityType = "Manga")
     public MangaResponse create(MangaCreate mangaDto) {
         if (mangaRepository.existsByTitle(mangaDto.title())) {
             throw new ResourceAlreadyExistsException(mangaDto.title() + " já existe.");
@@ -85,6 +90,7 @@ public class MangaService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.VOLUMES_ADDED, entityType = "Volume")
     public List<VolumeResponse> addVolumesToManga(Long mangaId, List<VolumeCreate> volDto) {
         if (volDto.isEmpty())
             throw new IllegalArgumentException("The list of volumes cannot be empty.");
@@ -127,6 +133,7 @@ public class MangaService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.VOLUME_UPDATED, entityType = "Volume")
     public VolumeResponse updateVolume(Long mangaId, Long volumeId, VolumeUpdate dto) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeMapper.updateMapping(dto, v);
@@ -136,6 +143,7 @@ public class MangaService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.VOLUME_DELETED, entityType = "Volume")
     public void deleteVolumeById(Long mangaId, Long volumeId) {
         Volume v = getVolumeAssociatedWithManga(mangaId, volumeId);
         volumeRepository.deleteById(v.getId());

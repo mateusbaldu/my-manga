@@ -1,6 +1,8 @@
 package fatecipi.progweb.mymanga.services;
 
+import fatecipi.progweb.mymanga.annotations.Auditable;
 import fatecipi.progweb.mymanga.configs.AccessTokenConfig;
+import fatecipi.progweb.mymanga.models.enums.AuditAction;
 import fatecipi.progweb.mymanga.exceptions.InvalidLoginException;
 import fatecipi.progweb.mymanga.exceptions.ResourceNotFoundException;
 import fatecipi.progweb.mymanga.dto.security.LoginRequest;
@@ -32,6 +34,7 @@ public class LoginService {
     private long expiresIn;
 
     @Transactional
+    @Auditable(action = AuditAction.USER_LOGIN, entityType = "Auth")
     public LoginResponse login(LoginRequest loginRequest) {
         Users user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User with email "+ loginRequest.email() +" not found"));
@@ -47,6 +50,7 @@ public class LoginService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.PASSWORD_RESET_REQUESTED, entityType = "Auth")
     public void requestPasswordReset(String email) {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " not found"));
@@ -63,6 +67,7 @@ public class LoginService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.PASSWORD_RESET_COMPLETED, entityType = "Auth")
     public void resetPassword(ResetPasswordRequest request) {
         Users user = userRepository.findByConfirmationToken(request.token())
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid or expired token."));

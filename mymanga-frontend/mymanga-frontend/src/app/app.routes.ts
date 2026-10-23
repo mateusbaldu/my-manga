@@ -8,6 +8,7 @@ import { MangaDetail } from './pages/manga-detail/manga-detail';
 import { AdminPanel } from './pages/admin-panel/admin-panel';
 import { AdminManageMangas } from './pages/admin-panel/pages/admin-manage-mangas/admin-manage-mangas';
 import { AdminAllOrders } from './pages/admin-panel/pages/admin-all-orders/admin-all-orders';
+import { AdminAuditLogs } from './pages/admin-panel/pages/admin-audit-logs/admin-audit-logs';
 import { Cart } from './pages/cart/cart';
 import { Orders } from './pages/orders/orders';
 import { About } from './pages/about/about';
@@ -29,15 +30,15 @@ export const routes: Routes = [
     title: 'Login - My Mangá'
   },
   {
-  path: 'forgot-password',
-  component: ForgotPassword,
-  title: 'Esqueci a Senha - My Mangá'
-},
-{
-  path: 'reset-password',
-  component: ResetPassword,
-  title: 'Redefinir Senha - My Mangá'
-},
+    path: 'forgot-password',
+    component: ForgotPassword,
+    title: 'Esqueci a Senha - My Mangá'
+  },
+  {
+    path: 'reset-password',
+    component: ResetPassword,
+    title: 'Redefinir Senha - My Mangá'
+  },
   {
     path: 'register',
     component: Register,
@@ -96,6 +97,11 @@ export const routes: Routes = [
         path: 'pedidos',
         component: AdminAllOrders,
         title: 'Gerenciar Pedidos - My Mangá'
+      },
+      {
+        path: 'logs',
+        component: AdminAuditLogs,
+        title: 'Logs do Sistema - My Mangá'
       },
       {
         path: '',
