@@ -18,6 +18,8 @@ public class AccessTokenConfig {
     @Value("${app.jwt.expires-in}")
     private long expiresIn;
 
+    @Value("${app.jwt.issuer:my-mangá.api}")
+    private String issuer;
 
     public AccessTokenConfig(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
@@ -31,7 +33,7 @@ public class AccessTokenConfig {
                 .map(Role::getName)
                 .collect(Collectors.joining(" "));
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("my-mangá.api")
+                .issuer(issuer)
                 .subject(user.getId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresIn))

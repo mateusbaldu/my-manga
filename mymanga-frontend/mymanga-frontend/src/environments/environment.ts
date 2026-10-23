@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080/my-manga'
+  production: true,
+  apiUrl: 'https://mymanga-api.onrender.com/my-manga'
 };
